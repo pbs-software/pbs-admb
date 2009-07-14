@@ -1,0 +1,146 @@
+window name=PBSadmb title="PBS ADMB GUI" #onclose=
+
+#------------------------------------ MENU -------------------------------------
+menu nitems=4 label="Edit"
+	menuitem label=TPL function=doAction action="editADfile(paste(getWinVal()$prefix,`.tpl`,sep=``))"
+	menuitem label=DAT function=doAction action="editADfile(paste(getWinVal()$prefix,`.dat`,sep=``))"
+	menuitem label=PIN function=doAction action="editADfile(paste(getWinVal()$prefix,`.pin`,sep=``))"
+	menuitem label=R   function=doAction action="editADfile(paste(getWinVal()$prefix,`.r`,sep=``))"
+
+menu nitems=7 label="View"
+  menuitem label=LOG function=doAction action="editADfile(paste(getWinVal()$prefix,`.log`,sep=``))"
+  menuitem label=COR function=doAction action="editADfile(paste(getWinVal()$prefix,`.cor`,sep=``))"
+  menuitem label=PAR function=doAction action="editADfile(paste(getWinVal()$prefix,`.par`,sep=``))"
+  menuitem label=REP function=doAction action="editADfile(paste(getWinVal()$prefix,`.rep`,sep=``))"
+  menuitem label=STD function=doAction action="editADfile(paste(getWinVal()$prefix,`.std`,sep=``))"
+  menuitem label=MC.DAT function=doAction action="editADfile(paste(getWinVal()$prefix,`.mc.dat`,sep=``))"
+  menuitem label="*.PLT" function=.win.editPLT
+
+# the Examples menu will be altered by admb()
+menu nitems=0 label="Examples"
+	menuitem label=findExamples
+
+menu nitems=2 label="Package"
+	menuitem label="R Code" func=.win.viewCode action=code
+	# this menuitem will be altered by admb()
+	menuitem label=Window func=doAction action=admbWin.txt
+
+menu nitems=4 label="Help"
+	menu nitems=2 label="Manuals"
+		menuitem label="ADMB Manual" function=openPackageFile action="PBSadmb,/ADMB/docs/Manual-ADMB.pdf"
+		menuitem label="ADMB RE Manual" function=openPackageFile action="PBSadmb,/ADMB/docs/Manual-ADMB-RE.pdf"
+	menu nitems=4 label="Online"
+		menuitem label="ADMB Project" function=openPackageFile action="PBSadmb,/ADMB/docs/ADMB-Project.url"
+		menuitem label="Random Effects in ADMB" function=openPackageFile action="PBSadmb,/ADMB/docs/ADMB-RE.url"
+		menuitem label="ADMB Examples"  function=openPackageFile action="PBSadmb,/ADMB/docs/Examples-ADMB.url"
+		menuitem label="ADMB RE Examples" function=openPackageFile action="PBSadmb,/ADMB/docs/Examples-ADMB-RE.url"
+	menuitem label="User Guide" function=doAction action="openFile(paste(system.file(package=`PBSadmb`),`/doc/PBSadmb-UG.pdf`,sep=``))"
+	menuitem label=About function=doAction action="editADfile(paste(system.file(package=`PBSadmb`),`/DESCRIPTION`,sep=``))"
+
+#----------------------------------- BUTTONS -----------------------------------
+
+grid 5 1 sticky=W
+	grid 1 6 sticky=W
+		label text=Initialize font="bold 11" sticky=W fg=darkgoldenrod
+		label text="           " font="Courier 8"
+		button text=WD func=doAction action="shell(`start explorer.exe /n,/e,.`)"
+		button text="Set WD" func=setwdGUI action="tpl" 
+		button text="Check" func=.win.checkADopts action=check bg=moccasin width=5
+		entry name=chkstat mode=character label="" value="" sticky=W width=4 entrybg=lightgoldenrodyellow
+	grid 1 2 sticky=E
+		entry name=admpath value="C:/Utils/ADMB" label="ADM path:" width=35 mode=character func=setGUIoptions action=admpath
+		button text=">" func=setPathOption action=admpath
+	grid 1 2 sticky=E
+		entry name=gccpath value="" label="GCC path:" width=35 mode=character func=setGUIoptions action=gccpath
+		button text=">" func=setPathOption action=gccpath
+	grid 1 2 sticky=E
+		entry name=editor value="C:/WINDOWS/notepad.exe" label=Editor: width=35 mode=character func=setGUIoptions action=editor
+		button text=">" func=setFileOption action=editor
+	grid 1 5 sticky=E
+		label text="Options: "
+		entry name=optfile value="ADopts.txt" label="" width=15 mode=character action=optfile
+		button text="File to R" func=.win.readADopts  bg=palegoldenrod
+		button text="GUI to R"  func=.win.makeADopts  bg=lightgoldenrod1
+		button text="R to File" func=.win.writeADopts bg=lightgoldenrod2
+
+grid 4 1 sticky="" relief=sunken pady=4
+	grid 1 4 sticky=W
+		label text=Make font="bold 11" sticky=W fg=blue
+		label text="        " font="Courier 8"
+		entry name=prefix mode=character label=Prefix: value=vonb sticky=W width=20
+		button text=">" func=.win.findTPL action=tpl
+	grid 1 8 sticky=E
+		button text="tpl" func=doAction action="editAD(getWinVal()$prefix,c(`.tpl`))" 
+		button text="dat pin" func=doAction action="editAD(getWinVal()$prefix,c(`.dat`,`.pin`))" 
+		button text="cpp log" func=doAction action="editAD(getWinVal()$prefix,c(`.cpp`,`.log`))" 
+		button text="R" func=doAction action="editADfile(paste(getWinVal()$prefix,`.r`,sep=``))"
+		button text=Docs func=doAction action="openFile(paste(getWinVal()$prefix,`.pdf`,sep=``))"
+		label text=" " font="Courier 8"
+		label text="      Make times\nUsr     Sys     Elap" sticky=E
+		label text="" font="Courier 8"
+	grid 1 2 sticky=W
+		grid 2 3 sticky=W
+			label text=Operation: sticky=NW
+			radio name=safe text=Safe value=1 sticky=W
+			radio name=safe text=Optimize value=0 sticky=W
+			label text="Ran Eff:" sticky=NW
+			radio name=raneff text=No   value=0 sticky=W
+			radio name=raneff text=Yes  value=1 sticky=W
+		matrix nrow=3 ncol=3 names=Mtime rowlabels=NULL collabels=NULL width=5 entrybg=grey94 sticky=N
+	grid 1 7
+		button text=Make    func=.win.makeAD  width=7 bg="#b9d7ff"
+		null padx=1 pady=5
+		button text=Convert func=.win.convAD  width=7 bg="#cae1ff"
+		button text=Compile func=.win.compAD  width=7 bg="#d2e6ff"
+		button text=Link    func=.win.linkAD  width=7 bg="#dfeeff"
+		null padx=1
+		button text=Clean   func=.win.cleanAD width=7 bg=aliceblue
+
+grid 4 1 sticky=W
+	grid 1 3 sticky=W
+		label text=Run font="bold 11" sticky=W fg=forestgreen
+		label text="            " font="Courier 8"
+		matrix nrow=1 ncol=3 names=Rtime rowlabels="'Run times'" collabels=NULL width=5 entrybg=grey94
+	grid 2 5  sticky=W
+		label text="Options:" 
+		radio name=runType text=Normal   value=normal mode=character func=.win.showGUIargs selected=T 
+		radio name=runType text=MCMC     value=mcmc   mode=character func=.win.showGUIargs
+		radio name=runType text=Profile  value=lprof  mode=character func=.win.showGUIargs
+		radio name=runType text=Custom   value=custom mode=character func=.win.showGUIargs
+		null
+		check name=logfile text=logfile checked=T sticky=W
+		check name=add text=add checked=T sticky=W
+		check name=verbose text=verbose checked=T sticky=W
+		null
+	grid 1 4 sticky=W
+		label text="MCMC:" 
+		entry name=nsims label=Sims value=10000 sticky=W width=14
+		entry name=nthin label=Thin value=100 sticky=W width=10
+		button text=Run func=.win.run bg=green font="bold 9" width=5
+	grid 1 2  sticky=W
+		entry name=argvec value="" label="AD args" width=33 mode=character entrybg=grey94
+		button text="All args" func=.win.showADargs width=6
+
+grid 3 1 sticky="" relief=sunken pady=2
+	grid 1 3 sticky=W
+		label text=Output font="bold 11" sticky=NW fg=orangered
+		vector length=6 names=toView mode=logical labels="log cor par rep std mc.dat" sticky=NW \
+			values="F F F F F F" vecnames="log cor par rep std mc.dat" action=check func=.win.viewRep 
+		vector length=1 names=pltView mode=logical labels="*.plt" sticky=NW values="F" vecnames="plt" action=check func=.win.viewRep
+	grid 1 6 sticky=E
+		label text=Reports: sticky=NW
+		radio name=allnone text=None value=0 func=.win.viewRep sticky=W action="allnone" selected=TRUE
+		radio name=allnone text=All value=1 func=.win.viewRep sticky=W action="allnone"
+		button text=View func=.win.viewRep action="open"
+		button text=Import func=.win.readRep action="import"
+		button text="Clean WD"  func=cleanAD bg=ghostwhite
+	grid 1 8 sticky=W
+		label text=MCMC sticky=NW
+		button text="Pairs" func=.win.plotMC action="pairs" bg="#ffb3b3"
+		button text="Eggs" func=.win.plotMC action="eggs" bg="#ffe6e6"
+		button text="ACF" func=.win.plotMC action="acf" bg="#ffb3b3"
+		button text="Trace" func=.win.plotMC action="trace" bg="#ffe6e6"
+		button text="Density" func=.win.plotMC action="dens" bg="#ffb3b3"
+		entry name=pthin label=Thin value=1 sticky=W width=4
+		button text=Var func=.chooseCols
+
