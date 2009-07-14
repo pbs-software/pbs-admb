@@ -1,0 +1,4 @@
+window name=PBSadmbLog title="log"
+
+text name=logText height=30 width=80 edit=FALSE scrollbar=TRUE \
+    mode=character

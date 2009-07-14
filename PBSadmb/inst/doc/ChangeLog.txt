@@ -1,0 +1,102 @@
+PBSadmb Changes
+===============
+0.43  2009-07-09  Rowan
+  - Revised 'readRep()': if 'global=TRUE', function places reports in the global environment.
+  - Removed 'doAction()', '.findSquare()', and '.covertSlashes()' as these occur in a CRAN version (2.06) of PBSmodelling.
+
+0.42  2009-02-13  Rowan
+  - Added new function '.convertSlashes()' to convert unix "/" to R's "\\" if OS is windows. 
+  - Revised 'editADfile()' to convert slashes before sending to shell commnd.
+
+0.41  2009-02-12  Rowan
+  - Revised '.win.viewCode()' to see all functions. Also made it generic for any package.
+
+0.40  2009-02-11  Rowan
+  - Added a new function '.doCleanWD()' to clean all potential junk files in cwd.
+  - Revised 'cleanAD()' to used only files if 'prefix' is NULL.
+  - Revised templates 'vonb.tpl' and 'simpleMC.tpl' to report 'mcnames' and 'mcest'.
+  - Revised 'readRep()' to use 'mcnames' and 'mcest' if available.
+  - Changed GUI buttons 'Clean' to 'Clean WD' in the Output section and 'Col' to 'Var'.
+
+0.39  2009-02-10  Rowan
+  - Enabled the code to handle paths with spaces more robustly (probably not perfectly yet).
+  - Added function '.addQuotes()' to add leading and ending escaped double quotes.
+
+0.38  2009-02-06  Rowan
+  - Added subfunction 'stripExt()' to 'admb()' (thank-you Jim Ianelli).
+  - Fixed plot thinning to start from the first point (also reduced size of pairs points).
+  - Fixed colour vector in 'plotMC()'. Also tweaked some settings.
+  - Fixed the importing of '*.mc.dat' to be global using 'readRep()' in place of 'read.table()'.
+  - Added new 'Col' button to the GUI to allow user selection of MCMC fields to plot.
+  - Added new 'WD' button to open explorer to the current working directory.
+
+0.37  2009-02-04  Rowan
+  - Revised ADMB User's Guide (Jon).
+  - Re-organized the GUI (moved some buttons from the Initialize section to the Make section).
+  - Created a new function '.findPrefix()' to replace Anisa's 'findPrefix()'.
+  - Edit menu now edits input files in the current working directory.
+  - Fixed links to viewing and importing '*.plt' files.
+
+0.36  2009-02-03  Rowan
+  - Revised the GUI somewhat.
+  - Added new function 'doAction()' to excute the string expression specified in the 'action' component of a widget.
+  - Added new function 'copyFiles()' to copy system files with specified prefixes and/or suffixes from one location to another.
+  - Revised 'readRep()' to better handle correlation reports.
+  - Added hidden functions '.cleanUp', '.cleanUpAgain', '.win.findClean', '.win.editPLT' to make life easier.
+  - Added a cool User's Guide (Jon).
+
+0.35  2009-01-30  Jon
+  - Extensively revised the examples to illustrate important features,
+    such as a report ready for "readList".
+  - Added r code to make and run some examples and to produce R graphics.
+  - Added pdf files for some examples.
+  - Fixed a bug in "cleanAD" (use "\\.", not "." because "." is a metacharacter).
+  - Added .r and .pdf to the list of files that shouldn't be cleaned.
+
+0.34  2009-01-29 Rowan
+  - Revised 'admb()' to create dynamic menuitems examples.
+  - Revised 'readRep()' to detect PBS-format lists if available.
+  - Revised slightly the GUI
+  - Removed ADMB subdirectories ('examples','pack') as well as various ReadMe files.
+
+0.33  2009-01-28 Rowan
+  - Revised 'checkADopts()' and created a Check button in the GUI.
+  - Added new function '.makeREbat() to make a temporary batch file to handle conversion by 'tpl2rem.exe'.
+
+0.32  2009-01-27 Rowan
+  - Added some more plotting options (trace, density) with option to thin chains.
+  - Revised the GUI (e.g., R code button)
+  - Added new function '.win.viewCode()' to collect the primary functions in a temporary R file.
+
+0.31  2009-01-26 Rowan
+  - Fixed problems with log files (Fournier's executables generate logs that interfere with ours).
+  - Fixed a number of minor bugs in various functions.
+  - Created a new function 'admb()' to start up a GUI.
+  - Fleshed out the function 'checkADopts()'.
+
+0.30  2009-01-23 Jon/Rowan
+  - Transported the new code into the package.
+  - Completely revamped the GUI.
+  - All new functions to work in command files.
+  - Wrapper functions to access main function from a GUI (prefixed with '.win.')
+
+0.22-0.29  2008-12-20 to 2009-01-23 Jon/Rowan
+  - Extensive re-coding of functions and GUI.
+  - Now using the publicly avalaible ADMB.
+
+0.21 2008-12-19  Jon Schnute
+  - new Window description file by Rowan
+  - ADMB updated to the version in "setupADMB_gcc4.2.1_mingw32_03.exe"
+
+0.20 2008-12-18  Jon Schnute
+  - modified and repackaged to contain an open version of ADMB
+  - works with MinGW in Rtools28.exe at
+    http://www.murdoch-sutherland.com/Rtools/
+  - compiler script needs "-Dlinux" for this version
+
+0.1  2008-08-13  Anisa Egeli
+  - Initial prototype for a commercial version of ADMB
+  - Originally produced as version 1.1.5, after a series of 
+    experimental versions
+  - In this log file, the former version 1.1.5 is considered
+    version 0.1.
