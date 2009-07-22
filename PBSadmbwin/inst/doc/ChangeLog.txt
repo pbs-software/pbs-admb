@@ -1,5 +1,8 @@
 PBSadmbwin Changes
 ==================
+0.50.r4  2009-07-22  Rowan
+  - Modified 'cleanAD' to more carefully match potential discard candidates. 
+
 0.50  2009-07-21  Rowan
   - Introduced @variables to window description file.
   - Updated the User's Guide.

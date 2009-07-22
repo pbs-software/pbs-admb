@@ -625,12 +625,13 @@ copyFiles=function(prefix,suffix=NULL,dir0=getwd(),dir1=getwd(),ask=TRUE){
 .addQuotes=function(str){
 	return(paste("\"",str,"\"",sep="")) }
 
-#cleanAD--------------------------------2009-02-11
+#cleanAD--------------------------------2009-07-22
 # Clean files with given prefix.
 #-------------------------------------------JTS/RH
 cleanAD <- function(prefix=NULL) {
-	ofile=findPat(c("admodel.","eigv.","sims","variance","tmp_","fmin.log",
-		"tfile",".tmp",".bak","hessian.bin","hesscheck","diags","dgs2"),list.files(all.files=TRUE,ignore.case=TRUE))
+	ofile=findPat(c("^admodel\\.","^eigv\\.","^sims$","^variance$","^tmp_","^fmin\\.log$",
+		"^tfile$","\\.tmp$","\\.bak$","^hessian\\.bin$","^hesscheck$","^diags$","^dgs2$"),
+		list.files(all.files=TRUE,ignore.case=TRUE))
 	if (is.null(prefix)) {
 		tpl=.findPrefix(".tpl")
 		apat=paste("^",tpl,"\\.",sep="") # all tpls
@@ -646,7 +647,7 @@ cleanAD <- function(prefix=NULL) {
 		if (!isOK) closeWin("cleanWindow") 
 	}
 	else {
-		pfile=list.files(pattern=paste(prefix,"\\.",sep=""),ignore.case=TRUE)
+		pfile=list.files(pattern=paste("^",prefix,"\\.",sep=""),ignore.case=TRUE)
 		if (length(pfile)==0) psuff=NULL
 		else {
 			psuff=substring(pfile,nchar(prefix)+1)

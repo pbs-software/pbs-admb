@@ -6,12 +6,12 @@
 	#userguide_path <- system.file( "doc/PBSadmbwin-UG.pdf", package = "PBSadmbwin" )
 	
 	cat("
-PBS ADMB for Windows 0.50 -- Copyright (C) 2008-09 Fisheries and Oceans Canada
+PBS ADMB for Windows 0.50.r4 -- Copyright (C) 2008-09 Fisheries and Oceans Canada
 
 A complete user guide 'PBSadmbwin-UG.pdf' is located at 
 C:/Apps/R/R291/library/PBSadmbwin/doc/PBSadmbwin-UG.pdf 
 
-Packaged on 2009-07-21
+Packaged on 2009-07-22
 Pacific Biological Station, Nanaimo
 
 Type admb() to start a GUI for operating ADMB.
