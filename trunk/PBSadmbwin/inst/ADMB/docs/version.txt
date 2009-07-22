@@ -1,0 +1,13 @@
+ADMB for gcc (GCC) 4.2.1-sjlj (mingw32-2), as distributed in Rtools28.exe,
+available from http://www.murdoch-sutherland.com/Rtools/.
+
+This version was built by Dave Fournier and repackaged by Jon Schnute.
+
+Install the package by:
+
+1. running the setup program to put the ADMB files in a suitable location;
+2. modifying the file ADMcall.bat in the \bin subdirectory to reflect
+   paths to ADMB and the C/C++ compiler;
+3. copying ADMcall.bat to a directory guaranteed to be on your path.
+
+See "HowTo.txt" in the ADMB\docs directory for detailed information.

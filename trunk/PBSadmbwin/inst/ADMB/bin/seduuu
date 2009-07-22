@@ -1,0 +1,3 @@
+s/memcpy(list,px,sizeof(df1b2_header))/memcpy(list,(df1b2_header*)(px),sizeof(df1b2_header))/
+s/memcpy(list,py,sizeof(df1b2_header))/memcpy(list,(df1b2_header*)(py),sizeof(df1b2_header))/
+s/memcpy(list,pz,sizeof(df1b2_header))/memcpy(list,(df1b2_header*)(pz),sizeof(df1b2_header))/
