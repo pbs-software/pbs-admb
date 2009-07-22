@@ -1,0 +1,6 @@
+/^ *double minb/i\
+\ \  double get_minb(void);\
+\ \  void set_minb(double b);\
+\ \  double get_maxb(void);}\
+\ \  void set_maxb(double b);
+
