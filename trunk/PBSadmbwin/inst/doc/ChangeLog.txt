@@ -1,5 +1,11 @@
 PBSadmbwin Changes
 ==================
+0.50.r6  2009-08-11  Rowan
+  - Modified 'convAD', 'compAD', 'linkAD' to use 'ADMBcmd' via 'parseCmd()'. 
+  - Added new function 'parseCmd' to parde the correct ADMB command line based on an index
+	that describes unique combinations of steps, safe mode, and random effects model.
+  - Added 'ADMBcmd': Jon's database of command lines suitable for ADMB.
+
 0.50.r4  2009-07-22  Rowan
   - Modified 'cleanAD' to more carefully match potential discard candidates. 
 
