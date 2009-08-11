@@ -150,20 +150,18 @@ appendLog <- function(prefix, lines) {
 	appendLog(prefix=prefix,lines=lines) 
 	invisible() }
 
-#convAD---------------------------------2009-02-10
+#convAD---------------------------------2009-08-11
 # Conver TPL file to CPP code.
 #-------------------------------------------JTS/RH
 convAD <- function(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE) {
   adp <- .ADopts$admpath;
-  if (raneff) cmd1 <- "tpl2rem.exe" else cmd1 <- "tpl2cpp.exe";
-  cmd1 = .addQuotes(paste(adp,"/bin/",cmd1,sep=""))
-  cmd2 <- paste(cmd1,prefix,collapse=" ")
-  if (raneff) {.makeREbat(); cmd2=paste("re",prefix,collapse=" ")}  # RE model fix for ADMB_HOME nonsense
+  index=ifelse(raneff,2,1)
+  cmd=parseCmd(prefix,index=index,admpath=adp)
+  if (raneff) {.makeREbat(); cmd=paste("re",prefix,collapse=" ")}  # RE model fix for ADMB_HOME nonsense
   if (logfile & !add) startLog(prefix);
-  if (verbose) cat(cmd2,"\n");
-#browser();return()
-  tplout <- shell(cmd2,intern=TRUE);
-  tplout2 <- c(cmd2,tplout)
+  if (verbose) cat(cmd,"\n");
+  tplout <- system(cmd,intern=TRUE);
+  tplout2 <- c(cmd,tplout)
   if (logfile) appendLog(prefix, tplout2);
   if (verbose) cat(tplout, sep="\n");
   if (raneff) file.remove("re.bat")
@@ -179,23 +177,18 @@ convAD <- function(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE) 
 	setWinVal(list("Mtime[1,1]"=Ttime[1],"Mtime[1,2]"=Ttime[2],"Mtime[1,3]"=Ttime[3]),winName=winName) 
 	invisible(Ttime) }
 
-#compAD---------------------------------2009-02-10
+#compAD---------------------------------2009-08-11
 # Apparently "raneff" doesn't influence the compile stage,
 # but the argument is preserved here for future development.
 #-------------------------------------------JTS/RH
 compAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verbose=TRUE) {
   adp <- .ADopts$admpath;
   gcp <- .ADopts$gccpath;
-  c1 <- .addQuotes(paste(gcp,"/g++",sep=""));
-  c2 <- "-w -g -Dlinux -DUSE_LAPLACE -D__GNUDOS__ -O3 -c -fpermissive -Wno-deprecated";
-  c3s <- paste("-I. -I ",.addQuotes(paste(adp,"/include",sep=""))," ",prefix,".cpp",sep="");
-  c3o <- paste("-DOPT_LIB -I. -I", .addQuotes(paste(adp,"/include",sep=""))," ",prefix,".cpp",sep="");
-  cmds <- .addQuotes(paste(c1,c2,c3s,collapse=" "));
-  cmdo <- .addQuotes(paste(c1,c2,c3o,collapse=" "));
-  if (safe) cmd <- cmds else cmd <- cmdo;
+  index=ifelse(safe,4,3)
+  cmd=parseCmd(prefix,index=index,admpath=adp,gccpath=gcp)
   if (logfile & !add) startLog(prefix);
   if (verbose) cat(cmd,"\n");
-  out1 <- shell(cmd,intern=TRUE);
+  out1 <- system(cmd,intern=TRUE);
   out2 <- c(cmd,out1)
   if (logfile) appendLog(prefix, out2);
   if (verbose) cat(out1, sep="\n");
@@ -210,28 +203,17 @@ compAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verb
 	setWinVal(list("Mtime[2,1]"=Ttime[1],"Mtime[2,2]"=Ttime[2],"Mtime[2,3]"=Ttime[3]),winName=winName) 
 	invisible(Ttime) }
 
-#linkAD---------------------------------2009-02-10
+#linkAD---------------------------------2009-08-11
 # Links binaries into executable
 #-------------------------------------------JTS/RH
 linkAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verbose=TRUE) {
   adp <- .ADopts$admpath;
-  gcp <- .ADopts$gccpath; gcc=.addQuotes(paste(gcp,"/g++",sep=""))
-  c1 <- paste(gcc," -o",prefix,".exe ",prefix,".o",sep="");
-  c2 <- paste("-Xlinker -s -L",.addQuotes(paste(adp,"/lib",sep="")),sep="");
-  # o = optimized, s = safe; n = normal, r = random effects
-  c3on <- "-ldf1b2stub -ladmod -ladt -lado  -ldf1b2stub -lado";
-  c3sn <- "-ldf1b2stub -ladmod -ladt -lads  -ldf1b2stub -lads";
-  c3or <- "-ldf1b2o -ladmod -ladt -lado -ldf1b2o -lado";
-  c3sr <- "-ldf1b2s -ladmod -ladt -lads -ldf1b2s -lads";
-  cmdon <- .addQuotes(paste(c1,c2,c3on,collapse=" "))
-  cmdsn <- .addQuotes(paste(c1,c2,c3sn,collapse=" "))
-  cmdor <- .addQuotes(paste(c1,c2,c3or,collapse=" "))
-  cmdsr <- .addQuotes(paste(c1,c2,c3sr,collapse=" "))
-  if (safe) {if (raneff) cmd <- cmdsr else cmd <- cmdsn}
-  else {if (raneff) cmd <- cmdor else cmd <- cmdon};
+  gcp <- .ADopts$gccpath;
+  index=ifelse(safe&raneff,8,ifelse(!safe&raneff,7,ifelse(safe&!raneff,6,5)))
+  cmd=parseCmd(prefix,index=index,admpath=adp,gccpath=gcp)
   if (logfile & !add) startLog(prefix);
   if (verbose) cat(cmd,"\n");
-  out1 <- shell(cmd,intern=TRUE);
+  out1 <- system(cmd,intern=TRUE);
   out2 <- c(cmd,out1)
   if (logfile) appendLog(prefix, out2);
   if (verbose) cat(out1, sep="\n");
@@ -274,7 +256,7 @@ runAD <- function(prefix, argvec="", logfile=TRUE, add=TRUE, verbose=TRUE) {
 		if (file.exists(p.log)) file.copy(p.log,p.log.log,overwrite=TRUE) }
 	p.cmd <- paste(p.exe, paste(argvec,collapse=" "), sep=" ");
 	p.err <- paste("File",p.exe,"does not exist.\n",sep=" ");
-	if (file.exists(p.exe)) p.out <- shell(p.cmd,intern=TRUE) else p.out <- p.err;
+	if (file.exists(p.exe)) p.out <- system(p.cmd,intern=TRUE) else p.out <- p.err;
 	if (logfile) {
 		if (!add) startLog(prefix)
 		else if (file.exists(p.log.log)) file.copy(p.log.log,p.log,overwrite=TRUE)
@@ -322,9 +304,10 @@ runMC <- function(prefix, nsims=2000, nthin=20, outsuff=".mc.dat",
 #-------------------------------------------JTS/RH
 editADfile <- function(fname) {
   if (!checkADopts(warn=FALSE)) {cat("Invalid options for PBSadmb\n"); stop()}
-  f.edit <- paste("start \"\"",.addQuotes(convSlashes(.ADopts$editor)),.addQuotes(convSlashes(fname)),sep=" ");
+  #f.edit <- paste("start \"\"",.addQuotes(convSlashes(.ADopts$editor)),.addQuotes(convSlashes(fname)),sep=" ");
+  f.edit <- paste(.addQuotes(convSlashes(.ADopts$editor)),.addQuotes(convSlashes(fname)),sep=" ");
   f.err  <- paste("File",fname,"does not exist.\n",sep=" ");
-  if (file.exists(fname)) {shell(f.edit,intern=TRUE); cat(f.edit,"\n"); f.out <- TRUE}
+  if (file.exists(fname)) {system(f.edit,intern=TRUE); cat(f.edit,"\n"); f.out <- TRUE}
   else {cat(f.err); f.out <- FALSE};
   return(f.out); };
 
@@ -347,7 +330,7 @@ showADargs <- function(prefix,ed=TRUE) {
   p.arg <- paste(prefix,".arg", sep="");
   p.err <- paste("File",p.exe,"does not exist.\n",sep=" ");
   p.cmd <- paste(p.exe,"-?",sep=" ");
-  if (file.exists(p.exe)) p.out <- shell(p.cmd,intern=TRUE) else p.out <- p.err;
+  if (file.exists(p.exe)) p.out <- system(p.cmd,intern=TRUE) else p.out <- p.err;
   if (ed) {writeLines(p.out,p.arg); editADfile(p.arg); }
   else {cat(paste(p.out,collapse="\n")); cat(paste(p.arg,collapse="\n")) }
   invisible(p.out) };
@@ -747,4 +730,23 @@ cleanAD <- function(prefix=NULL) {
 	writeLines(code, fname); editADfile(fname)
 	invisible() }
 #------------------------------------.win.viewCode
+
+#parseCmd-------------------------------2009-08-11
+# Parse a command for an ADMB command.
+#-----------------------------------------------RH
+parseCmd = function(prefix, os=.Platform$OS, comp="GCC", index=1,
+     admpath="", gccpath="") {
+	data(ADMBcmd)
+	dat=ADMBcmd; dat$OS=tolower(dat$OS)
+	osdat = dat[dat$OS%in%os & dat$Comp%in%comp,]
+	if(nrow(osdat)==0) stop("No records for specified OS and compiler")
+	idat  = osdat[osdat$Index%in%index,]
+	if(nrow(idat)==0) stop("No records for specified index")
+	cmd=idat$Command[1]
+	cmd=gsub("`","\"",cmd)
+	cmd=gsub("@prefix",prefix,cmd)
+	cmd=gsub("@adHome",admpath,cmd)
+	cmd=gsub("@ccPath",gccpath,cmd)
+	return(cmd) } 
+
 
