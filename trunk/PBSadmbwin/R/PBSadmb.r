@@ -150,6 +150,9 @@ appendLog <- function(prefix, lines) {
 	appendLog(prefix=prefix,lines=lines) 
 	invisible() }
 
+.callSys <- function(...) {
+  if(.Platform$OS.type=="windows") shell(...) else system(...) }
+
 #convAD---------------------------------2009-08-11
 # Conver TPL file to CPP code.
 #-------------------------------------------JTS/RH
@@ -160,7 +163,7 @@ convAD <- function(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE) 
   if (raneff) {.makeREbat(); cmd=paste("re",prefix,collapse=" ")}  # RE model fix for ADMB_HOME nonsense
   if (logfile & !add) startLog(prefix);
   if (verbose) cat(cmd,"\n");
-  tplout <- system(cmd,intern=TRUE);
+  tplout <- .callSys(cmd,intern=TRUE);
   tplout2 <- c(cmd,tplout)
   if (logfile) appendLog(prefix, tplout2);
   if (verbose) cat(tplout, sep="\n");
@@ -188,7 +191,7 @@ compAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verb
   cmd=parseCmd(prefix,index=index,admpath=adp,gccpath=gcp)
   if (logfile & !add) startLog(prefix);
   if (verbose) cat(cmd,"\n");
-  out1 <- system(cmd,intern=TRUE);
+  out1 <- .callSys(cmd,intern=TRUE);
   out2 <- c(cmd,out1)
   if (logfile) appendLog(prefix, out2);
   if (verbose) cat(out1, sep="\n");
@@ -213,7 +216,7 @@ linkAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verb
   cmd=parseCmd(prefix,index=index,admpath=adp,gccpath=gcp)
   if (logfile & !add) startLog(prefix);
   if (verbose) cat(cmd,"\n");
-  out1 <- system(cmd,intern=TRUE);
+  out1 <- .callSys(cmd,intern=TRUE);
   out2 <- c(cmd,out1)
   if (logfile) appendLog(prefix, out2);
   if (verbose) cat(out1, sep="\n");
@@ -256,7 +259,7 @@ runAD <- function(prefix, argvec="", logfile=TRUE, add=TRUE, verbose=TRUE) {
 		if (file.exists(p.log)) file.copy(p.log,p.log.log,overwrite=TRUE) }
 	p.cmd <- paste(p.exe, paste(argvec,collapse=" "), sep=" ");
 	p.err <- paste("File",p.exe,"does not exist.\n",sep=" ");
-	if (file.exists(p.exe)) p.out <- system(p.cmd,intern=TRUE) else p.out <- p.err;
+	if (file.exists(p.exe)) p.out <- .callSys(p.cmd,intern=TRUE) else p.out <- p.err;
 	if (logfile) {
 		if (!add) startLog(prefix)
 		else if (file.exists(p.log.log)) file.copy(p.log.log,p.log,overwrite=TRUE)
@@ -307,7 +310,7 @@ editADfile <- function(fname) {
   #f.edit <- paste("start \"\"",.addQuotes(convSlashes(.ADopts$editor)),.addQuotes(convSlashes(fname)),sep=" ");
   f.edit <- paste(.addQuotes(convSlashes(.ADopts$editor)),.addQuotes(convSlashes(fname)),sep=" ");
   f.err  <- paste("File",fname,"does not exist.\n",sep=" ");
-  if (file.exists(fname)) {system(f.edit,intern=TRUE); cat(f.edit,"\n"); f.out <- TRUE}
+  if (file.exists(fname)) {.callSys(f.edit,intern=TRUE); cat(f.edit,"\n"); f.out <- TRUE}
   else {cat(f.err); f.out <- FALSE};
   return(f.out); };
 
@@ -330,7 +333,7 @@ showADargs <- function(prefix,ed=TRUE) {
   p.arg <- paste(prefix,".arg", sep="");
   p.err <- paste("File",p.exe,"does not exist.\n",sep=" ");
   p.cmd <- paste(p.exe,"-?",sep=" ");
-  if (file.exists(p.exe)) p.out <- system(p.cmd,intern=TRUE) else p.out <- p.err;
+  if (file.exists(p.exe)) p.out <- .callSys(p.cmd,intern=TRUE) else p.out <- p.err;
   if (ed) {writeLines(p.out,p.arg); editADfile(p.arg); }
   else {cat(paste(p.out,collapse="\n")); cat(paste(p.arg,collapse="\n")) }
   invisible(p.out) };
