@@ -81,11 +81,11 @@ grid 4 1 sticky="" relief=sunken pady=4
 	grid 1 2 sticky=W
 		grid 2 3 sticky=W
 			label text=Operation: sticky=NW
-			radio name=safe text=Safe value=1 sticky=W
-			radio name=safe text=Optimize value=0 sticky=W
+			radio name=safe mode=logical value=TRUE  text=Safe sticky=W
+			radio name=safe mode=logical value=FALSE text=Optimize sticky=W
 			label text="Ran Eff:" sticky=NW
-			radio name=raneff text=No   value=0 sticky=W
-			radio name=raneff text=Yes  value=1 sticky=W
+			radio name=raneff mode=logical value=FALSE text=No  sticky=W
+			radio name=raneff mode=logical value=TRUE  text=Yes sticky=W
 		matrix nrow=3 ncol=3 names=Mtime rowlabels=NULL collabels=NULL width=5 entrybg=grey94 sticky=N
 	grid 1 7
 		button text=Make    func=.win.makeAD  width=7 bg="#b9d7ff"

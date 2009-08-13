@@ -1,10 +1,9 @@
 Package: PBSadmbwin
-Version: 0.50.09
-Date: 2009-08-11
+Version: 0.50.11
+Date: 2009-08-13
 Title: PBS ADMB for Windows
 Author: Jon T. Schnute, Rowan Haigh, Anisa Egeli
 Maintainer: Jon T. Schnute <Jon.Schnute@dfo-mpo.gc.ca>
 Depends: R (>= 2.7.0), PBSmodelling (>= 2.06)
 Description: R Support for ADMB (AD Model Builder)
 License: GPL (>=2)
-Packaged: 2009-07-21 23:50:42 UTC; haighr
