@@ -151,9 +151,15 @@ appendLog <- function(prefix, lines) {
 	invisible() }
 
 .callSys <- function(...) {
-  if(.Platform$OS.type=="windows") shell(...) else system(...) }
+	if (.Platform$OS.type=="windows") {
+		dots=list(...)
+		if("edit"%in%names(dots))
+			dots[[1]]=paste("start \"\"",dots[[1]],sep=" ")
+		out=shell(dots) }
+	else out=system(...)
+	invisible(out) }
 
-#convAD---------------------------------2009-08-11
+#convAD---------------------------------2009-08-12
 # Conver TPL file to CPP code.
 #-------------------------------------------JTS/RH
 convAD <- function(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE) {
@@ -163,6 +169,7 @@ convAD <- function(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE) 
   if (raneff) {.makeREbat(); cmd=paste("re",prefix,collapse=" ")}  # RE model fix for ADMB_HOME nonsense
   if (logfile & !add) startLog(prefix);
   if (verbose) cat(cmd,"\n");
+  cmd=.addQuotes(convSlashes(cmd))
   tplout <- .callSys(cmd,intern=TRUE);
   tplout2 <- c(cmd,tplout)
   if (logfile) appendLog(prefix, tplout2);
@@ -180,7 +187,7 @@ convAD <- function(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE) 
 	setWinVal(list("Mtime[1,1]"=Ttime[1],"Mtime[1,2]"=Ttime[2],"Mtime[1,3]"=Ttime[3]),winName=winName) 
 	invisible(Ttime) }
 
-#compAD---------------------------------2009-08-11
+#compAD---------------------------------2009-08-12
 # Apparently "raneff" doesn't influence the compile stage,
 # but the argument is preserved here for future development.
 #-------------------------------------------JTS/RH
@@ -191,6 +198,8 @@ compAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verb
   cmd=parseCmd(prefix,index=index,admpath=adp,gccpath=gcp)
   if (logfile & !add) startLog(prefix);
   if (verbose) cat(cmd,"\n");
+#browser()
+  cmd=.addQuotes(convSlashes(cmd))
   out1 <- .callSys(cmd,intern=TRUE);
   out2 <- c(cmd,out1)
   if (logfile) appendLog(prefix, out2);
@@ -206,7 +215,7 @@ compAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verb
 	setWinVal(list("Mtime[2,1]"=Ttime[1],"Mtime[2,2]"=Ttime[2],"Mtime[2,3]"=Ttime[3]),winName=winName) 
 	invisible(Ttime) }
 
-#linkAD---------------------------------2009-08-11
+#linkAD---------------------------------2009-08-12
 # Links binaries into executable
 #-------------------------------------------JTS/RH
 linkAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verbose=TRUE) {
@@ -216,6 +225,7 @@ linkAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verb
   cmd=parseCmd(prefix,index=index,admpath=adp,gccpath=gcp)
   if (logfile & !add) startLog(prefix);
   if (verbose) cat(cmd,"\n");
+  cmd=.addQuotes(convSlashes(cmd))
   out1 <- .callSys(cmd,intern=TRUE);
   out2 <- c(cmd,out1)
   if (logfile) appendLog(prefix, out2);
@@ -259,6 +269,7 @@ runAD <- function(prefix, argvec="", logfile=TRUE, add=TRUE, verbose=TRUE) {
 		if (file.exists(p.log)) file.copy(p.log,p.log.log,overwrite=TRUE) }
 	p.cmd <- paste(p.exe, paste(argvec,collapse=" "), sep=" ");
 	p.err <- paste("File",p.exe,"does not exist.\n",sep=" ");
+	p.cmd=.addQuotes(convSlashes(p.cmd))
 	if (file.exists(p.exe)) p.out <- .callSys(p.cmd,intern=TRUE) else p.out <- p.err;
 	if (logfile) {
 		if (!add) startLog(prefix)
@@ -310,7 +321,7 @@ editADfile <- function(fname) {
   #f.edit <- paste("start \"\"",.addQuotes(convSlashes(.ADopts$editor)),.addQuotes(convSlashes(fname)),sep=" ");
   f.edit <- paste(.addQuotes(convSlashes(.ADopts$editor)),.addQuotes(convSlashes(fname)),sep=" ");
   f.err  <- paste("File",fname,"does not exist.\n",sep=" ");
-  if (file.exists(fname)) {.callSys(f.edit,intern=TRUE); cat(f.edit,"\n"); f.out <- TRUE}
+  if (file.exists(fname)) {.callSys(edit=f.edit,intern=TRUE); cat(f.edit,"\n"); f.out <- TRUE}
   else {cat(f.err); f.out <- FALSE};
   return(f.out); };
 
@@ -333,7 +344,8 @@ showADargs <- function(prefix,ed=TRUE) {
   p.arg <- paste(prefix,".arg", sep="");
   p.err <- paste("File",p.exe,"does not exist.\n",sep=" ");
   p.cmd <- paste(p.exe,"-?",sep=" ");
-  if (file.exists(p.exe)) p.out <- .callSys(p.cmd,intern=TRUE) else p.out <- p.err;
+  p.cmd=.addQuotes(convSlashes(p.cmd))
+  if (file.exists(p.exe)) p.out <- .callSys(edit=p.cmd,intern=TRUE) else p.out <- p.err;
   if (ed) {writeLines(p.out,p.arg); editADfile(p.arg); }
   else {cat(paste(p.out,collapse="\n")); cat(paste(p.arg,collapse="\n")) }
   invisible(p.out) };
