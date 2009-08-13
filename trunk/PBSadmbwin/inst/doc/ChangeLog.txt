@@ -1,5 +1,9 @@
 PBSadmbwin Changes
 ==================
+0.50.r10  2009-08-12  Rowan
+  - Fiddled with '.callSys' and 'convAD', 'compAD', and 'linkAD' (still not satisfied).
+  - Made slight change to ADMBcmd[7,"Command"]
+
 0.50.r6  2009-08-11  Rowan
   - Modified 'convAD', 'compAD', 'linkAD' to use 'ADMBcmd' via 'parseCmd()'. 
   - Added new function 'parseCmd' to parde the correct ADMB command line based on an index
