@@ -748,8 +748,7 @@ cleanAD <- function(prefix=NULL) {
 #parseCmd-------------------------------2009-08-11
 # Parse a command for an ADMB command.
 #-----------------------------------------------RH
-parseCmd = function(prefix, os=.Platform$OS, comp="GCC", index=1,
-     admpath="", gccpath="") {
+parseCmd = function(prefix, index, os=.Platform$OS, comp="GCC", admpath="", gccpath="") {
 	data(ADMBcmd)
 	dat=ADMBcmd; dat$OS=tolower(dat$OS)
 	osdat = dat[dat$OS%in%os & dat$Comp%in%comp,]

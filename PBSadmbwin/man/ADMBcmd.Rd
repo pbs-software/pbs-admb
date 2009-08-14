@@ -24,7 +24,7 @@
     \item{\code{Comment}}{comment about the command, if any}
   }
 }
-\description{
+\details{
   This database represents a compilation of ADMB scripts for various 
   operating systems and compilers. A user's project normally starts 
   with a template file, named with a prefix to denote the project and 
@@ -36,8 +36,8 @@
   processing step, and two binary options (safe/optimized; 
   normal/random effects). In principle, the three processing steps and 
   two binary options give 3x2x2=12 possibilities. However, conversion 
-  doesn't depend on the "safe/optimized" choice, and compilation 
-  doesn't depend on "normal/random effects". This reduction leaves
+  doesn't depend on the \dQuote{safe/optimized} choice, and compilation 
+  doesn't depend on \dQuote{normal/random effects}. This reduction leaves
   only 8 possibilities, specified by an \code{index} in the range 
   1:8.
   

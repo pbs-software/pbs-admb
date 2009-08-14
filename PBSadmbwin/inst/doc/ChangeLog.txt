@@ -1,5 +1,11 @@
 PBSadmbwin Changes
 ==================
+0.50.r13  2009-08-14  Rowan
+  - Modified function 'parseCmd' so that arguments match those in 'parseCmd.Rd'.
+
+0.50.r12  2009-08-14  Jon
+  - Modified Rd files: 'ADMBcmd', 'parseCmd'.
+
 0.50.r11  2009-08-13  Rowan
   - Added the library files to ADMB/lib (missing for some strange reason).
   - Modified .callSys (need to explicitly state 'intern=TRUE' in calls to 'system' and 'shell'
