@@ -172,7 +172,10 @@ appendLog <- function(prefix, lines) {
 		out=shell(dots,intern=TRUE) }
 	else {
 		cmd <- unlist(list(...))
-	   	out=system(cmd,intern=TRUE,wait=wait)
+		if( wait == FALSE )
+	   		out=system(cmd,wait=FALSE)
+		else
+	   		out=system(cmd,intern=TRUE)
 	}
 	invisible(out) }
 
