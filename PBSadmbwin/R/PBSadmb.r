@@ -34,7 +34,7 @@ admb=function(prefix="",pkg="PBSadmbwin",wdf="admbWin.txt",optfile="ADopts.txt")
 	temp <- gsub("@menuitems",paste(enew,collapse="\n\t"),temp)
 	temp <- gsub("@pkg",pkg,temp)
 	writeLines(temp,con=wtmp)
-	createWin(wtmp) 
+	createWin(wtmp) #TODO use astext=TRUE
 	.win.initAD()
 	invisible() }
 #---------------------------------------------admb
@@ -95,11 +95,25 @@ checkADopts=function(opts=.ADopts, check=c("admpath","gccpath","editor"),
 	sAF=options()$stringsAsFactors; options(stringsAsFactors=FALSE)
 	mess=list()
 	for (i in names(opts)) {
-		if (!any(i==check)) next
+		if (!any(i==check))
+			next
 		ii=ipath=opts[[i]]
-		if (i=="admpath") {ipath=paste(ii,"/bin",sep=""); progs=c("tpl2cpp.exe","tpl2rem.exe") }
-		else if (i=="gccpath") progs="g++.exe" 
-		else if (i=="editor") {ipath=dirname(ii); progs=basename(ii) }
+		if (i=="admpath") {
+			ipath=paste(ii,"/bin",sep="")
+			if( .Platform$OS.type == "windows" )
+				progs=c("tpl2cpp.exe","tpl2rem.exe")
+			else
+				progs=c("tpl2cpp","tpl2rem") #TODO verify these names
+		}
+		else if (i=="gccpath")
+			if( .Platform$OS.type == "windows" )
+				progs="g++.exe" 
+			else
+				progs="g++" 
+		else if (i=="editor") {
+			ipath=dirname(ii)
+			progs=basename(ii)
+		}
 		target=paste(ipath,progs,sep="/")
 		istatus=file.exists(target); names(istatus)=progs
 		mess[[ipath]]=istatus
@@ -166,6 +180,7 @@ convAD <- function(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE) 
   adp <- .ADopts$admpath;
   index=ifelse(raneff,2,1)
   cmd=parseCmd(prefix,index=index,admpath=adp)
+#TODO bat files not portable - what does RE use on unix?
   if (raneff) {.makeREbat(); cmd=paste("re",prefix,collapse=" ")}  # RE model fix for ADMB_HOME nonsense
   if (logfile & !add) startLog(prefix);
   if (verbose) cat(cmd,"\n");
@@ -261,8 +276,12 @@ makeAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, verbose=TRUE) 
 	setWinVal(list("Mtime[3,1]"=Ttime[1],"Mtime[3,2]"=Ttime[2],"Mtime[3,3]"=Ttime[3]),winName=winName) 
 	invisible() }
 
-runAD <- function(prefix, argvec="", logfile=TRUE, add=TRUE, verbose=TRUE) {
-	p.exe <- paste(prefix,".exe",sep="");
+runAD <- function(prefix, argvec="", logfile=TRUE, add=TRUE, verbose=TRUE)
+{
+	if( .Platform$OS.type == "windows" )
+		p.exe <- paste(prefix,".exe",sep="")
+	else
+		p.exe <- prefix #TODO verify
 	if (logfile) {
 		p.log=paste(prefix,".log",sep=""); p.log.log=paste(p.log,".log",sep="")
 		if (file.exists(p.log)) file.copy(p.log,p.log.log,overwrite=TRUE) }
@@ -339,15 +358,19 @@ editAD <- function(prefix, suffix=c(".tpl",".cpp",".log")) {
 	editAD(prefix=pref,suffix=".plt"); invisible() }
 
 showADargs <- function(prefix,ed=TRUE) {
-  p.exe <- paste(prefix,".exe", sep="");
-  p.arg <- paste(prefix,".arg", sep="");
-  p.err <- paste("File",p.exe,"does not exist.\n",sep=" ");
-  p.cmd <- paste(p.exe,"-?",sep=" ");
-  p.cmd=.addQuotes(convSlashes(p.cmd))
-  if (file.exists(p.exe)) p.out <- .callSys(p.cmd) else p.out <- p.err;
-  if (ed) {writeLines(p.out,p.arg); editADfile(p.arg); }
-  else {cat(paste(p.out,collapse="\n")); cat(paste(p.arg,collapse="\n")) }
-  invisible(p.out) };
+	if( .Platform$OS.type == "windows" )
+		p.exe <- paste(prefix,".exe", sep="")
+	else
+		p.exe <- paste("./", prefix, sep="") #TODO verify
+	p.exe <- paste(prefix,".exe", sep="");
+	p.arg <- paste(prefix,".arg", sep="");
+	p.err <- paste("File",p.exe,"does not exist.\n",sep=" ");
+	p.cmd <- paste(p.exe,"-?",sep=" ");
+	p.cmd=.addQuotes(convSlashes(p.cmd))
+	if (file.exists(p.exe)) p.out <- .callSys(p.cmd) else p.out <- p.err;
+	if (ed) {writeLines(p.out,p.arg); editADfile(p.arg); }
+	else {cat(paste(p.out,collapse="\n")); cat(paste(p.arg,collapse="\n")) }
+	invisible(p.out) };
 
 .win.showADargs=function(winName="PBSadmb") {
 	getWinVal(scope="L",winName=winName)
@@ -551,6 +574,7 @@ plotMC=function(prefix,act="pairs",pthin=1,useCols=NULL){
 	if (is.numeric(x)) x=format(x,scientific=FALSE)
 	return(x) }
 
+#TODO how to make this portable?
 .makeREbat=function(opts=.ADopts) {
 	isOK=checkADopts(opts); if (!isOK) return()
 	unpackList(opts)
