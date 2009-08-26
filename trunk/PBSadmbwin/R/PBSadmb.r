@@ -164,13 +164,16 @@ appendLog <- function(prefix, lines) {
 	appendLog(prefix=prefix,lines=lines) 
 	invisible() }
 
-.callSys <- function(...) { # note dots is not interpreted as expected, uses only first in list
+.callSys <- function(..., wait=TRUE) { # note dots is not interpreted as expected, uses only first in list
+	dots=list(...)
 	if (.Platform$OS.type=="windows") {
-		dots=list(...)
 		if("edit"%in%names(dots))
 			dots[[1]]=paste("start \"\"",dots[[1]],sep=" ")
 		out=shell(dots,intern=TRUE) }
-	else out=system(...,intern=TRUE)
+	else {
+		cmd <- unlist(list(...))
+	   	out=system(cmd,intern=TRUE,wait=wait)
+	}
 	invisible(out) }
 
 #convAD---------------------------------2009-08-12
@@ -184,7 +187,9 @@ convAD <- function(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE) 
   if (raneff) {.makeREbat(); cmd=paste("re",prefix,collapse=" ")}  # RE model fix for ADMB_HOME nonsense
   if (logfile & !add) startLog(prefix);
   if (verbose) cat(cmd,"\n");
+if (.Platform$OS.type=="windows") {
   cmd=.addQuotes(convSlashes(cmd))
+}
   tplout <- .callSys(cmd)
   tplout2 <- c(cmd,tplout)
   if (logfile) appendLog(prefix, tplout2);
@@ -213,7 +218,9 @@ compAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verb
   cmd=parseCmd(prefix,index=index,admpath=adp,gccpath=gcp)
   if (logfile & !add) startLog(prefix);
   if (verbose) cat(cmd,"\n");
+if (.Platform$OS.type=="windows") {
   cmd=.addQuotes(convSlashes(cmd))
+}
   out1 <- .callSys(cmd)
   out2 <- c(cmd,out1)
   if (logfile) appendLog(prefix, out2);
@@ -239,7 +246,9 @@ linkAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verb
   cmd=parseCmd(prefix,index=index,admpath=adp,gccpath=gcp)
   if (logfile & !add) startLog(prefix);
   if (verbose) cat(cmd,"\n");
+if (.Platform$OS.type=="windows") {
   cmd=.addQuotes(convSlashes(cmd))
+}
   out1 <- .callSys(cmd)
   out2 <- c(cmd,out1)
   if (logfile) appendLog(prefix, out2);
@@ -281,13 +290,15 @@ runAD <- function(prefix, argvec="", logfile=TRUE, add=TRUE, verbose=TRUE)
 	if( .Platform$OS.type == "windows" )
 		p.exe <- paste(prefix,".exe",sep="")
 	else
-		p.exe <- prefix #TODO verify
+		p.exe <- paste("./", prefix, sep="" )
 	if (logfile) {
 		p.log=paste(prefix,".log",sep=""); p.log.log=paste(p.log,".log",sep="")
 		if (file.exists(p.log)) file.copy(p.log,p.log.log,overwrite=TRUE) }
 	p.cmd <- paste(p.exe, paste(argvec,collapse=" "), sep=" ");
 	p.err <- paste("File",p.exe,"does not exist.\n",sep=" ");
-	p.cmd=.addQuotes(convSlashes(p.cmd))
+	if (.Platform$OS.type=="windows") {
+		p.cmd=.addQuotes(convSlashes(p.cmd))
+	}
 	if (file.exists(p.exe)) p.out <- .callSys(p.cmd) else p.out <- p.err;
 	if (logfile) {
 		if (!add) startLog(prefix)
@@ -337,9 +348,14 @@ runMC <- function(prefix, nsims=2000, nthin=20, outsuff=".mc.dat",
 editADfile <- function(fname) {
   if (!checkADopts(warn=FALSE)) {cat("Invalid options for PBSadmb\n"); stop()}
   #f.edit <- paste("start \"\"",.addQuotes(convSlashes(.ADopts$editor)),.addQuotes(convSlashes(fname)),sep=" ");
+	if (.Platform$OS.type=="windows") {
   f.edit <- paste(.addQuotes(convSlashes(.ADopts$editor)),.addQuotes(convSlashes(fname)),sep=" ");
+	} else {
+
+  f.edit <- paste(.ADopts$editor,fname,sep=" ");
+	}
   f.err  <- paste("File",fname,"does not exist.\n",sep=" ");
-  if (file.exists(fname)) {.callSys(edit=f.edit); cat(f.edit,"\n"); f.out <- TRUE}
+  if (file.exists(fname)) {.callSys(edit=f.edit, wait=FALSE); cat(f.edit,"\n"); f.out <- TRUE}
   else {cat(f.err); f.out <- FALSE};
   return(f.out); };
 
@@ -544,7 +560,8 @@ plotMC=function(prefix,act="pairs",pthin=1,useCols=NULL){
 			addLabel(0.95,0.95,names(inData)[i],adj=c(1,1),cex=1.2) }
 		#normData=sweep(inData,2,apply(inData,2,calcGM),"/")
 		mtext("Kernel Density",outer=TRUE,side=2,line=0.2,cex=1.2) 
-		mtext("Parameter estimates",outer=TRUE,side=1,line=-0.5,cex=1) }
+		mtext("Parameter estimates",outer=TRUE,side=1,line=-0.5,cex=1)
+	}
 	invisible() }
 #-------------------------------------------plotMC
 
