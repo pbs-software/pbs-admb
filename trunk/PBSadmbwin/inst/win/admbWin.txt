@@ -43,19 +43,19 @@ grid 5 1 sticky=W
 	grid 1 6 sticky=W
 		label text=Initialize font="bold 11" sticky=W fg=darkgoldenrod
 		label text="           " font="Courier 8"
-		button text=WD func=doAction action="shell(`start explorer.exe /n,/e,.`)"
-		button text="Set WD" func=setwdGUI action="tpl" 
+		button text=WD func=doAction action="openFile(\".\")"
+		button text="Set WD" func=setwdGUI action="tpl" #TODO replace with doAction
 		button text="Check" func=.win.checkADopts action=check bg=moccasin width=5
 		entry name=chkstat mode=character label="" value="" sticky=W width=4 entrybg=lightgoldenrodyellow
 	grid 1 2 sticky=E
 		entry name=admpath value=@admpath label="ADM path:" width=35 mode=character func=setGUIoptions action=admpath
-		button text=">" func=setPathOption action=admpath
+		button text=">" func=doAction action="selectDir(usewidget=\"admpath\")"
 	grid 1 2 sticky=E
 		entry name=gccpath value="" label="GCC path:" width=35 mode=character func=setGUIoptions action=gccpath
-		button text=">" func=setPathOption action=gccpath
+		button text=">" func=doAction action="selectDir(usewidget=\"gccpath\")"
 	grid 1 2 sticky=E
-		entry name=editor value="C:/WINDOWS/notepad.exe" label=Editor: width=35 mode=character func=setGUIoptions action=editor
-		button text=">" func=setFileOption action=editor
+		entry name=editor value="" label=Editor: width=35 mode=character func=setGUIoptions action=editor
+		button text=">" func=doAction action="selectFile(usewidget=\"editor\")"
 	grid 1 5 sticky=E
 		label text="Options: "
 		entry name=optfile value=@optfile label="" width=15 mode=character action=optfile
