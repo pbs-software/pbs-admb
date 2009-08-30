@@ -44,6 +44,38 @@ initAD <- function(optfile="ADopts.txt") {
   if (fileOK) 
     readADopts(optfile)
   else cat(paste("No AD options file: ","\n",optfile,sep=""));
+  #guess at empty fields
+
+  if( exists( ".ADopts" ) == FALSE )
+	  .ADopts <<- list()
+	
+  #guess ADMB path
+  if( is.null( .ADopts[[ "admpath" ]] ) || .ADopts$admpath == "" ) {
+	tmp <- findProgram( "tpl2rem" )
+	if( !is.null( tmp ) )
+		.ADopts$admpath <<- dirname( tmp )
+  }
+
+  #guess gcc path
+  if( is.null( .ADopts[[ "gccpath" ]] ) || .ADopts$gccpath == "" ) {
+	tmp <- findProgram( "g++" )
+	if( !is.null( tmp ) )
+		.ADopts$gccpath <<- dirname( tmp )
+  }
+
+  #guess editor
+  if( is.null( .ADopts[[ "editor" ]] ) || .ADopts$editor == "" ) {
+	tmp <- findProgram( "kate" )
+	if( !is.null( tmp ) )
+		.ADopts$admpath <<- dirname( tmp )
+	tmp <- findProgram( "notepad" )
+	if( !is.null( tmp ) )
+		.ADopts$admpath <<- dirname( tmp )
+	tmp <- findProgram( "gvim" )
+	if( !is.null( tmp ) )
+		.ADopts$admpath <<- dirname( tmp )
+  }
+
   invisible(fileOK); };
 
 .win.initAD=function(winName="PBSadmb") {
@@ -182,10 +214,10 @@ appendLog <- function(prefix, lines) {
 #convAD---------------------------------2009-08-12
 # Conver TPL file to CPP code.
 #-------------------------------------------JTS/RH
-convAD <- function(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE) {
+convAD <- function(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE, comp="GCC") {
   adp <- .ADopts$admpath;
   index=ifelse(raneff,2,1)
-  cmd=parseCmd(prefix,index=index,admpath=adp)
+  cmd=parseCmd(prefix,index=index,admpath=adp,comp=comp )
 #TODO bat files not portable - what does RE use on unix?
   if (raneff) {.makeREbat(); cmd=paste("re",prefix,collapse=" ")}  # RE model fix for ADMB_HOME nonsense
   if (logfile & !add) startLog(prefix);
@@ -214,11 +246,11 @@ if (.Platform$OS.type=="windows") {
 # Apparently "raneff" doesn't influence the compile stage,
 # but the argument is preserved here for future development.
 #-------------------------------------------JTS/RH
-compAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verbose=TRUE) {
+compAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verbose=TRUE, comp="GCC") {
   adp <- .ADopts$admpath;
   gcp <- .ADopts$gccpath;
   index=ifelse(safe,4,3)
-  cmd=parseCmd(prefix,index=index,admpath=adp,gccpath=gcp)
+  cmd=parseCmd(prefix,index=index,admpath=adp,gccpath=gcp,comp=comp)
   if (logfile & !add) startLog(prefix);
   if (verbose) cat(cmd,"\n");
 if (.Platform$OS.type=="windows") {
@@ -242,11 +274,11 @@ if (.Platform$OS.type=="windows") {
 #linkAD---------------------------------2009-08-12
 # Links binaries into executable
 #-------------------------------------------JTS/RH
-linkAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verbose=TRUE) {
+linkAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verbose=TRUE, comp="GCC") {
   adp <- .ADopts$admpath;
   gcp <- .ADopts$gccpath;
   index=ifelse(safe&raneff,8,ifelse(!safe&raneff,7,ifelse(safe&!raneff,6,5)))
-  cmd=parseCmd(prefix,index=index,admpath=adp,gccpath=gcp)
+  cmd=parseCmd(prefix,index=index,admpath=adp,gccpath=gcp,comp=comp)
   if (logfile & !add) startLog(prefix);
   if (verbose) cat(cmd,"\n");
 if (.Platform$OS.type=="windows") {
