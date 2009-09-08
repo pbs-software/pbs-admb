@@ -405,7 +405,7 @@ editAD <- function(prefix, suffix=c(".tpl",".cpp",".log")) {
 	getWinVal(scope="L",winName=winName)
 	editAD(prefix=prefix); invisible() }
 .win.editPLT=function() {
-	pref=.findPrefix(".plt")
+	pref=findPrefix(".plt")
 	editAD(prefix=pref,suffix=".plt"); invisible() }
 
 showADargs <- function(prefix,ed=TRUE) {
@@ -437,7 +437,7 @@ showADargs <- function(prefix,ed=TRUE) {
 	invisible() }
 
 .win.findTPL=function(suffix=".tpl",winName="PBSadmb"){ 
-	choice=.findPrefix(suffix) 
+	choice=findPrefix(suffix) 
 	chooseWinVal(choice,"prefix",winname=winName) 
 	invisible() }
 
@@ -539,7 +539,7 @@ readRep=function(prefix, suffix=c(".cor",".rep",".std",".mc.dat"), global=FALSE)
 		suffix=paste(".",names(toView)[toView],sep="")
 		readRep(prefix=prefix,suffix=suffix,global=TRUE) }
 	if (pltView) {
-		pref=.findPrefix(".plt")
+		pref=findPrefix(".plt")
 		if (length(pref)>0){
 			for (i in pref) readRep(prefix=i,suffix=".plt",global=TRUE) } }
 	invisible() }
@@ -666,12 +666,6 @@ copyFiles=function(prefix,suffix=NULL,dir0=getwd(),dir1=getwd(),ask=TRUE){
 	invisible(copy.out) }
 #----------------------------------------copyFiles
 
-.findPrefix=function(suffix){ # to replace Anisa's findPrefix
-	spat=gsub("\\.","\\\\\\.",suffix)
-	sfiles=list.files(pattern=paste(spat,"$",sep=""),ignore.case=TRUE)
-	pref=substring(sfiles,1,nchar(sfiles)-nchar(suffix))
-	return(pref) }
-
 .chooseCols=function(winName="PBSadmb") {
 	getWinVal(scope="L",winName=winName)
 	if (is.null(prefix) || prefix=="") return()
@@ -706,7 +700,7 @@ cleanAD <- function(prefix=NULL) {
 		"^tfile$","\\.tmp$","\\.bak$","^hessian\\.bin$","^hesscheck$","^diags$","^dgs2$"),
 		list.files(all.files=TRUE,ignore.case=TRUE))
 	if (is.null(prefix)) {
-		tpl=.findPrefix(".tpl")
+		tpl=findPrefix(".tpl")
 		apat=paste("^",tpl,"\\.",sep="") # all tpls
 		bpat=paste("\\.",c("tpl","dat","pin","r","pdf","mc.dat"),"$",sep="") # keep files
 		afile=sapply(apat,function(x){list.files(pattern=x,ignore.case=TRUE)},simplify=FALSE)
@@ -759,12 +753,12 @@ cleanAD <- function(prefix=NULL) {
 		"button function=.selectCleanBoxes action=1 text=\"Select All\" padx=4 pady=4", 
 		"button function=.selectCleanBoxes action=0 text=\"Deselect All\" padx=4 pady=4", 
 		"button function=.doClean text=Clean bg=aliceblue padx=4 pady=4")
-	createWin(winDesc, astext = TRUE) 
+	createWin(winDesc, astext = TRUE, env=PBSmodelling:::.getHiddenEnv() ) 
 	invisible(TRUE) }
 .cleanUpAgain=function(winName="cleanWindow"){
 	cleanAD(getWinVal(winName=winName)$cleanPrefix); invisible() }
 .win.findClean=function(winName="cleanWindow"){
-	choice=.findPrefix(".tpl") 
+	choice=findPrefix(".tpl") 
 	chooseWinVal(choice,"cleanPrefix",winname=winName) 
 	invisible() }
 
@@ -782,7 +776,7 @@ cleanAD <- function(prefix=NULL) {
 		"button function=.selectCleanBoxes action=1 text=\"Select All\" padx=4 pady=4", 
 		"button function=.selectCleanBoxes action=0 text=\"Deselect All\" padx=4 pady=4", 
 		"button function=doAction text=Clean bg=aliceblue padx=4 pady=4 action=\".doCleanWD(); closeWin(`cleanWD`)\"")
-	createWin(winDesc, astext = TRUE) 
+	createWin(winDesc, astext = TRUE, env=PBSmodelling:::.getHiddenEnv() )
 	invisible(TRUE) }
 
 #.doCleanWD-----------------------------2009-02-11

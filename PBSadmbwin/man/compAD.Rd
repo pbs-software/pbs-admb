@@ -6,7 +6,7 @@
   file \code{'prefix'.o}.
 }
 \usage{
-compAD(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verbose=TRUE)
+compAD(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verbose=TRUE, comp="GCC")
 }
 \arguments{
   \item{prefix}{string name prefix of the ADMB project (e.g., \code{"vonb"}).}
@@ -18,6 +18,7 @@ compAD(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verbose=TRUE)
   \item{logfile}{logical: if \code{TRUE}, create a log file of the messages from the shell call.}
   \item{add}{logical: if \code{TRUE}, append shell call messages to an exsiting log file.}
   \item{verbose}{logical: if \code{TRUE}, report the shell call an its messages to the R console.}
+  \item{comp}{string: compiler to use - "GCC" is only currently supported}
 }
 \details{
   This function uses the C++ comiler declared in \code{.ADopts}. If \code{logfile=TRUE},
