@@ -5,7 +5,7 @@
   Convert code in \code{'prefix'.tpl} to C++ code in \code{'prefix'.cpp}.
 }
 \usage{
-convAD(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE)
+convAD(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE, comp="GCC")
 }
 \arguments{
   \item{prefix}{string name prefix of the ADMB project (e.g., \code{"vonb"}).}
@@ -14,6 +14,7 @@ convAD(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE)
   \item{logfile}{logical: if \code{TRUE}, create a log file of the messages from the shell call.}
   \item{add}{logical: if \code{TRUE}, append shell call messages to an exsiting log file.}
   \item{verbose}{logical: if \code{TRUE}, report the shell call an its messages to the R console.}
+  \item{comp}{string: compiler to use - "GCC" is only currently supported}
 }
 \details{
   This function invokes the ADMB command \code{tpl2cpp.exe} or \code{tpl2rem.exe},
