@@ -71,6 +71,7 @@ installADMB <- function()
 	download.file( url, "admb.zip" )
 	unzip( "admb.zip" )
 	setwd( oldwd )
+	cat( "Please re-run admb() for changes to take effect\n" )
 	return( paste( download_to, "/admb-win32-mingw", sep="" ) )
 }
 
