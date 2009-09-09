@@ -10,7 +10,7 @@ admb=function(prefix="",pkg="PBSadmbwin",wdf="admbWin.txt",optfile="ADopts.txt")
 
 	pdir <- system.file(package=pkg)                 # package directory
 	wdir <- paste(pdir,"/win",sep="")                # window description file directory
-	adir <- paste(pdir,"/ADMB",sep="")               # ADMB directory
+	adir <- paste(pdir,"/admb/admb-win32-mingw",sep="")               # ADMB directory
 	edir <- paste(pdir,"/examples",sep="")           # examples directory
 	tdir <- tempdir(); tdir <- gsub("\\\\","/",tdir) # temporary directory for R
 	stripExt=function(x) { return(sub("[.].{1,3}$", "", x)) }
@@ -21,7 +21,20 @@ admb=function(prefix="",pkg="PBSadmbwin",wdf="admbWin.txt",optfile="ADopts.txt")
 	temp <- gsub("@editADfile",paste("\"editADfile(`",wtmp,"`)\"",sep=""),temp)
 	if (is.null(prefix) || prefix=="") prefix="vonb"
 	temp <- gsub("@prefix",prefix,temp)
-	temp <- gsub("@admpath",adir,temp)
+	if( file.exists( adir ) ) {
+		temp <- gsub("@admpath",adir,temp)
+		if( exists( ".ADopts" ) == FALSE )
+			.ADopts <<- list()
+		.ADopts$admpath <<- adir
+	} else {
+		temp <- gsub("@admpath","\"fillme\"",temp)
+		if( .Platform$OS.type == "windows" ) {
+			cat( "\nADMB is not installed in the default location - Windows users can run\n" )
+			cat( "installADMB() to automatically download and extract files into PBSadmb's\n" )
+			cat( "R library location. If ADMB is installed elsewhere, you can manually set\n" )
+			cat( "the ADM path value in the GUI to point to your own installation.\n\n" )
+		}
+	}
 	temp <- gsub("@optfile",optfile,temp)
 	#---examples---
 	etpl <- basename(Sys.glob(file.path(edir,"*.tpl"))) # TPL files in examples directory
@@ -39,6 +52,28 @@ admb=function(prefix="",pkg="PBSadmbwin",wdf="admbWin.txt",optfile="ADopts.txt")
 	invisible() }
 #---------------------------------------------admb
 
+installADMB <- function()
+{
+	if( .Platform$OS.type != "windows" )
+		stop( "automatic installation of ADMB is only available for windows. Unix users must visit the admb website and install the corresponding copy manually" )
+
+	oldwd <- getwd()
+	url <- "http://admb-project.googlecode.com/files/admb-9.0.363-win32-mingw-gcc3.4.zip"
+	download_to <- system.file(package="PBSadmbwin")
+	download_to <- paste( download_to, "/admb", sep="" )
+	print( download_to )
+	#create dir
+	if( file.exists( download_to ) == FALSE )
+		dir.create( download_to )
+	setwd( download_to )
+	#save as admb.zip in the dir
+	download.file( url, "admb.zip" )
+	unzip( "admb.zip" )
+	setwd( oldwd )
+	return( paste( download_to, "/admb-win32-mingw", sep="" ) )
+}
+
+
 initAD <- function(optfile="ADopts.txt") {
   fileOK <- file.exists(optfile); #in the user's working directory
   if (fileOK) 
@@ -54,6 +89,8 @@ initAD <- function(optfile="ADopts.txt") {
 	tmp <- findProgram( "tpl2rem" )
 	if( !is.null( tmp ) )
 		.ADopts$admpath <<- dirname( tmp )
+	else
+		.ADopts$admpath <<- "unknown"
   }
 
   #guess gcc path
@@ -67,13 +104,13 @@ initAD <- function(optfile="ADopts.txt") {
   if( is.null( .ADopts[[ "editor" ]] ) || .ADopts$editor == "" ) {
 	tmp <- findProgram( "kate" )
 	if( !is.null( tmp ) )
-		.ADopts$admpath <<- dirname( tmp )
+		.ADopts$editor <<- dirname( tmp )
 	tmp <- findProgram( "notepad" )
 	if( !is.null( tmp ) )
-		.ADopts$admpath <<- dirname( tmp )
+		.ADopts$editor <<- dirname( tmp )
 	tmp <- findProgram( "gvim" )
 	if( !is.null( tmp ) )
-		.ADopts$admpath <<- dirname( tmp )
+		.ADopts$editor <<- dirname( tmp )
   }
 
   invisible(fileOK); };
@@ -736,7 +773,6 @@ cleanAD <- function(prefix=NULL) {
 #------------------------------------------cleanAD
 
 .win.cleanAD=function(winName="PBSadmb") {
-	print("here")
 	getWinVal(scope="L",winName=winName)
 	cleanAD(prefix=prefix) 
 	invisible() }
