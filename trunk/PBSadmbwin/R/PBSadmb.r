@@ -240,6 +240,7 @@ if (.Platform$OS.type=="windows") {
 	convAD(prefix=prefix,raneff=raneff) #,logfile=logfile,add=add,verbose=verbose)
 	Ttime=round(proc.time()[1:3]-time0,2)
 	setWinVal(list("Mtime[1,1]"=Ttime[1],"Mtime[1,2]"=Ttime[2],"Mtime[1,3]"=Ttime[3]),winName=winName) 
+	if( .Platform$OS.type == "unix" ) cat("\n>")
 	invisible(Ttime) }
 
 #compAD---------------------------------2009-08-12
@@ -269,6 +270,7 @@ if (.Platform$OS.type=="windows") {
 	compAD(prefix=prefix,raneff=raneff,safe=safe) #,logfile=logfile,add=add,verbose=verbose)
 	Ttime=round(proc.time()[1:3]-time0,2)
 	setWinVal(list("Mtime[2,1]"=Ttime[1],"Mtime[2,2]"=Ttime[2],"Mtime[2,3]"=Ttime[3]),winName=winName) 
+	if( .Platform$OS.type == "unix" ) cat("\n>")
 	invisible(Ttime) }
 
 #linkAD---------------------------------2009-08-12
@@ -297,6 +299,7 @@ if (.Platform$OS.type=="windows") {
 	linkAD(prefix=prefix,raneff=raneff,safe=safe) #,logfile=logfile,add=add,verbose=verbose) 
 	Ttime=round(proc.time()[1:3]-time0,2)
 	setWinVal(list("Mtime[3,1]"=Ttime[1],"Mtime[3,2]"=Ttime[2],"Mtime[3,3]"=Ttime[3]),winName=winName) 
+	if( .Platform$OS.type == "unix" ) cat("\n>")
 	invisible(Ttime) }
 
 makeAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, verbose=TRUE) {
@@ -309,15 +312,20 @@ makeAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, verbose=TRUE) 
 	setWinVal(list(Mtime=matrix(NA,nrow=3,ncol=3)),winName=winName)
 	time0=proc.time()[1:3]
 	getWinVal(scope="L",winName=winName)
+
 	convAD(prefix=prefix,raneff=raneff) #,logfile=logfile,add=add,verbose=verbose)
 	Ttime=round(proc.time()[1:3]-time0,2); time0=proc.time()[1:3]
 	setWinVal(list("Mtime[1,1]"=Ttime[1],"Mtime[1,2]"=Ttime[2],"Mtime[1,3]"=Ttime[3]),winName=winName)
+
 	compAD(prefix=prefix,raneff=raneff,safe=safe) #,logfile=logfile,add=add,verbose=verbose)
 	Ttime=round(proc.time()[1:3]-time0,2); time0=proc.time()[1:3]
 	setWinVal(list("Mtime[2,1]"=Ttime[1],"Mtime[2,2]"=Ttime[2],"Mtime[2,3]"=Ttime[3]),winName=winName)
+
 	linkAD(prefix=prefix,raneff=raneff,safe=safe) #,logfile=logfile,add=add,verbose=verbose) 
 	Ttime=round(proc.time()[1:3]-time0,2)
 	setWinVal(list("Mtime[3,1]"=Ttime[1],"Mtime[3,2]"=Ttime[2],"Mtime[3,3]"=Ttime[3]),winName=winName) 
+
+	if( .Platform$OS.type == "unix" ) cat("\n>")
 	invisible() }
 
 runAD <- function(prefix, argvec="", logfile=TRUE, add=TRUE, verbose=TRUE)
@@ -375,6 +383,7 @@ runMC <- function(prefix, nsims=2000, nthin=20, outsuff=".mc.dat",
 	getWinVal(scope="L",winName=winName)
 	if (runType=="mcmc") .win.runMC()
 	else .win.runAD() 
+	if( .Platform$OS.type == "unix" ) cat("\n>")
 	invisible()}
 
 #editADfile-----------------------------2009-02-13
@@ -727,6 +736,7 @@ cleanAD <- function(prefix=NULL) {
 #------------------------------------------cleanAD
 
 .win.cleanAD=function(winName="PBSadmb") {
+	print("here")
 	getWinVal(scope="L",winName=winName)
 	cleanAD(prefix=prefix) 
 	invisible() }
