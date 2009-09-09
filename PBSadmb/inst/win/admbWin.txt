@@ -1,4 +1,4 @@
-window name=PBSadmb title="PBS ADMB for Windows" #onclose=
+window name=PBSadmb title="PBS ADMB" #onclose=
 
 #------------------------------------ MENU -------------------------------------
 menu nitems=4 label="Edit"
