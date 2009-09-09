@@ -1,2 +1,0 @@
-s/param_init\(.*\)/param_init_df1b2\1/g
-/param_init_df1b2/p
