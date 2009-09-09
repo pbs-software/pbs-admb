@@ -5,12 +5,10 @@
   Start up the PBS GUI for running ADMB.
 }
 \usage{
-admb(prefix="", pkg="PBSadmbwin", wdf="admbWin.txt", 
-     optfile="ADopts.txt")
+admb(prefix="", wdf="admbWin.txt", optfile="ADopts.txt")
 }
 \arguments{
   \item{prefix}{string name prefix of the ADMB project (e.g., \code{"vonb"}).}
-  \item{pkg}{string name of package (redundant but may allow flexibility in future).}
   \item{wdf}{string name of the \emph{window description file} that creates the GUI.}
   \item{optfile}{string name of options file (usually in user's working directory).}
 }

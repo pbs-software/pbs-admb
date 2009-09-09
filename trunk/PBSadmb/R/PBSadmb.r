@@ -3,7 +3,8 @@
 #admb-----------------------------------2009-07-21
 # Starts the primary GUI interface
 #-----------------------------------------------RH
-admb=function(prefix="",pkg="PBSadmbwin",wdf="admbWin.txt",optfile="ADopts.txt"){
+admb=function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
+	pkg="PBSadmb"
 	if (!require(PBSmodelling)) stop("!!!!!Install package PBSmodelling!!!!!")
 	assign("PBSadmb",list(pkg=pkg,func="admb",useCols=NULL),envir=.GlobalEnv)
 	if (exists(".ADopts",envir=.GlobalEnv)) rm(.ADopts,envir=.GlobalEnv) # remove previous hidden object
@@ -59,7 +60,7 @@ installADMB <- function()
 
 	oldwd <- getwd()
 	url <- "http://admb-project.googlecode.com/files/admb-9.0.363-win32-mingw-gcc3.4.zip"
-	download_to <- system.file(package="PBSadmbwin")
+	download_to <- system.file(package="PBSadmb")
 	download_to <- paste( download_to, "/admb", sep="" )
 	print( download_to )
 	#create dir
@@ -654,7 +655,7 @@ plotMC=function(prefix,act="pairs",pthin=1,useCols=NULL){
 	plotMC(prefix=prefix,act=act,pthin=pthin,useCols=PBSadmb$useCols) 
 	invisible() }
 
-.win.viewCode=function(winName="PBSadmb",pkg="PBSadmbwin"){
+.win.viewCode=function(winName="PBSadmb",pkg="PBSadmb"){
 	getWinVal(scope="L",winName=winName)
 	tdir <- tempdir(); tdir <- gsub("\\\\","/",tdir)  # temporary directory for R
 	pkgN=match(paste("package:",pkg,sep=""),search()) # position number of package
@@ -844,7 +845,7 @@ cleanAD <- function(prefix=NULL) {
 #.win.viewCode--------------------------2009-02-13
 # View the package R code on the fly.
 #-----------------------------------------------RH
-.win.viewCode=function(pkg="PBSadmbwin"){
+.win.viewCode=function(pkg="PBSadmb"){
 	eval(parse(text=paste("if(!require(",pkg,",quietly=TRUE)) stop(\"",pkg," package is required\")",sep="")))
 	tdir <- tempdir(); tdir <- gsub("\\\\","/",tdir)                      # temporary directory for R
 	pkgO=ls(paste("package:",pkg,sep=""),all=TRUE)                        # package objects
