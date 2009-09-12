@@ -104,13 +104,13 @@ initAD <- function(optfile="ADopts.txt") {
 
   #guess editor
   if( is.null( .ADopts[[ "editor" ]] ) || .ADopts$editor == "" ) {
-	tmp <- findProgram( "kate" )
+	tmp <- findProgram( "kate", TRUE )
 	if( !is.null( tmp ) )
 		.ADopts$editor <<- dirname( tmp )
-	tmp <- findProgram( "notepad" )
+	tmp <- findProgram( "notepad", TRUE )
 	if( !is.null( tmp ) )
 		.ADopts$editor <<- dirname( tmp )
-	tmp <- findProgram( "gvim" )
+	tmp <- findProgram( "gvim", TRUE )
 	if( !is.null( tmp ) )
 		.ADopts$editor <<- dirname( tmp )
   }
