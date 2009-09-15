@@ -714,27 +714,48 @@ copyFiles=function(prefix,suffix=NULL,dir0=getwd(),dir1=getwd(),ask=TRUE){
 	invisible(copy.out) }
 #----------------------------------------copyFiles
 
-.chooseCols=function(winName="PBSadmb") {
+.chooseCols=function(winName="PBSadmb")
+{
 	getWinVal(scope="L",winName=winName)
-	if (is.null(prefix) || prefix=="") return()
+	if (is.null(prefix) || prefix=="")
+		return()
+
 	inFile=paste(prefix, ".mc.dat", sep="")
 	if(!file.exists(inFile)){
-		showAlert(paste("Cannot find file", inFile, "in working directory.")); return() }
+		showAlert(paste("Cannot find file", inFile, "in working directory."));
+		return()
+	}
+
 	if (!exists(inFile,envir=.GlobalEnv) || is.null(attributes(get(inFile))$mtime) ||
 			file.info(inFile)$mtime!=attributes(get(inFile))$mtime)
 		inData=readRep(prefix,".mc.dat")
-	else inData=get(inFile)
-	flds=names(inData); nc=length(flds); rc=PBSmodelling:::.findSquare(nc)
-	assign("PBSadmb",PBSadmb); useCols=PBSadmb$useCols
-	if (is.null(useCols) || length(useCols)!=nc) useCols=rep(TRUE,nc)
+	else
+		inData=get(inFile)
+	
+	flds=names(inData)
+	nc=length(flds)
+	assign("PBSadmb",PBSadmb)
+	useCols=PBSadmb$useCols
+	if (is.null(useCols) || length(useCols)!=nc)
+		useCols=rep(TRUE,nc)
+
+	#store feilds as a data.frame - for use with scrolling object widget
+	choices <- as.data.frame( useCols )
+	rownames( choices ) <- flds
+
+	#converts data.frame scrolling object back into vector and saves to global var
+	saveCols <- function()
+	{
+		choices <- getWinVal(winName="chooseCols")$choices
+		PBSadmb$useCols=choices[[ 1 ]]
+		assign("PBSadmb",PBSadmb,envir=.GlobalEnv)
+		closeWin("chooseCols")
+	}
+
 	winDesc = c("window name=chooseCols title=Choose",
-		"grid 3 1",
-		"label text=\"Choose fields to plot:\"",
-		paste("vector mode=logical vertical=T length=\"",nc,"\" names=useCols values=\"",
-			paste(useCols,collapse=" "),"\" labels=\"",paste(flds,collapse=" "),"\"",sep=""),
-		paste("button text=OK bg=skyblue function=doAction action=\"",
-			"PBSadmb$useCols=getWinVal(winName=`chooseCols`)$useCols; ",
-			"assign(`PBSadmb`,PBSadmb,envir=.GlobalEnv); closeWin(`chooseCols`)\"",sep=""))
+		"object choices rowshow=20",
+		"button text=OK bg=skyblue function=saveCols" )
+		
 	createWin(winDesc, astext = TRUE) }
 
 .addQuotes=function(str){
