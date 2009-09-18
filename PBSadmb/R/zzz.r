@@ -1,5 +1,7 @@
 .First.lib <- function(lib,pkg)
 {
+	.initOptions()
+
 	pkg_info <- utils::sessionInfo( package=pkg )$otherPkgs[[ pkg ]]
 	pkg_date <- strsplit( pkg_info$Packaged, " " )[[1]][1]
 	
@@ -18,4 +20,5 @@ Type admb() to start a GUI for operating ADMB.
 
 
 ")
+
 }

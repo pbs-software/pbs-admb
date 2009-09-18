@@ -1,13 +1,50 @@
 # Authors: Jon T. Schnute, Rowan Haigh
 
+.initOptions <- function()
+{
+	#don't re-init
+	if( exists( ".PBSadmb" ) ) 
+		return()
+
+	#first setup initial option values
+	initial_options <- list()
+
+	#search vector of programs for the first found path, if nothing is found return "failed" object
+	.guessPath <- function( programs, includefilename = FALSE, failed = "unknown" )
+	{
+		for( p in programs ) {
+			tmp <- findProgram( p, includefilename )
+			if( is.null( tmp ) == FALSE )
+				return( tmp )
+		}
+		return( failed )
+	}
+
+	#guess ADMB path
+	initial_options$admpath <- .guessPath( "tpl2rem" )
+	
+	#guess gcc path
+	initial_options$gccpath <- .guessPath( "g++" )
+	
+	#guess editor
+	initial_options$editor <- .guessPath( c( "gvim", "kate", "notepad" ), TRUE )
+
+	#create instance of option manager - use this to get/set/save/load options
+	.PBSadmb <<- createOptionManager( "ADopts.txt", initial_options, gui_prefix="" )
+}
+
 #admb-----------------------------------2009-07-21
 # Starts the primary GUI interface
 #-----------------------------------------------RH
 admb=function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
+	.initOptions()
 	pkg="PBSadmb"
-	if (!require(PBSmodelling)) stop("!!!!!Install package PBSmodelling!!!!!")
+	if (!require(PBSmodelling))
+		stop("!!!!!Install package PBSmodelling!!!!!")
+
+	#TODO rename to something else - too similar to .PBSadmb
 	assign("PBSadmb",list(pkg=pkg,func="admb",useCols=NULL),envir=.GlobalEnv)
-	if (exists(".ADopts",envir=.GlobalEnv)) rm(.ADopts,envir=.GlobalEnv) # remove previous hidden object
+	#if (exists(".ADopts",envir=.GlobalEnv)) rm(.ADopts,envir=.GlobalEnv) # remove previous hidden object
 
 	pdir <- system.file(package=pkg)                 # package directory
 	wdir <- paste(pdir,"/win",sep="")                # window description file directory
@@ -24,9 +61,7 @@ admb=function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 	temp <- gsub("@prefix",prefix,temp)
 	if( file.exists( adir ) ) {
 		temp <- gsub("@admpath",adir,temp)
-		if( exists( ".ADopts" ) == FALSE )
-			.ADopts <<- list()
-		.ADopts$admpath <<- adir
+		.PBSadmb$set( admpath = adir )
 	} else {
 		temp <- gsub("@admpath","\"fillme\"",temp)
 		if( .Platform$OS.type == "windows" ) {
@@ -50,10 +85,14 @@ admb=function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 	writeLines(temp,con=wtmp)
 	createWin(wtmp) #TODO use astext=TRUE
 	.load.prefix.droplist()
-	.win.initAD()
+	.PBSadmb$loadgui()
+	.win.checkADopts()
 	invisible() }
 #---------------------------------------------admb
 
+#repopulates droplist with all prefixes in current directory
+#TODO we might want a "refresh" button on the GUI to call this
+#ideally we could have the droplist call a function *BEFORE* it drops down - thus refreshing the list
 .load.prefix.droplist <- function()
 {
 	choices <- findPrefix( ".tpl" )
@@ -84,67 +123,19 @@ installADMB <- function()
 }
 
 
-initAD <- function(optfile="ADopts.txt") {
-  fileOK <- file.exists(optfile); #in the user's working directory
-  if (fileOK) 
-    readADopts(optfile)
-  else cat(paste("No AD options file: ","\n",optfile,sep=""));
-  #guess at empty fields
-
-  if( exists( ".ADopts" ) == FALSE )
-	  .ADopts <<- list()
-	
-  #guess ADMB path
-  if( is.null( .ADopts[[ "admpath" ]] ) || .ADopts$admpath == "" ) {
-	tmp <- findProgram( "tpl2rem" )
-	if( !is.null( tmp ) )
-		.ADopts$admpath <<- dirname( tmp )
-	else
-		.ADopts$admpath <<- "unknown"
-  }
-
-  #guess gcc path
-  if( is.null( .ADopts[[ "gccpath" ]] ) || .ADopts$gccpath == "" ) {
-	tmp <- findProgram( "g++" )
-	if( !is.null( tmp ) )
-		.ADopts$gccpath <<- dirname( tmp )
-  }
-
-  #guess editor
-  if( is.null( .ADopts[[ "editor" ]] ) || .ADopts$editor == "" ) {
-	tmp <- findProgram( "kate", TRUE )
-	if( !is.null( tmp ) )
-		.ADopts$editor <<- dirname( tmp )
-	tmp <- findProgram( "notepad", TRUE )
-	if( !is.null( tmp ) )
-		.ADopts$editor <<- dirname( tmp )
-	tmp <- findProgram( "gvim", TRUE )
-	if( !is.null( tmp ) )
-		.ADopts$editor <<- dirname( tmp )
-  }
-
-  invisible(fileOK); };
-
-.win.initAD=function(winName="PBSadmb") {
-	getWinVal(scope="L",winName=winName)
-	initAD(optfile=optfile)
-	try(setWinVal(.ADopts[c("admpath","gccpath","editor")],winName=winName),silent=TRUE) 
-	.win.checkADopts()
-	invisible() }
-
-makeADopts <- function(admpath,gccpath,editor,ver="gcc421") {
-	opts <- list(admpath=admpath, gccpath=gccpath, editor=editor,ver=ver)
-	for(i in names(opts)) {setPBSoptions(i,opts[[i]])} # for compatibility with PBSoptions
-	assign(".ADopts",opts,envir=.GlobalEnv) }
+makeADopts <- function( admpath, gccpath, editor )
+{
+	.PBSadmb$set( admpath = admpath, gccpath = gccpath, editor = editor )
+}
 	
 .win.makeADopts=function(winName="PBSadmb"){
 	getWinVal(scope="L",winName=winName)
 	makeADopts(admpath,gccpath,editor) 
 	invisible() }
 
-writeADopts <- function(opts=.ADopts,optfile="ADopts.txt") {
-  writeList(opts,optfile,format="P",comments=" Options for PBSadmb");
-  invisible(opts); };
+writeADopts <- function(optfile="ADopts.txt") {
+	.PBSadmb$save( optfile )
+}
 
 .win.writeADopts=function(winName="PBSadmb") {
 	getWinVal(scope="L",winName=winName)
@@ -152,25 +143,23 @@ writeADopts <- function(opts=.ADopts,optfile="ADopts.txt") {
 	invisible() }
 
 readADopts <- function(optfile="ADopts.txt") {
-	opts <- readList(optfile)
-	opts=sapply(opts,paste,collapse=" ",simplify=FALSE) # for ADopts paths with no enclosing quotes
-	for(i in names(opts)) {setPBSoptions(i,opts[[i]])}  # for compatibility with PBSoptions
-	assign(".ADopts",opts,envir=.GlobalEnv) }
+	.PBSadmb$load( optfile )
+}
 
 .win.readADopts=function(winName="PBSadmb") {
 	getWinVal(scope="L",winName=winName)
 	if (file.exists(optfile)) {
 		readADopts(optfile=optfile)
-		setWinVal(.ADopts[c("admpath","gccpath","editor")],winName="PBSadmb") }
-	else {
+		.PBSadmb$loadgui()
+	} else {
 		mess=paste("Options file '",optfile,"' does not exist",sep="")
 		showAlert(mess); stop(mess) }
 	invisible() }
 
-checkADopts=function(opts=.ADopts, check=c("admpath","gccpath","editor"),
+checkADopts=function(opts=.PBSadmb$get(), check=c("admpath","gccpath","editor"),
      warn=TRUE, popup=FALSE) {
 	# Check that .ADopts has all required components and that links point to actual files on the hard drive.
-	if (!exists(".ADopts",envir=.GlobalEnv)) initAD()
+	#if (!exists(".ADopts",envir=.GlobalEnv)) initAD()
 	sAF=options()$stringsAsFactors; options(stringsAsFactors=FALSE)
 	mess=list()
 	for (i in names(opts)) {
@@ -266,7 +255,7 @@ appendLog <- function(prefix, lines) {
 # Conver TPL file to CPP code.
 #-------------------------------------------JTS/RH
 convAD <- function(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE, comp="GCC") {
-  adp <- .ADopts$admpath;
+  adp <- .PBSadmb$get("admpath")
   index=ifelse(raneff,2,1)
   cmd=parseCmd(prefix,index=index,admpath=adp,comp=comp )
 #TODO bat files not portable - what does RE use on unix?
@@ -299,8 +288,8 @@ if (.Platform$OS.type=="windows") {
 # but the argument is preserved here for future development.
 #-------------------------------------------JTS/RH
 compAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verbose=TRUE, comp="GCC") {
-  adp <- .ADopts$admpath;
-  gcp <- .ADopts$gccpath;
+  adp <- .PBSadmb$get("admpath")
+    gcp <- .PBSadmb$get("gccpath")
   index=ifelse(safe,4,3)
   cmd=parseCmd(prefix,index=index,admpath=adp,gccpath=gcp,comp=comp)
   if (logfile & !add) startLog(prefix);
@@ -328,8 +317,8 @@ if (.Platform$OS.type=="windows") {
 # Links binaries into executable
 #-------------------------------------------JTS/RH
 linkAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verbose=TRUE, comp="GCC") {
-  adp <- .ADopts$admpath;
-  gcp <- .ADopts$gccpath;
+  adp <- .PBSadmb$get("admpath")
+  gcp <- .PBSadmb$get("gccpath")
   index=ifelse(safe&raneff,8,ifelse(!safe&raneff,7,ifelse(safe&!raneff,6,5)))
   cmd=parseCmd(prefix,index=index,admpath=adp,gccpath=gcp,comp=comp)
   if (logfile & !add) startLog(prefix);
@@ -444,10 +433,10 @@ editADfile <- function(fname) {
   if (!checkADopts(warn=FALSE)) {cat("Invalid options for PBSadmb\n"); stop()}
   #f.edit <- paste("start \"\"",.addQuotes(convSlashes(.ADopts$editor)),.addQuotes(convSlashes(fname)),sep=" ");
 	if (.Platform$OS.type=="windows") {
-  f.edit <- paste(.addQuotes(convSlashes(.ADopts$editor)),.addQuotes(convSlashes(fname)),sep=" ");
+  f.edit <- paste(.addQuotes(convSlashes(.PBSadmb$get("editor"))),.addQuotes(convSlashes(fname)),sep=" ");
 	} else {
 
-  f.edit <- paste(.ADopts$editor,fname,sep=" ");
+  f.edit <- paste(.PBSadmb$get("editor"),fname,sep=" ");
 	}
   f.err  <- paste("File",fname,"does not exist.\n",sep=" ");
   if (file.exists(fname)) {.callSys(edit=f.edit, wait=FALSE); cat(f.edit,"\n"); f.out <- TRUE}
@@ -687,7 +676,7 @@ plotMC=function(prefix,act="pairs",pthin=1,useCols=NULL){
 	return(x) }
 
 #TODO how to make this portable?
-.makeREbat=function(opts=.ADopts) {
+.makeREbat=function(opts=.PBSadmb$get()) {
 	isOK=checkADopts(opts); if (!isOK) return()
 	unpackList(opts)
 	cmd=c("SETLOCAL",
