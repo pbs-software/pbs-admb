@@ -49,9 +49,17 @@ admb=function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 	temp <- gsub("@pkg",pkg,temp)
 	writeLines(temp,con=wtmp)
 	createWin(wtmp) #TODO use astext=TRUE
+	.load.prefix.droplist()
 	.win.initAD()
 	invisible() }
 #---------------------------------------------admb
+
+.load.prefix.droplist <- function()
+{
+	choices <- findPrefix( ".tpl" )
+	setWinVal( list( prefix.values = choices ) )
+	setWinVal( list( prefix = choices[ 1 ] ) )
+}
 
 installADMB <- function()
 {
@@ -210,7 +218,11 @@ checkADopts=function(opts=.ADopts, check=c("admpath","gccpath","editor"),
 .win.checkADopts=function(winName="PBSadmb") {
 	getWinVal(scope="L",winName=winName)
 	chkstat=checkADopts(opts=list(admpath=admpath,gccpath=gccpath,editor=editor),popup=TRUE)
+	#set label to OK/FIX with coloured background
 	setWinVal(list(chkstat=ifelse(chkstat," OK"," Fix")),winName=winName)
+	setWidgetColor( "chkstat", winName=winName, bg=ifelse(chkstat,"lightgreen","red") )
+	setWidgetColor( "checkbutton", winName=winName, bg=ifelse(chkstat,"moccasin","red") )
+
 	invisible(chkstat) }
 
 startLog <- function(prefix) {
@@ -752,8 +764,21 @@ copyFiles=function(prefix,suffix=NULL,dir0=getwd(),dir1=getwd(),ask=TRUE){
 		closeWin("chooseCols")
 	}
 
+	toggleSelected <- function()
+	{
+		winName <- "chooseCols" 
+		choices <- getWinVal(winName = winName )$choices
+		if( any( choices[[1]] ) )
+			choices[[1]] <- choices[[1]] & FALSE #force all false
+		else
+			choices[[1]] <- choices[[1]] | TRUE #force all true
+		setWinVal( list( choices = choices ), winName = winName )
+	}
+
 	winDesc = c("window name=chooseCols title=Choose",
 		"object choices rowshow=20",
+		"grid 1 2",
+		"button text=\"select all/none\" func=toggleSelected padx=\"0 10\"",
 		"button text=OK bg=skyblue function=saveCols" )
 		
 	createWin(winDesc, astext = TRUE) }
