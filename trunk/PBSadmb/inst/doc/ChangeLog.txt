@@ -1,5 +1,10 @@
 PBSadmbwin Changes
 ==================
+XXXXXXXX
+  -added droplist for prefix selection
+  -integrated file status OK/FIX with setWidgetColor
+  -added select all/none for variable selection window (and added scrollbar when |vars| > 20)
+  
 0.50.r13  2009-08-14  Rowan
   - Modified function 'parseCmd' so that arguments match those in 'parseCmd.Rd'.
 
