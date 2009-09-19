@@ -288,20 +288,23 @@ if (.Platform$OS.type=="windows") {
 # but the argument is preserved here for future development.
 #-------------------------------------------JTS/RH
 compAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verbose=TRUE, comp="GCC") {
-  adp <- .PBSadmb$get("admpath")
-    gcp <- .PBSadmb$get("gccpath")
-  index=ifelse(safe,4,3)
-  cmd=parseCmd(prefix,index=index,admpath=adp,gccpath=gcp,comp=comp)
-  if (logfile & !add) startLog(prefix);
-  if (verbose) cat(cmd,"\n");
-if (.Platform$OS.type=="windows") {
-  cmd=.addQuotes(convSlashes(cmd))
+	adp <- .PBSadmb$get("admpath")
+	gcp <- .PBSadmb$get("gccpath")
+	index=ifelse(safe,4,3)
+	print( gcp )
+	cmd=parseCmd(prefix,index=index,admpath=adp,gccpath=gcp,comp=comp)
+	print( cmd )
+	if (logfile & !add) startLog(prefix)
+	if (verbose) cat(cmd,"\n")
+	if (.Platform$OS.type=="windows") {
+	  cmd=.addQuotes(convSlashes(cmd))
+	}
+	out1 <- .callSys(cmd)
+	out2 <- c(cmd,out1)
+	if (logfile) appendLog(prefix, out2)
+	if (verbose) cat(out1, sep="\n")
+	invisible(out2)
 }
-  out1 <- .callSys(cmd)
-  out2 <- c(cmd,out1)
-  if (logfile) appendLog(prefix, out2);
-  if (verbose) cat(out1, sep="\n");
-  invisible(out2); };
 
 .win.compAD=function(winName="PBSadmb") {
 	isOK=.win.checkADopts(); if (!isOK) return()
@@ -902,6 +905,7 @@ cleanAD <- function(prefix=NULL) {
 # Parse a command for an ADMB command.
 #-----------------------------------------------RH
 parseCmd = function(prefix, index, os=.Platform$OS, comp="GCC", admpath="", gccpath="") {
+	.addSlashes <- function( str ) return( gsub( "\\\\", "\\\\\\\\", str ) )
 	data(ADMBcmd)
 	dat=ADMBcmd; dat$OS=tolower(dat$OS)
 	osdat = dat[dat$OS%in%os & dat$Comp%in%comp,]
@@ -910,9 +914,9 @@ parseCmd = function(prefix, index, os=.Platform$OS, comp="GCC", admpath="", gccp
 	if(nrow(idat)==0) stop("No records for specified index")
 	cmd=idat$Command[1]
 	cmd=gsub("`","\"",cmd)
-	cmd=gsub("@prefix",prefix,cmd)
-	cmd=gsub("@adHome",admpath,cmd)
-	cmd=gsub("@ccPath",gccpath,cmd)
+	cmd=gsub("@prefix",.addSlashes(prefix),cmd)
+	cmd=gsub("@adHome",.addSlashes(admpath),cmd)
+	cmd=gsub("@ccPath",.addSlashes(gccpath),cmd)
 	return(cmd) } 
 
 
