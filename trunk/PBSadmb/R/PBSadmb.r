@@ -255,22 +255,39 @@ appendLog <- function(prefix, lines) {
 # Conver TPL file to CPP code.
 #-------------------------------------------JTS/RH
 convAD <- function(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE, comp="GCC") {
-  adp <- .PBSadmb$get("admpath")
-  index=ifelse(raneff,2,1)
-  cmd=parseCmd(prefix,index=index,admpath=adp,comp=comp )
-#TODO bat files not portable - what does RE use on unix?
-  if (raneff) {.makeREbat(); cmd=paste("re",prefix,collapse=" ")}  # RE model fix for ADMB_HOME nonsense
-  if (logfile & !add) startLog(prefix);
-  if (verbose) cat(cmd,"\n");
-if (.Platform$OS.type=="windows") {
-  cmd=.addQuotes(convSlashes(cmd))
+	adp <- .PBSadmb$get("admpath")
+	index=ifelse(raneff,2,1)
+	cmd=parseCmd(prefix,index=index,admpath=adp,comp=comp )
+	if (raneff) {
+		#set path to include admb's bin dir (for sed.exe, etc...)
+		path_sep <- ifelse( .Platform$OS.type == "windows", ";", ":" )
+		admb_bin_path <- paste( adp, "/bin/", sep="" )
+		if( .Platform$OS.type == "windows" ) 
+			admb_bin_path <- gsub( "/", "\\\\", admb_bin_path )
+		path <- Sys.getenv( "PATH" )
+		#only change PATH if required
+		if( any( unlist( strsplit( path, path_sep ) ) == admb_bin_path ) == FALSE ) {
+			#admb_bin doesn't exist in path - append it, and reset env variable
+			path <- paste( path, admb_bin_path, sep = path_sep )
+			Sys.setenv( PATH = path )
+		}
+
+		#set env var for random effects
+		Sys.setenv( ADMB_HOME = adp )
+	
+		cmd <- paste( adp, "/bin/tpl2rem.exe ", prefix, sep="" )
+	}
+	if (logfile & !add) startLog(prefix);
+	if (verbose) cat(cmd,"\n");
+	if (.Platform$OS.type=="windows") {
+	  cmd=.addQuotes(convSlashes(cmd))
+	}
+	tplout <- .callSys(cmd)
+	tplout2 <- c(cmd,tplout)
+	if (logfile) appendLog(prefix, tplout2)
+	if (verbose) cat(tplout, sep="\n")
+	invisible(tplout2)
 }
-  tplout <- .callSys(cmd)
-  tplout2 <- c(cmd,tplout)
-  if (logfile) appendLog(prefix, tplout2);
-  if (verbose) cat(tplout, sep="\n");
-  if (raneff) file.remove("re.bat")
-  invisible(tplout2); };
 
 .win.convAD=function(winName="PBSadmb") {
 	isOK=.win.checkADopts(); if (!isOK) return()
@@ -677,18 +694,6 @@ plotMC=function(prefix,act="pairs",pthin=1,useCols=NULL){
 .asIs=function(x) {
 	if (is.numeric(x)) x=format(x,scientific=FALSE)
 	return(x) }
-
-#TODO how to make this portable?
-.makeREbat=function(opts=.PBSadmb$get()) {
-	isOK=checkADopts(opts); if (!isOK) return()
-	unpackList(opts)
-	cmd=c("SETLOCAL",
-		paste("set ADMB_HOME=",admpath,sep=""),
-		"set ADMB_PATH=%ADMB_HOME%/bin",
-		"set Path=.;%ADMB_PATH%;%Path%",
-		"\"%ADMB_HOME%/bin/tpl2rem.exe\" %1")
-	doscmd=gsub("/","\\\\",cmd)
-	writeLines(doscmd,"re.bat") }
 
 #copyFiles------------------------------2009-02-04
 # Copy files with specified prefixes and suffixes 
