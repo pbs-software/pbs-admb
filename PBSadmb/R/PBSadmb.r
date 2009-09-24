@@ -275,7 +275,10 @@ convAD <- function(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE, 
 		#set env var for random effects
 		Sys.setenv( ADMB_HOME = adp )
 	
-		cmd <- paste( adp, "/bin/tpl2rem.exe ", prefix, sep="" )
+		if( .Platform$OS.type == "windows" ) 
+			cmd <- paste( adp, "/bin/tpl2rem.exe ", prefix, sep="" )
+		else
+			cmd <- paste( adp, "/bin/tpl2rem ", prefix, sep="" )
 	}
 	if (logfile & !add) startLog(prefix);
 	if (verbose) cat(cmd,"\n");
@@ -297,7 +300,7 @@ convAD <- function(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE, 
 	convAD(prefix=prefix,raneff=raneff) #,logfile=logfile,add=add,verbose=verbose)
 	Ttime=round(proc.time()[1:3]-time0,2)
 	setWinVal(list("Mtime[1,1]"=Ttime[1],"Mtime[1,2]"=Ttime[2],"Mtime[1,3]"=Ttime[3]),winName=winName) 
-	if( .Platform$OS.type == "unix" ) cat("\n>")
+	if( .Platform$OS.type == "unix" ) cat("\n> ")
 	invisible(Ttime) }
 
 #compAD---------------------------------2009-08-12
@@ -330,7 +333,7 @@ compAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verb
 	compAD(prefix=prefix,raneff=raneff,safe=safe) #,logfile=logfile,add=add,verbose=verbose)
 	Ttime=round(proc.time()[1:3]-time0,2)
 	setWinVal(list("Mtime[2,1]"=Ttime[1],"Mtime[2,2]"=Ttime[2],"Mtime[2,3]"=Ttime[3]),winName=winName) 
-	if( .Platform$OS.type == "unix" ) cat("\n>")
+	if( .Platform$OS.type == "unix" ) cat("\n> ")
 	invisible(Ttime) }
 
 #linkAD---------------------------------2009-08-12
@@ -359,7 +362,7 @@ if (.Platform$OS.type=="windows") {
 	linkAD(prefix=prefix,raneff=raneff,safe=safe) #,logfile=logfile,add=add,verbose=verbose) 
 	Ttime=round(proc.time()[1:3]-time0,2)
 	setWinVal(list("Mtime[3,1]"=Ttime[1],"Mtime[3,2]"=Ttime[2],"Mtime[3,3]"=Ttime[3]),winName=winName) 
-	if( .Platform$OS.type == "unix" ) cat("\n>")
+	if( .Platform$OS.type == "unix" ) cat("\n> ")
 	invisible(Ttime) }
 
 makeAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, verbose=TRUE) {
@@ -385,7 +388,7 @@ makeAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, verbose=TRUE) 
 	Ttime=round(proc.time()[1:3]-time0,2)
 	setWinVal(list("Mtime[3,1]"=Ttime[1],"Mtime[3,2]"=Ttime[2],"Mtime[3,3]"=Ttime[3]),winName=winName) 
 
-	if( .Platform$OS.type == "unix" ) cat("\n>")
+	if( .Platform$OS.type == "unix" ) cat("\n> ")
 	invisible() }
 
 runAD <- function(prefix, argvec="", logfile=TRUE, add=TRUE, verbose=TRUE)
@@ -443,7 +446,7 @@ runMC <- function(prefix, nsims=2000, nthin=20, outsuff=".mc.dat",
 	getWinVal(scope="L",winName=winName)
 	if (runType=="mcmc") .win.runMC()
 	else .win.runAD() 
-	if( .Platform$OS.type == "unix" ) cat("\n>")
+	if( .Platform$OS.type == "unix" ) cat("\n> ")
 	invisible()}
 
 #editADfile-----------------------------2009-02-13
