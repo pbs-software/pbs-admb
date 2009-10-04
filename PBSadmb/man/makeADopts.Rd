@@ -6,13 +6,12 @@
   and the user's preferred text editor.
 }
 \usage{
-makeADopts(admpath, gccpath, editor, ver="gcc421")
+makeADopts(admpath, gccpath, editor)
 }
 \arguments{
   \item{admpath}{explicit path to the user's ADMB directory.}
   \item{gccpath}{explicit path to the user's GCC bin (C-compiler) directory.}
   \item{editor}{explicit path and program to use for editing text.}
-  \item{ver}{optional C-compiler version number (not used at present).}
 }
 \value{
   Creates a global, hidden list object called \code{.ADopts}.
@@ -21,6 +20,6 @@ makeADopts(admpath, gccpath, editor, ver="gcc421")
 \note{
   A wrapper function that can be called from a GUI exists as \code{.win.makeADopts}.
 }
-\seealso{ \code{\link{initAD}},  \code{\link{makeADopts}},  \code{\link{writeADopts}} }
+\seealso{ \code{\link{makeADopts}},  \code{\link{writeADopts}} }
 \keyword{ data }
 \keyword{ list }

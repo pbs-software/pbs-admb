@@ -6,11 +6,11 @@
   that links point to actual files on the hard drive.
 }
 \usage{
-checkADopts(opts=.ADopts, check=c("admpath","gccpath","editor"),
+checkADopts(opts=getOptions( .PBSadmb ), check=c("admpath","gccpath","editor"),
             warn=TRUE, popup=FALSE)
 }
 \arguments{
-  \item{opts}{ADMB options hidden list object \code{.ADopts}.}
+  \item{opts}{ADMB options values.}
   \item{check}{components of \code{.ADopts} to check.}
   \item{warn}{logical: if \code{TRUE}, print the results of the check to the R console.}
   \item{popup}{logical: if \code{TRUE}, display program location problems in a popup GUI.}
@@ -26,6 +26,6 @@ checkADopts(opts=.ADopts, check=c("admpath","gccpath","editor"),
 \note{
   A wrapper function that can be called from a GUI exists as \code{.win.checkADopts}.
 }
-\seealso{ \code{\link{initAD}}, \code{\link{makeADopts}},\code{\link{readADopts}} }
+\seealso{ \code{\link{makeADopts}},\code{\link{readADopts}} }
 \keyword{ data }
 \keyword{ list }
