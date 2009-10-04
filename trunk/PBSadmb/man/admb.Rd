@@ -14,6 +14,6 @@ admb(prefix="", wdf="admbWin.txt", optfile="ADopts.txt")
 }
 
 \author{ Rowan Haigh, Pacific Biological Station, Nanaimo BC, Canada }
-\seealso{ \code{\link{initAD}}, \code{\link{makeADopts}} }
+\seealso{ \code{\link{makeADopts}} }
 \keyword{ IO }
 

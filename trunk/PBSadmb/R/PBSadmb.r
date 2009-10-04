@@ -7,7 +7,7 @@
 		return()
 
 	#first setup initial option values
-	initial_options <- list()
+	initial.options <- list()
 
 	#search vector of programs for the first found path, if nothing is found return "failed" object
 	.guessPath <- function( programs, includefilename = FALSE, failed = "unknown" )
@@ -21,16 +21,16 @@
 	}
 
 	#guess ADMB path
-	initial_options$admpath <- .guessPath( "tpl2rem" )
+	initial.options$admpath <- .guessPath( "tpl2rem" )
 	
 	#guess gcc path
-	initial_options$gccpath <- .guessPath( "g++" )
+	initial.options$gccpath <- .guessPath( "g++" )
 	
 	#guess editor
-	initial_options$editor <- .guessPath( c( "gvim", "kate", "notepad" ), TRUE )
+	initial.options$editor <- .guessPath( c( "gvim", "kate", "notepad" ), TRUE )
 
 	#create instance of option manager - use this to get/set/save/load options
-	.PBSadmb <<- createOptionManager( "ADopts.txt", initial_options, gui_prefix="" )
+	.PBSadmb <<- new( "option", filename = "ADopts.txt", initial.options = initial.options, gui.prefix="" )
 }
 
 #admb-----------------------------------2009-07-21
@@ -61,7 +61,7 @@ admb=function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 	temp <- gsub("@prefix",prefix,temp)
 	if( file.exists( adir ) ) {
 		temp <- gsub("@admpath",adir,temp)
-		.PBSadmb$set( admpath = adir )
+		setOptions( .PBSadmb, admpath = adir )
 	} else {
 		temp <- gsub("@admpath","\"fillme\"",temp)
 		if( .Platform$OS.type == "windows" ) {
@@ -85,7 +85,7 @@ admb=function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 	writeLines(temp,con=wtmp)
 	createWin(wtmp) #TODO use astext=TRUE
 	.load.prefix.droplist()
-	.PBSadmb$loadgui()
+	loadOptionsGUI( .PBSadmb )
 	.win.checkADopts()
 	invisible() }
 #---------------------------------------------admb
@@ -125,7 +125,7 @@ installADMB <- function()
 
 makeADopts <- function( admpath, gccpath, editor )
 {
-	.PBSadmb$set( admpath = admpath, gccpath = gccpath, editor = editor )
+	setOptions( .PBSadmb, admpath = admpath, gccpath = gccpath, editor = editor )
 }
 	
 .win.makeADopts=function(winName="PBSadmb"){
@@ -134,7 +134,7 @@ makeADopts <- function( admpath, gccpath, editor )
 	invisible() }
 
 writeADopts <- function(optfile="ADopts.txt") {
-	.PBSadmb$save( optfile )
+	saveOptions( .PBSadmb, optfile )
 }
 
 .win.writeADopts=function(winName="PBSadmb") {
@@ -143,20 +143,20 @@ writeADopts <- function(optfile="ADopts.txt") {
 	invisible() }
 
 readADopts <- function(optfile="ADopts.txt") {
-	.PBSadmb$load( optfile )
+	loadOptions( .PBSadmb, optfile )
 }
 
 .win.readADopts=function(winName="PBSadmb") {
 	getWinVal(scope="L",winName=winName)
 	if (file.exists(optfile)) {
 		readADopts(optfile=optfile)
-		.PBSadmb$loadgui()
+		loadOptionsGUI( .PBSadmb )
 	} else {
 		mess=paste("Options file '",optfile,"' does not exist",sep="")
 		showAlert(mess); stop(mess) }
 	invisible() }
 
-checkADopts=function(opts=.PBSadmb$get(), check=c("admpath","gccpath","editor"),
+checkADopts=function(opts=getOptions( .PBSadmb ), check=c("admpath","gccpath","editor"),
      warn=TRUE, popup=FALSE) {
 	# Check that .ADopts has all required components and that links point to actual files on the hard drive.
 	#if (!exists(".ADopts",envir=.GlobalEnv)) initAD()
@@ -255,7 +255,7 @@ appendLog <- function(prefix, lines) {
 # Conver TPL file to CPP code.
 #-------------------------------------------JTS/RH
 convAD <- function(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE, comp="GCC") {
-	adp <- .PBSadmb$get("admpath")
+	adp <- getOptions( .PBSadmb, "admpath" )
 	index=ifelse(raneff,2,1)
 	cmd=parseCmd(prefix,index=index,admpath=adp,comp=comp )
 	if (raneff) {
@@ -308,8 +308,8 @@ convAD <- function(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE, 
 # but the argument is preserved here for future development.
 #-------------------------------------------JTS/RH
 compAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verbose=TRUE, comp="GCC") {
-	adp <- .PBSadmb$get("admpath")
-	gcp <- .PBSadmb$get("gccpath")
+	adp <- getOptions( .PBSadmb, "admpath")
+	gcp <- getOptions( .PBSadmb, "gccpath")
 	index=ifelse(safe,4,3)
 	print( gcp )
 	cmd=parseCmd(prefix,index=index,admpath=adp,gccpath=gcp,comp=comp)
@@ -340,8 +340,8 @@ compAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verb
 # Links binaries into executable
 #-------------------------------------------JTS/RH
 linkAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verbose=TRUE, comp="GCC") {
-  adp <- .PBSadmb$get("admpath")
-  gcp <- .PBSadmb$get("gccpath")
+  adp <- getOptions( .PBSadmb, "admpath")
+  gcp <- getOptions( .PBSadmb, "gccpath")
   index=ifelse(safe&raneff,8,ifelse(!safe&raneff,7,ifelse(safe&!raneff,6,5)))
   cmd=parseCmd(prefix,index=index,admpath=adp,gccpath=gcp,comp=comp)
   if (logfile & !add) startLog(prefix);
@@ -456,10 +456,10 @@ editADfile <- function(fname) {
   if (!checkADopts(warn=FALSE)) {cat("Invalid options for PBSadmb\n"); stop()}
   #f.edit <- paste("start \"\"",.addQuotes(convSlashes(.ADopts$editor)),.addQuotes(convSlashes(fname)),sep=" ");
 	if (.Platform$OS.type=="windows") {
-  f.edit <- paste(.addQuotes(convSlashes(.PBSadmb$get("editor"))),.addQuotes(convSlashes(fname)),sep=" ");
+  f.edit <- paste(.addQuotes(convSlashes(getOptions(.PBSadmb,"editor"))),.addQuotes(convSlashes(fname)),sep=" ");
 	} else {
 
-  f.edit <- paste(.PBSadmb$get("editor"),fname,sep=" ");
+  f.edit <- paste(getOptions(.PBSadmb,"editor"),fname,sep=" ");
 	}
   f.err  <- paste("File",fname,"does not exist.\n",sep=" ");
   if (file.exists(fname)) {.callSys(edit=f.edit, wait=FALSE); cat(f.edit,"\n"); f.out <- TRUE}
