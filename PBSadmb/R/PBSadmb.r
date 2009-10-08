@@ -30,7 +30,7 @@
 	initial.options$editor <- .guessPath( c( "gvim", "kate", "notepad" ), TRUE )
 
 	#create instance of option manager - use this to get/set/save/load options
-	.PBSadmb <<- new( "option", filename = "ADopts.txt", initial.options = initial.options, gui.prefix="" )
+	.PBSadmb <<- new( "PBSoptions", filename = "ADopts.txt", initial.options = initial.options, gui.prefix="" )
 }
 
 #admb-----------------------------------2009-07-21
