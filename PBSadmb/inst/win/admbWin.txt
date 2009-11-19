@@ -26,15 +26,18 @@ menu nitems=2 label="Package"
 	menuitem label=Window func=doAction action=@editADfile
 
 menu nitems=4 label="Help"
-	menu nitems=2 label="Manuals"
-		menuitem label="ADMB Manual" function=openPackageFile action="@pkg,/ADMB/docs/Manual-ADMB.pdf"
-		menuitem label="ADMB RE Manual" function=openPackageFile action="@pkg,/ADMB/docs/Manual-ADMB-RE.pdf"
+	menu nitems=3 label="Manuals"
+		#menuitem label="ADMB Manual" function=doAction action="openFile(`doc/Manual-ADMB.pdf`,package=`PBSadmb`)"
+		#menuitem label="ADMB RE Manual" function=doAction action="openFile(`doc/Manual-ADMB-RE.pdf`,package=`PBSadmb`)"
+		menuitem label="ADMB Manual" function=doAction action="browseURL(`http://admb-project.googlecode.com/files/admb.pdf`)"
+		menuitem label="ADMB RE Manual" function=doAction action="browseURL(`http://admb-project.googlecode.com/files/admb-re.pdf`)"
+		menuitem label="AUTODIF Library" function=doAction action="browseURL(`http://admb-project.googlecode.com/files/autodif.pdf`)"
 	menu nitems=4 label="Online"
-		menuitem label="ADMB Project" function=openPackageFile action="@pkg,/ADMB/docs/ADMB-Project.url"
-		menuitem label="Random Effects in ADMB" function=openPackageFile action="@pkg,/ADMB/docs/ADMB-RE.url"
-		menuitem label="ADMB Examples"  function=openPackageFile action="@pkg,/ADMB/docs/Examples-ADMB.url"
-		menuitem label="ADMB RE Examples" function=openPackageFile action="@pkg,/ADMB/docs/Examples-ADMB-RE.url"
-	menuitem label="User Guide" function=doAction action="openFile(paste(system.file(package=`@pkg`),`/doc/@pkg-UG.pdf`,sep=``))"
+		menuitem label="ADMB Project" function=doAction action="browseURL(`http://admb-project.org/`)"
+		menuitem label="Random Effects in ADMB" function=doAction action="browseURL(`http://otter-rsch.com/admbre/admbre.html`)"
+		menuitem label="ADMB Examples" function=doAction action="browseURL(`http://otter-rsch.com/examples.htm`)"
+		menuitem label="ADMB RE Examples" function=doAction action="browseURL(`http://otter-rsch.com/admbre/examples.html`)"
+	menuitem label="User Guide" function=doAction action="openFile(`doc/PBSadmb-UG.pdf`,package=`PBSadmb`)"
 	menuitem label=About function=doAction action="editADfile(paste(system.file(package=`@pkg`),`/DESCRIPTION`,sep=``))"
 
 #----------------------------------- BUTTONS -----------------------------------
@@ -63,7 +66,6 @@ grid 5 1 sticky=W
 		button text="File to R" func=.win.readADopts  bg=palegoldenrod
 		button text="GUI to R"  func=.win.makeADopts  bg=lightgoldenrod1
 		button text="R to File" func=.win.writeADopts bg=lightgoldenrod2
-
 
 grid 4 1 sticky="" relief=sunken pady=4
 	grid 1 4 sticky=W

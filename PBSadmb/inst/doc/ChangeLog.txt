@@ -1,10 +1,13 @@
-PBSadmbwin Changes
-==================
-XXXXXXXX
-  -added droplist for prefix selection
-  -integrated file status OK/FIX with setWidgetColor
-  -added select all/none for variable selection window (and added scrollbar when |vars| > 20)
-  
+PBSadmb Changes
+===============
+0.50.rxx  2009-xx-xx  Builder
+  - Redrafted 'PBSadmb-UG.pdf' (JTS).
+  - Modified menuitems for the menu 'Help' (RH).
+  - Added 'droplist' for prefix selection (ACB).
+  - Integrated file status OK/FIX with setWidgetColor (ACB).
+  - Added select all/none for variable selection window, and added scrollbar when |vars| > 20 (ACB).
+  - Removed the ADMB directory, and renamed the package to 'PBSadmb" to work on multiple platforms (ACB).
+
 0.50.r13  2009-08-14  Rowan
   - Modified function 'parseCmd' so that arguments match those in 'parseCmd.Rd'.
 
@@ -22,7 +25,7 @@ XXXXXXXX
 
 0.50.r6  2009-08-11  Rowan
   - Modified 'convAD', 'compAD', 'linkAD' to use 'ADMBcmd' via 'parseCmd()'. 
-  - Added new function 'parseCmd' to parde the correct ADMB command line based on an index
+  - Added new function 'parseCmd' to parse the correct ADMB command line based on an index
 	that describes unique combinations of steps, safe mode, and random effects model.
   - Added 'ADMBcmd': Jon's database of command lines suitable for ADMB.
 
