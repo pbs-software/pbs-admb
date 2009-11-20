@@ -1,6 +1,6 @@
 PBSadmb Changes
 ===============
-0.50.rxx  2009-xx-xx  Builder
+0.51.rxx  2009-11-20  Jon
   - Redrafted 'PBSadmb-UG.pdf' (JTS).
   - Modified menuitems for the menu 'Help' (RH).
   - Added 'droplist' for prefix selection (ACB).
