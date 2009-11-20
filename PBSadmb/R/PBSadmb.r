@@ -78,7 +78,7 @@ admb=function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 	enew=character(0)
 	for (i in eprf) 
 		enew=c(enew,paste("menuitem label=",i," function=doAction action=\"copyFiles(`",
-			i,".`,dir0=`",edir,"`)\"",sep=""))
+			i,".`,dir0=`",edir,"`); convOS(paste(`",i,"`,c(`.tpl`,`.dat`,`.pin`,`.r`),sep=``))\"",sep=""))
 	temp <- gsub("@nitems",length(eprf),temp)
 	temp <- gsub("@menuitems",paste(enew,collapse="\n\t"),temp)
 	temp <- gsub("@pkg",pkg,temp)
@@ -927,4 +927,19 @@ parseCmd = function(prefix, index, os=.Platform$OS, comp="GCC", admpath="", gccp
 	cmd=gsub("@ccPath",.addSlashes(gccpath),cmd)
 	return(cmd) } 
 
+#convOS---------------------------------2009-11-20
+# Convert text files to the default format
+# of the operating system.
+#-----------------------------------------------RH
+convOS = function(inam, onam=inam, path=getwd()) {
+	if (missing(inam)) stop("Supply names(s) of text file(s) to convert")
+	else if(length(inam)!=length(onam)) stop("Number of 'inam's does not match number of 'onam's")
+	N=length(inam)
+	inam=paste(path,inam,sep="/")
+	onam=paste(path,onam,sep="/")
+	for (i in 1:N) {
+		if(file.exists(inam[i])) {
+			idat=readLines(inam[i])
+			writeLines(idat,con=onam[i]) } }
+}
 
