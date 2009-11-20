@@ -5,7 +5,8 @@
   Convert code in \code{'prefix'.tpl} to C++ code in \code{'prefix'.cpp}.
 }
 \usage{
-convAD(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE, comp="GCC")
+convAD(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, 
+       verbose=TRUE, comp="GCC")
 }
 \arguments{
   \item{prefix}{string name prefix of the ADMB project (e.g., \code{"vonb"}).}
