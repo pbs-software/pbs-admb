@@ -1,5 +1,10 @@
 PBSadmb Changes
 ===============
+0.60.rxx  2009-11-20 Jon
+  - Final revision of 'PBSadmb-UG.pdf', including PBSadmb.pdf starting on p. 19
+  - Fixed syntax error in convOS.Rd
+  - Advanced to version 0.60 for CRAN release
+
 0.51.rxx  2009-11-20  Jon
   - Redrafted 'PBSadmb-UG.pdf' (JTS).
   - Modified menuitems for the menu 'Help' (RH).

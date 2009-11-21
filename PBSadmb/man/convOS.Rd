@@ -17,7 +17,6 @@ convOS(inam, onam = inam, path = getwd() )
 \value{
   Text file(s) formatted in accordance with standards of the operating system.
 }
-}
 \author{
   Rowan Haigh, Pacific Biological Station, Nanaimo BC
 }
