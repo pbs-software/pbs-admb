@@ -485,7 +485,7 @@ showADargs <- function(prefix,ed=TRUE) {
 		p.exe <- paste(prefix,".exe", sep="")
 	else
 		p.exe <- paste("./", prefix, sep="") #TODO verify
-	p.exe <- paste(prefix,".exe", sep="");
+	# p.exe <- paste(prefix,".exe", sep=""); # JTS: Wrong for Unix; should have been deleted
 	p.arg <- paste(prefix,".arg", sep="");
 	p.err <- paste("File",p.exe,"does not exist.\n",sep=" ");
 	p.cmd <- paste(p.exe,"-?",sep=" ");
