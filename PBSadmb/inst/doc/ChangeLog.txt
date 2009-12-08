@@ -1,5 +1,9 @@
 PBSadmb Changes
 ===============
+0.61.rxx 2009-12-07 Jon
+  - Fixed Linux bug in "All args" button in the GUI (use "prefix", not xxxfs"prefix.exe")
+  - Advanced to version 0.61 for CRAN release
+
 0.60.rxx  2009-11-20 Jon
   - Final revision of 'PBSadmb-UG.pdf', including PBSadmb.pdf starting on p. 19
   - Fixed syntax error in convOS.Rd
