@@ -1,5 +1,9 @@
 PBSadmb Changes
 ===============
+0.62  2010-10-08  Rowan
+  - (keep adding changes here until sent to CRAN as v.0.62)
+  - Modified functions 'runMC' and '.win.runMC' so that script version doesn't require GUI. (RH 10/8)
+
 0.61.rxx 2009-12-07 Jon
   - Fixed Linux bug in "All args" button in the GUI (use "prefix", not xxxfs"prefix.exe")
   - Advanced to version 0.61 for CRAN release

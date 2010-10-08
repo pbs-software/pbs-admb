@@ -1,4 +1,4 @@
-# Authors: Jon T. Schnute, Rowan Haigh
+# Authors: Jon T. Schnute, Rowan Haigh, Alex Couture-Beil
 
 .initOptions <- function()
 {
@@ -426,7 +426,6 @@ runMC <- function(prefix, nsims=2000, nthin=20, outsuff=".mc.dat",
                   logfile=FALSE, add=TRUE, verbose=TRUE) {
   outf <- paste(prefix,outsuff,sep="");
   arg1 <- paste("-mcmc",.asIs(nsims),"-mcsave",.asIs(nthin),sep=" ");
-  setWinVal(list(argvec=arg1))
   arg2 <- "-mceval";
   runAD(prefix, arg1, logfile=logfile, add=add, verbose=verbose);
   p.out <- runAD(prefix, arg2, logfile=logfile, add=TRUE, verbose=verbose);
@@ -436,6 +435,8 @@ runMC <- function(prefix, nsims=2000, nthin=20, outsuff=".mc.dat",
 .win.runMC=function(winName="PBSadmb") {
 	time0=proc.time()[1:3]
 	getWinVal(scope="L",winName=winName)
+	arg1 <- paste("-mcmc",.asIs(nsims),"-mcsave",.asIs(nthin),sep=" ");
+	setWinVal(list(argvec=arg1))
 	runMC(prefix=prefix,nsims=nsims,nthin=nthin,logfile=logfile,add=add,verbose=verbose)
 	Ttime=round(proc.time()[1:3]-time0,2)
 	setWinVal(list("Rtime[1,1]"=Ttime[1],"Rtime[1,2]"=Ttime[2],"Rtime[1,3]"=Ttime[3]),winName=winName)
