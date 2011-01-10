@@ -1,0 +1,64 @@
+Notes for building admb-10.0Beta2 for windows.
+
+At the time of writing these instructions, the most current version is 10.0Beta2 which was released November 19, 2010
+and downloaded from http://admb-project.org/downloads (direct link: http://admb-project.googlecode.com/files/admb-10.0Beta2.zip)
+
+There are instructions for building the source provided at http://admb-project.org/documentation/installation/build; however, these notes attempt to fill in missing and incomplete steps.
+
+=building with gcc for windows=
+
+For demonstration purposes, we will be working under the directory c:\admb_build; however, any directory may be used.
+
+==Software required==
+
+1. GnuWin32 Flex
+2. mingw
+
+
+===gnuwin32 Flex===
+download the complete package ("Complete package, except sources") from http://gnuwin32.sourceforge.net/packages/flex.htm
+(direct link: http://downloads.sourceforge.net/project/gnuwin32/flex/2.5.4a-1/flex-2.5.4a-1.exe?r=http%3A%2F%2Fgnuwin32.sourceforge.net%2Fpackages%2Fflex.htm&ts=1294644043&use_mirror=superb-sea2 )
+(size: 1226215, last change: 7 April 2004)
+
+run flex-2.5.4a-1.exe
+and choose the installation directory C:\admb_build\GnuWin32 (if you wish to directly follow this guide)
+perform a "full installation"
+no need to create start menu item
+no need to download source files
+
+the following files should now exist:
+C:\admb_build\GnuWin32\bin\flex.exe
+C:\admb_build\GnuWin32\bin\flex++.exe
+
+
+===mingw===
+download the latest version from http://sourceforge.net/projects/mingw/files/
+At the time, the downloaded version was: mingw-get-inst-20101030.exe (796.0 KB)
+
+run mingw-get-inst-20101030.exe
+use pre-packaged repository catalogues
+install to C:\admb_build\MinGW
+select components:
+-"C Compiler"
+-"C++ Compiler"
+
+
+==unzip beta source==
+unzip to C:\admb_build\admb-10.0Beta2
+verify C:\admb_build\admb-10.0Beta2\src exists and contains the file mingw.mak
+
+Open a cmd shell and cd to C:\admb_build\admb-10.0Beta2\src
+and type:
+
+set PATH=C:\admb_build\GnuWin32\bin;C:\admb_build\MinGW\bin;c:\Windows\system32
+
+*this will allow cmd to find the installed software. Make sure system32 is also included as the makefile must be able to find cmd.exe
+
+start the build process by typing:
+mingw32-make --file=mingw.mak
+
+
+=building with gcc for windows (64bit)=
+
+TODO: need to try installing mingw-64 (http://mingw-w64.sourceforge.net/)
+      might be distributed with the R tools; however, it's probably best to get it from the real source.
