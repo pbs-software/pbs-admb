@@ -62,3 +62,37 @@ mingw32-make --file=mingw.mak
 
 TODO: need to try installing mingw-64 (http://mingw-w64.sourceforge.net/)
       might be distributed with the R tools; however, it's probably best to get it from the real source.
+
+
+=OSX=
+download beta source code:
+wget http://admb-project.googlecode.com/files/admb-10.0Beta2.zip
+
+unzip admb-10.0Beta2.zip
+cd admb-10.0Beta2
+make linux
+
+#note - make linux-verify fails for me
+
+To install, copy it somewhere
+cp -r build/dists/admb_gcc411_fedora8 ~/admb_10.0beta
+
+export PATH=$PATH:/Users/alex/admb_10.0beta/bin/
+(if you dont export you get:
+		Macintosh-103:tmp alex$ ~/admb_10.0beta/bin/tpl2rem pheno
+		sed: /Users/alex/admb_10.0beta//binseddf1b3: No such file or directory
+		Error executing command sed -n -f /Users/alex/admb_10.0beta//binseddf1b3 tfile2 >> pheno.htp
+		sed: /Users/alex/admb_10.0beta//binseddf1b4: No such file or directory
+		Error executing command sed -n -f /Users/alex/admb_10.0beta//binseddf1b4 tfile4 >> pheno.htp
+		sed: /Users/alex/admb_10.0beta//binseddf1b2: No such file or directory
+		Error executing command sed -f /Users/alex/admb_10.0beta//binseddf1b2 tfile2 >> pheno.htp
+		sed: /Users/alex/admb_10.0beta//binsedf1b2d: No such file or directory
+		Error executing command sed -f /Users/alex/admb_10.0beta//binsedf1b2d tfile4 >> pheno.htp
+		sed: /Users/alex/admb_10.0beta//binsedf1b2a: No such file or directory
+		Error executing command sed -f /Users/alex/admb_10.0beta//binsedf1b2a xxalloc3.tmp >> pheno.cpp
+		sed: /Users/alex/admb_10.0beta//binsedf1b2c: No such file or directory
+		Error executing command sed -f /Users/alex/admb_10.0beta//binsedf1b2c xxalloc2.tmp >> pheno.cpp
+)
+
+you *MUST* instead:
+export ADMB_HOME=/Users/alex/admb_10.0beta    ***without the trailing slash
