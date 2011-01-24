@@ -5,13 +5,13 @@
   Copy files with specified prefixes and suffixes from one location to another.
 }
 \usage{
-copyFiles(prefix, suffix=NULL, dir0=getwd(), dir1=getwd(), ask=TRUE)
+copyFiles(prefix, suffix=NULL, srcdir=getwd(), dstdir=getwd(), ask=TRUE)
 }
 \arguments{
   \item{prefix}{ string scalar/vector of potential file prefixes. }
   \item{suffix}{ string scalar/vector of potential file suffixes. }
-  \item{dir0}{ source directory from which to copy files. }
-  \item{dir1}{ destination directory to copy files to. }
+  \item{srcdir}{ source directory from which to copy files. }
+  \item{dstdir}{ destination directory to copy files to. }
   \item{ask}{ logical: if \code{TRUE}, popup boxes will prompt the user
     for every instance that a file will be overwritten. }
 }

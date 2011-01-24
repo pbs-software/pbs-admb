@@ -96,3 +96,11 @@ export PATH=$PATH:/Users/alex/admb_10.0beta/bin/
 
 you *MUST* instead:
 export ADMB_HOME=/Users/alex/admb_10.0beta    ***without the trailing slash
+
+
+
+
+
+=Compilling an example in cmd.exe (without PBSadmb)=
+set PATH=C:\admb_build\GnuWin32\bin;C:\admb_build\MinGW\bin;c:\Windows\system32;C:\admb_build\admb-10.0Beta2\build\dists\admb_gcc345_mingw32\bin
+set ADMB_HOME=C:\admb_build\admb-10.0Beta2\build\dists\admb_gcc345_mingw32
