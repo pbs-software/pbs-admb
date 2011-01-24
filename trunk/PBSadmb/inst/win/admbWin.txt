@@ -42,15 +42,25 @@ menu nitems=4 label="Help"
 
 #----------------------------------- BUTTONS -----------------------------------
 
+Grid 2 2 sticky=E
+	label "Current directory:" sticky=WN
+	grid 1 2
+	droplist name=currentdir value="'' '<change path>'" add=T width=40 func=.changeWDEnter
+	grid 1 2 sticky=E
+		button text="Set" function=.changeWD
+		button text="Open" func=doAction action="openFile(\".\")"
 
-grid 5 1 sticky=W
-	grid 1 6 sticky=W
-		label text=Initialize font="bold 11" sticky=W fg=darkgoldenrod
-		label text="           " font="Courier 8"
-		button text=WD func=doAction action="openFile(\".\")"
-		button text="Set WD" func=setwdGUI action="tpl" #TODO replace with doAction
-		button name=checkbutton text="Check" func=.win.checkADopts action=check bg=moccasin width=5
-		label test name=chkstat sticky=W width=4 bg=lightgoldenrodyellow
+	label "Prefix:" sticky=W
+	droplist name=prefix mode=character sticky=W width=30 values="" add=T 
+
+notebook tabs="Setup Make Run Output" pady="5 0"
+
+#setup
+grid 7 1 sticky=W
+	grid 1 3 sticky=W
+		Label "Path Setup" sticky=W fg=blue font="bold 11"
+		null padx=85
+		label test name=chkstat sticky=W width=4 bg=lightgoldenrodyellow sticky=E
 	grid 1 2 sticky=E
 		entry name=admpath value=@admpath label="ADM path:" width=35 mode=character func=setGUIoptions action=admpath
 		button text=">" func=doAction action="selectDir(usewidget=\"admpath\")"
@@ -60,22 +70,22 @@ grid 5 1 sticky=W
 	grid 1 2 sticky=E
 		entry name=editor value="" label=Editor: width=35 mode=character func=setGUIoptions action=editor
 		button text=">" func=doAction action="selectFile(usewidget=\"editor\")"
-	grid 1 5 sticky=E
+	button name=checkbutton text="Apply" func=.win.makeADopts action=check bg=moccasin sticky=E
+
+	Label "Save/Load Options to/from Disk" sticky=W fg=blue font="bold 11"
+	grid 1 4 sticky=E
 		label text="Options: "
 		entry name=optfile value=@optfile label="" width=15 mode=character action=optfile
-		button text="File to R" func=.win.readADopts  bg=palegoldenrod
-		button text="GUI to R"  func=.win.makeADopts  bg=lightgoldenrod1
-		button text="R to File" func=.win.writeADopts bg=lightgoldenrod2
+		button text="Load" func=.win.readADopts bg=palegoldenrod
+		button text="Save"  func=.win.writeADopts bg=lightgoldenrod1
 
-grid 4 1 sticky="" relief=sunken pady=4
-	grid 1 4 sticky=W
-		label text=Make font="bold 11" sticky=W fg=blue
-		label text="        " font="Courier 8"
-#old entry + chooseVal GUI
-#		entry name=prefix mode=character label=Prefix: value=@prefix sticky=W width=20
-#		button text=">" func=.win.findTPL action=tpl
-		label "Prefix:"
-		droplist name=prefix mode=character sticky=W width=20 values="" add=T
+#Make
+grid 3 1 sticky=""
+	#grid 1 4 sticky=W
+	#	label text=Make font="bold 11" sticky=W fg=blue
+	#	label text="        " font="Courier 8"
+	#	label "Prefix:"
+	#	droplist name=prefix mode=character sticky=W width=20 values="" add=T
 
 	grid 1 8 sticky=E
 		button text="tpl" func=doAction action="editAD(getWinVal()$prefix,c(`.tpl`))" 
@@ -104,6 +114,7 @@ grid 4 1 sticky="" relief=sunken pady=4
 		null padx=1
 		button text=Clean   func=.win.cleanAD width=7 bg=aliceblue
 
+#Run
 grid 4 1 sticky=W
 	grid 1 3 sticky=W
 		label text=Run font="bold 11" sticky=W fg=forestgreen
@@ -129,7 +140,8 @@ grid 4 1 sticky=W
 		entry name=argvec value="" label="AD args" width=33 mode=character entrybg=grey94
 		button text="All args" func=.win.showADargs width=6
 
-grid 3 1 sticky="" relief=sunken pady=2
+#Output
+grid 3 1 sticky=""
 	grid 1 3 sticky=W
 		label text=Output font="bold 11" sticky=NW fg=orangered
 		vector length=6 names=toView mode=logical labels="log cor par rep std mc.dat" sticky=NW \

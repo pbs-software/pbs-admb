@@ -51,7 +51,7 @@ admb=function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 	adir <- paste(pdir,"/admb/admb-win32-mingw",sep="")               # ADMB directory
 	edir <- paste(pdir,"/examples",sep="")           # examples directory
 	tdir <- tempdir()
- tdir <- gsub("\\\\","/",tdir) # temporary directory for R
+	tdir <- gsub("\\\\","/",tdir) # temporary directory for R
 	stripExt=function(x) { return(sub("[.].{1,3}$", "", x)) }
 
 	wnam <- paste(wdir,wdf,sep="/")
@@ -77,17 +77,24 @@ admb=function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 	etpl <- basename(Sys.glob(file.path(edir,"*.tpl"))) # TPL files in examples directory
 	eprf <- stripExt(etpl)                              # strip off extensions
 	enew=character(0)
+	edir <- gsub( "\\\\", "/", edir )
 	for (i in eprf) 
 		enew=c(enew,paste("menuitem label=",i," function=doAction action=\"copyFiles(`",
-			i,".`,dir0=`",edir,"`); convOS(paste(`",i,"`,c(`.tpl`,`.dat`,`.pin`,`.r`),sep=``))\"",sep=""))
+			i,".`,srcdir=`",edir,"`); convOS(paste(`",i,"`,c(`.tpl`,`.dat`,`.pin`,`.r`),sep=``))\"",sep=""))
 	temp <- gsub("@nitems",length(eprf),temp)
 	temp <- gsub("@menuitems",paste(enew,collapse="\n\t"),temp)
 	temp <- gsub("@pkg",pkg,temp)
-	writeLines(temp,con=wtmp)
-	createWin(wtmp) #TODO use astext=TRUE
+
+	temp <- unlist( strsplit(temp, "\n" ) )
+	createWin(temp, TRUE)
 	.load.prefix.droplist()
 	loadOptionsGUI( .PBSadmb )
 	.win.checkADopts()
+
+	#TODO need centralized window variable init (is it done anywhere?)
+	setWinVal( list( currentdir.values = getwd() ) )
+	setWinVal( list( currentdir = getwd() ) )
+
 	invisible() }
 #---------------------------------------------admb
 
@@ -138,12 +145,14 @@ setADMBPath <- function( admbpath, gccpath, editor )
 		setOptions( .PBSadmb, gccpath = gccpath )
 	if( missing( editor ) == FALSE )
 		setOptions( .PBSadmb, editor = editor )
+	print( getOptions( .PBSadmb ) )
 }
 	
 .win.makeADopts=function(winName="PBSadmb")
 {
 	getWinVal(scope="L",winName=winName)
 	setADMBPath(admpath,gccpath,editor) 
+	.win.checkADopts()
 	invisible()
 }
 
@@ -154,6 +163,8 @@ writeADopts <- function(optfile="ADopts.txt")
 
 .win.writeADopts=function(winName="PBSadmb")
 {
+	isOK=.win.checkADopts()
+	if (!isOK) return()
 	getWinVal(scope="L",winName=winName)
 	writeADopts(optfile=optfile) 
 	invisible()
@@ -463,37 +474,19 @@ linkAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verb
 
 	#COMMON
 	args <- c(
-		"-Xlinker",
-		"-ladmod",
-		"-ladt" )
+		"-static"
+		)
 
 	#add admb to include path
 	args[ length( args ) + 1 ] = paste( "-L", adp, "/lib", sep="" )
-
-	#TODO
-	#some linker commands reference the same lib twice - this might actually be needed if the libraries link between each other
-	#        OS Comp Index Step  Safe RanEff        
-	#12    unix  GCC     4 Comp  TRUE     NA           `@ccPath/g++` -w -g -Dlinux -DUSE_LAPLACE -D__GNUDOS__ -O3 -c -fpermissive -Wno-deprecated -I. -I`@adHome/include` @prefix.cpp
-	#13    unix  GCC     5 Link FALSE  FALSE                         `@ccPath/g++` -o @prefix @prefix.o -Xlinker -s -L`@adHome/lib` -ldf1b2stub -ladmod -ladt -lado -ldf1b2stub -lado
-	#14    unix  GCC     6 Link  TRUE  FALSE                         `@ccPath/g++` -o @prefix @prefix.o -Xlinker -s -L`@adHome/lib` -ldf1b2stub -ladmod -ladt -lads -ldf1b2stub -lads
-	#15    unix  GCC     7 Link FALSE   TRUE                               `@ccPath/g++` -o @prefix @prefix.o -Xlinker -s -L`@adHome/lib` -ldf1b2o -ladmod -ladt -lado -ldf1b2o -lado
-	#16    unix  GCC     8 Link  TRUE   TRUE                               `@ccPath/g++` -o @prefix @prefix.o -Xlinker -s -L`@adHome/lib` -ldf1b2s -ladmod -ladt -lads -ldf1b2s -lads
 	
-	if( raneff ) {
-		if( safe )
-			args <- c( args, "-lads", "-ldf1b2s" )
-		else
-			args <- c( args, "-lado", "-ldf1b2o" )
+	#as of 10.0Beta2, the adlink.bat does not differentiate between randomeffects and non-randomeffects linking
+	if( safe ) {
+		args <- c( args, "-ldf1b2s -ladmod -ladt -lads -ldf1b2s -ladmod -ladt -lads" )
+
 	} else {
-		if( safe )
-			args <- c( args, "-ldf1b2stub", "-ladt", "-lads" )
-		else
-			args <- c( args, "-ldf1b2stub", "-ladt", "-lado" )
+		args <- c( args, "-ldf1b2o -ladmod -ladt -lado -ldf1b2o -ladmod -ladt -lado" )
 	}
-
-	#opt, non rand eff
-	#saVE, non RAnd eff
-
 
 	#add output name
 	args[ length( args ) + 1 ] = paste( "-o ", prefix, ext, sep="" )
@@ -501,7 +494,7 @@ linkAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verb
 	#collapse args and form the g++ command
 	args <- paste( args, collapse=" " )
 	file <- paste( prefix, ".o", sep="" )
-	cmd <- paste( prog, args, file, sep=" " )
+	cmd <- paste( prog, file, args, sep=" " )
 	if (.Platform$OS.type=="windows")
 	  cmd=.addQuotes(convSlashes(cmd))
 
@@ -960,7 +953,7 @@ is.function(f)}); pkgF=names(z)[z] # package functions
 # Copy files with specified prefixes and suffixes 
 # from one location to another.
 #-----------------------------------------------RH
-copyFiles=function(prefix,suffix=NULL,dir0=getwd(),dir1=getwd(),ask=TRUE){
+copyFiles=function(prefix,suffix=NULL,srcdir=getwd(),dstdir=getwd(),ask=TRUE){
 	if (missing(prefix)) return()
 	if (is.null(prefix) || prefix=="*") prefix=""
 	if (is.null(suffix) || suffix=="*") suffix=""
@@ -969,20 +962,20 @@ copyFiles=function(prefix,suffix=NULL,dir0=getwd(),dir1=getwd(),ask=TRUE){
 	npref=length(prefix)
  nsuff=length(suffix)
 	fpatt=paste(rep(prefix,each=nsuff),rep(suffix,npref),sep="")
-	fname=sapply(fpatt,function(x,dir){list.files(dir,x,ignore.case=TRUE)},dir=dir0,simplify=FALSE)
+	fname=sapply(fpatt,function(x,dir){list.files(dir,x,ignore.case=TRUE)},dir=srcdir,simplify=FALSE)
 	fname=unique(unlist(fname,use.names=FALSE))
  nfile=length(fname)
-	fname=list.files(dir0,pattern=fpatt,ignore.case=TRUE)
+	fname=list.files(srcdir,pattern=fpatt,ignore.case=TRUE)
 	if (nfile==0) return()
 	copy.out=rep(FALSE,nfile)
  names(copy.out)=fname
 	for (i in 1:nfile){
-		fnam0=paste(dir0,"/",fname[i],sep="")
-		fnam1=paste(dir1,"/",fname[i],sep="")
+		fnam0=paste(srcdir,"/",fname[i],sep="")
+		fnam1=paste(dstdir,"/",fname[i],sep="")
 		if (!file.exists(fnam1)) {ask=FALSE
  ovr=TRUE}
 		if (ask) ovr=getYes(paste("Overwrite",fname[i],"?"))
-		copy.out[i]=file.copy(fnam0,dir1,overwrite=ovr) }
+		copy.out[i]=file.copy(fnam0,dstdir,overwrite=ovr) }
 	if (exists(".PBSmod",envir=.GlobalEnv) && .PBSmod$.activeWin=="PBSadmb") 
 		setWinVal(list(prefix=substring(prefix,1,nchar(prefix)-2)),winName="PBSadmb")
 	invisible(copy.out) }
@@ -1184,7 +1177,7 @@ cleanAD <- function(prefix=NULL) {
 # Parse a command for an ADMB command.
 #-----------------------------------------------RH
 parseCmd = function(prefix, index, os=.Platform$OS, comp="GCC", admpath="", gccpath="") {
-	stop( "THIS DESIGN IS FUCKED" )
+	stop( "this will be removed" )
 	.addSlashes <- function( str ) return( gsub( "\\\\", "\\\\\\\\", str ) )
 	dat=ADMBcmd
  dat$OS=tolower(dat$OS)
@@ -1215,3 +1208,30 @@ convOS = function(inam, onam=inam, path=getwd()) {
 			writeLines(idat,con=onam[i]) } }
 }
 
+.changeWD <- function( wd )
+{
+	if( missing( wd ) )
+		wd <- tclvalue(tkchooseDirectory())
+	if( wd != "" ) {
+		currentdir.values <- sort( unique( c( wd, getWinVal()$currentdir.values ) ) )
+		setWinVal( list( currentdir.values = currentdir.values ) )
+		setWinVal( list( currentdir = wd ) )
+		setwd( wd )
+	}
+}
+
+#called by droplist when user hits enter
+.changeWDEnter <- function()
+{
+	wd <- getWinVal()$currentdir
+
+	#remove trailing slash
+	wd <- gsub("(\\\\|/)$", "", wd )
+
+	if( file.exists( wd ) )
+		.changeWD( wd )
+	else {
+		showAlert( paste( "unable to set working directory to \"", wd, "\" - does not exist", sep="" ) )
+		.changeWD( getwd() )
+	}
+}
