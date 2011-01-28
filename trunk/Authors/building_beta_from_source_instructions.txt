@@ -60,8 +60,37 @@ mingw32-make --file=mingw.mak
 
 =building with gcc for windows (64bit)=
 
-TODO: need to try installing mingw-64 (http://mingw-w64.sourceforge.net/)
-      might be distributed with the R tools; however, it's probably best to get it from the real source.
+===mingw-w64===
+Download the latest version of mingw-w64-1.0-bin_i686-mingw
+At the time, the downloaded version was:
+http://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Automated%20Builds/mingw-w64-1.0-bin_i686-mingw_20101129.zip/download (233,592KB)
+
+extract contents to: "C:\admb_build", such that C:\admb_build\mingw-w64\bin\x86_64-w64-mingw32-g++.exe exists
+
+edit the files:
+src\mingw.mak:
+  -replace g++ with x86_64-w64-mingw32-g++ (two occurrences)
+src\nh99\mingw-optg32-rh8-laplace.mak
+  -replace g++ with x86_64-w64-mingw32-g++ (one occurrence)
+
+Open a cmd shell and cd to C:\admb_build\admb-10.0Beta2\src
+and type:
+
+set PATH=C:\admb_build\GnuWin32\bin;C:\admb_build\mingw-w64\bin;C:\admb_build\MinGW\bin;c:\Windows\system32
+*note that the standard 32bit version of mingw is needed for make.
+
+start the build process by typing:
+mingw32-make --file=mingw.mak
+
+cd ../build
+
+rename the built directory to gcc4-5-2-64bit (or something similar), and cd gcc4-5-2-64bit
+
+*for some reason the build process fails to produce an index of the archive, so do that manually
+C:\admb_build\admb-10.0Beta2\build\dists\gcc4-5-2-64bit\lib>x86_64-w64-mingw32-ranlib *.a
+
+===setup with PBS-ADMB===
+-PBSadmb only looks for g++, so it's nessisary to make a copy of x86_64-w64-mingw32-g++.exe and rename it to g++.exe
 
 
 =OSX=
