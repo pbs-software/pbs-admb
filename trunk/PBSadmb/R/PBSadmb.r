@@ -41,6 +41,7 @@ admb=function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 	pkg="PBSadmb"
 	if (!require(PBSmodelling))
 		stop("!!!!!Install package PBSmodelling!!!!!")
+	require(tcltk,quietly=TRUE)
 
 	#TODO rename to something else - too similar to .PBSadmb
 	assign("PBSadmb",list(pkg=pkg,func="admb",useCols=NULL),envir=.GlobalEnv)
