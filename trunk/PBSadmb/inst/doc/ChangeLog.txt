@@ -1,7 +1,9 @@
 PBSadmb Changes
 ===============
-0.62  2010-10-08  Rowan
+0.62  2011-02-22  Authors
   - (keep adding changes here until sent to CRAN as v.0.62)
+  - Added ADM scripts in 'ADMtools' under 'inst' directory (RH 2/22)
+  - Started integrating batch wrappers for PBSadmb (ACB 2/21)
   - Modified functions 'runMC' and '.win.runMC' so that script version doesn't require GUI. (RH 10/8)
 
 0.61.rxx 2009-12-07 Jon
