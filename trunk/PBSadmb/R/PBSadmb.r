@@ -315,6 +315,18 @@ appendLog <- function(prefix, lines)
 	}
 }
 
+.setPath <- function()
+{
+	path_sep <- ifelse( .Platform$OS.type == "windows", ";", ":" )
+	dir_sep <- ifelse( .Platform$OS.type == "windows", "\\", "/" )
+
+	admb_path <- paste( getOptions( .PBSadmb, "admpath" ), "bin", sep = dir_sep )
+	gcc_path <- getOptions( .PBSadmb, "gccpath")
+
+	path <- paste( admb_path, gcc_path, sep = path_sep )
+	Sys.setenv( PATH = path )
+}
+
 #convAD---------------------------------2009-08-12
 # Conver TPL file to CPP code.
 #-------------------------------------------JTS/RH
@@ -323,17 +335,24 @@ convAD <- function(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE, 
 	adp <- getOptions( .PBSadmb, "admpath" )
 
 	#get path and name of program
-	ext <- ifelse( .Platform$OS.type == "windows", ".exe", "" )
-	prog <- ifelse( raneff == TRUE, "tpl2rem", "tpl2cpp" )
-	prog <- paste( adp, "/bin/", prog, ext, sep="" )
+	ext <- ifelse( .Platform$OS.type == "windows", ".bat", "" )
+	prog <- paste( "admb", ext, sep="" )
+
+	#add cmd flags
+	flags <- c()
+	if( raneff )
+		flags[ length( flags ) + 1 ] <- "-r"
+
+	#collapse flags to string
+	flags <- paste( flags, collapse=" " )
 	
 	cmd <- paste( prog, prefix, sep=" " )
 	if (.Platform$OS.type=="windows")
 	  cmd=.addQuotes(convSlashes(cmd))
 
 	#add ADMB path to path env variable
-	.appendToPath( adp )
 	Sys.setenv( ADMB_HOME = gsub("/*$", "", adp ) ) #ensure no trailing slash (`/') exists
+	.setPath()
 
 	#pre cmd run
 	if (logfile & !add)
@@ -376,6 +395,7 @@ convAD <- function(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE, 
 #-------------------------------------------JTS/RH
 compAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verbose=TRUE, comp="GCC")
 {
+	stop( "TODO - needs to be fixed to use .bat/scripts - press Convert only to build everything (currently a hack)" )
 	adp <- getOptions( .PBSadmb, "admpath" )
 	gcp <- getOptions( .PBSadmb, "gccpath")
 
@@ -451,6 +471,8 @@ compAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verb
 #-------------------------------------------JTS/RH
 linkAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verbose=TRUE, comp="GCC")
 {
+	stop( "TODO - needs to be fixed to use .bat/scripts - press Convert only to build everything (currently a hack)" )
+
 #	adp <- getOptions( .PBSadmb, "admpath")
 #	gcp <- getOptions( .PBSadmb, "gccpath")
 #	index=ifelse(safe&raneff,8,ifelse(!safe&raneff,7,ifelse(safe&!raneff,6,5)))
