@@ -14,10 +14,20 @@
 	{
 		for( p in programs ) {
 			found <- Sys.which( p )[ 1 ]
-			if( found != "" )
-				return( found )
+			if( found != "" ) {
+				if( includefilename )
+					return( found )
+				return( dirname( found ) )
+			}
 		}
 		return( failed )
+	}
+
+	.removeOneLevel <- function( path )
+	{
+		x <- strsplit( path, "/" )[[1]]
+		x <- x[ -length( x ) ]
+		return( paste( x, collapse="/" ) )
 	}
 
 	#guess ADMB path
@@ -25,6 +35,9 @@
 	
 	#guess gcc path
 	initial.options$gccpath <- .guessPath( "g++" )
+	if( initial.options$gccpath != "unknown" )
+		initial.options$gccpath <- .removeOneLevel( initial.options$gccpath )
+	
 	
 	#guess editor
 	initial.options$editor <- .guessPath( c( "gvim", "kate", "notepad" ), TRUE )
@@ -49,7 +62,7 @@ admb=function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 
 	pdir <- system.file(package=pkg)                 # package directory
 	wdir <- paste(pdir,"/win",sep="")                # window description file directory
-	adir <- paste(pdir,"/admb/admb-win32-mingw",sep="")               # ADMB directory
+	adir <- paste(pdir,"/admb/admb-10.0-mingw-gcc4.5.0-32bit",sep="")               # ADMB directory
 	edir <- paste(pdir,"/examples",sep="")           # examples directory
 	tdir <- tempdir()
 	tdir <- gsub("\\\\","/",tdir) # temporary directory for R
@@ -115,7 +128,7 @@ installADMB <- function()
 		stop( "automatic installation of ADMB is only available for windows. Unix users must visit the admb website and install the corresponding copy manually" )
 
 	oldwd <- getwd()
-	url <- "http://admb-project.googlecode.com/files/admb-9.0.363-win32-mingw-gcc3.4.zip"
+	url <- "http://admb-project.googlecode.com/files/admb-10.0-mingw-gcc4.5.0-32bit.zip"
 	download_to <- system.file(package="PBSadmb")
 	download_to <- paste( download_to, "/admb", sep="" )
 	print( download_to )
@@ -209,9 +222,9 @@ checkADopts=function(opts=getOptions( .PBSadmb ), check=c("admpath","gccpath","e
 		}
 		else if (i=="gccpath")
 			if( .Platform$OS.type == "windows" )
-				progs="g++.exe" 
+				progs="bin\\g++.exe" 
 			else
-				progs="g++" 
+				progs="bin/g++" 
 		else if (i=="editor") {
 			ipath=dirname(ii)
 			progs=basename(ii)
@@ -320,38 +333,42 @@ appendLog <- function(prefix, lines)
 	path_sep <- ifelse( .Platform$OS.type == "windows", ";", ":" )
 	dir_sep <- ifelse( .Platform$OS.type == "windows", "\\", "/" )
 
+	admb_home <- getOptions( .PBSadmb, "admpath" )
 	admb_path <- paste( getOptions( .PBSadmb, "admpath" ), "bin", sep = dir_sep )
-	gcc_path <- getOptions( .PBSadmb, "gccpath")
+	gcc_path <- paste( getOptions( .PBSadmb, "gccpath"), "bin", sep = dir_sep )
+	msys_path <- paste( getOptions( .PBSadmb, "gccpath"), "msys", "1.0", "bin", sep = dir_sep )
 
-	path <- paste( admb_path, gcc_path, sep = path_sep )
+	path <- paste( admb_path, gcc_path, msys_path, sep = path_sep )
 	Sys.setenv( PATH = path )
+
+	Sys.setenv( ADMB_HOME = gsub("/*$", "", admb_home ) ) #ensure no trailing slash (`/') exists
 }
 
 #convAD---------------------------------2009-08-12
 # Conver TPL file to CPP code.
 #-------------------------------------------JTS/RH
-convAD <- function(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE, comp="GCC")
+convAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
 {
-	adp <- getOptions( .PBSadmb, "admpath" )
-
 	#get path and name of program
-	ext <- ifelse( .Platform$OS.type == "windows", ".bat", "" )
-	prog <- paste( "admb", ext, sep="" )
+	ext <- ifelse( .Platform$OS.type == "windows", ".exe", "" )
+	prog <- ifelse( raneff == TRUE, "tpl2rem", "tpl2cpp" )
 
-	#add cmd flags
-	flags <- c()
-	if( raneff )
-		flags[ length( flags ) + 1 ] <- "-r"
+ 	#add cmd flags
+ 	flags <- c()
+ 	if( dll )
+ 		flags[ length( flags ) + 1 ] <- "-dll"
+ 	if( safe )
+ 		flags[ length( flags ) + 1 ] <- "-bounds"
 
-	#collapse flags to string
-	flags <- paste( flags, collapse=" " )
-	
-	cmd <- paste( prog, prefix, sep=" " )
+ 	#build command string
+ 	flags <- paste( flags, collapse=" " )
+
+	cmd <- paste( prog, flags, prefix, sep=" " )
 	if (.Platform$OS.type=="windows")
 	  cmd=.addQuotes(convSlashes(cmd))
 
 	#add ADMB path to path env variable
-	Sys.setenv( ADMB_HOME = gsub("/*$", "", adp ) ) #ensure no trailing slash (`/') exists
+	old_path <- Sys.getenv( "PATH" )
 	.setPath()
 
 	#pre cmd run
@@ -371,6 +388,8 @@ convAD <- function(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE, 
 	if (verbose)
 		cat(tplout, sep="\n")
 
+	#restore path
+	Sys.setenv( PATH = old_path )
 	invisible(tplout2)
 }
 
@@ -393,45 +412,32 @@ convAD <- function(prefix, raneff=FALSE, logfile=TRUE, add=FALSE, verbose=TRUE, 
 # Apparently "raneff" doesn't influence the compile stage,
 # but the argument is preserved here for future development.
 #-------------------------------------------JTS/RH
-compAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verbose=TRUE, comp="GCC")
+compAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
 {
-	stop( "TODO - needs to be fixed to use .bat/scripts - press Convert only to build everything (currently a hack)" )
-	adp <- getOptions( .PBSadmb, "admpath" )
-	gcp <- getOptions( .PBSadmb, "gccpath")
-
 	#get path and name of program
-	ext <- ifelse( .Platform$OS.type == "windows", ".exe", "" )
-	prog <- paste( gcp, "/g++", ext, sep="" )
+	ext <- ifelse( .Platform$OS.type == "windows", ".bat", "" )
+	prog <- paste( "adcomp", ext, sep="" )
 
-	args <- c(
-			"-w",
-			"-g",
-			"-Dlinux",
-			"-DUSE_LAPLACE",
-			"-D__GNUDOS__",
-			"-O3",
-			"-c",
-			"-fpermissive",
-			"-Wno-deprecated",
-			"-I." )
-	
-	#add admb to include path
-	args[ length( args ) + 1 ] = paste( "-I", adp, "/include", sep="" )
+ 	#add cmd flags
+ 	flags <- c()
+ 	if( dll )
+ 		flags[ length( flags ) + 1 ] <- "-d"
+ 	if( debug )
+ 		flags[ length( flags ) + 1 ] <- "-g"
+ 	if( safe )
+ 		flags[ length( flags ) + 1 ] <- "-r"
+ 	if( raneff )
+ 		flags[ length( flags ) + 1 ] <- "-r"
 
-	#build optimized library (no bounds checking)
-	if( safe == FALSE )
-		args[ length( args ) + 1 ] = "-DOPT_LIB"
-
-	#collapse args and form the g++ command
-	args <- paste( args, collapse=" " )
-	file <- paste( prefix, ".cpp", sep="" )
-	cmd <- paste( prog, args, file, sep=" " )
-	if (.Platform$OS.type=="windows")
-	  cmd=.addQuotes(convSlashes(cmd))
+ 	#build command string
+ 	flags <- paste( flags, collapse=" " )
+	cmd <- paste( prog, flags, prefix, sep=" " )
+ 	if (.Platform$OS.type=="windows")
+ 		cmd=.addQuotes(convSlashes(cmd))
 
 	#add ADMB path to path env variable
-	.appendToPath( adp )
-	Sys.setenv( ADMB_HOME = gsub("/*$", "", adp ) ) #ensure no trailing slash (`/') exists
+	old_path <- Sys.getenv( "PATH" )
+	.setPath()
 
 	#pre cmd run
 	if (logfile & !add)
@@ -450,6 +456,7 @@ compAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verb
 	if (verbose)
 		cat(out, sep="\n")
 
+	Sys.setenv( PATH = old_path )
 	invisible(out2)
 }
 
@@ -469,61 +476,32 @@ compAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verb
 #linkAD---------------------------------2009-08-12
 # Links binaries into executable
 #-------------------------------------------JTS/RH
-linkAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verbose=TRUE, comp="GCC")
+linkAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
 {
-	stop( "TODO - needs to be fixed to use .bat/scripts - press Convert only to build everything (currently a hack)" )
-
-#	adp <- getOptions( .PBSadmb, "admpath")
-#	gcp <- getOptions( .PBSadmb, "gccpath")
-#	index=ifelse(safe&raneff,8,ifelse(!safe&raneff,7,ifelse(safe&!raneff,6,5)))
-#	cmd=parseCmd(prefix,index=index,admpath=adp,gccpath=gcp,comp=comp)
-#	if (logfile & !add) startLog(prefix)
-#
-#	if (verbose) cat(cmd,"\n")
-#	if (.Platform$OS.type=="windows") {
-#		cmd=.addQuotes(convSlashes(cmd))
-#	}
-#	out1 <- .callSys(cmd)
-#	out2 <- c(cmd,out1)
-#	if (logfile) appendLog(prefix, out2)
-#	if (verbose) cat(out1, sep="\n")
-#	return( invisible(out2) )
-	adp <- getOptions( .PBSadmb, "admpath" )
-	gcp <- getOptions( .PBSadmb, "gccpath")
-
 	#get path and name of program
-	ext <- ifelse( .Platform$OS.type == "windows", ".exe", "" )
-	prog <- paste( gcp, "/g++", ext, sep="" )
+	ext <- ifelse( .Platform$OS.type == "windows", ".bat", "" )
+	prog <- paste( "adlink", ext, sep="" )
 
-	#COMMON
-	args <- c(
-		"-static"
-		)
+ 	#add cmd flags
+ 	flags <- c()
+ 	if( dll )
+ 		flags[ length( flags ) + 1 ] <- "-d"
+ 	if( debug )
+ 		flags[ length( flags ) + 1 ] <- "-g"
+ 	if( safe )
+ 		flags[ length( flags ) + 1 ] <- "-r"
+ 	if( raneff )
+ 		flags[ length( flags ) + 1 ] <- "-r"
 
-	#add admb to include path
-	args[ length( args ) + 1 ] = paste( "-L", adp, "/lib", sep="" )
-	
-	#as of 10.0Beta2, the adlink.bat does not differentiate between randomeffects and non-randomeffects linking
-	if( safe ) {
-		args <- c( args, "-ldf1b2s -ladmod -ladt -lads -ldf1b2s -ladmod -ladt -lads" )
-
-	} else {
-		args <- c( args, "-ldf1b2o -ladmod -ladt -lado -ldf1b2o -ladmod -ladt -lado" )
-	}
-
-	#add output name
-	args[ length( args ) + 1 ] = paste( "-o ", prefix, ext, sep="" )
-
-	#collapse args and form the g++ command
-	args <- paste( args, collapse=" " )
-	file <- paste( prefix, ".o", sep="" )
-	cmd <- paste( prog, file, args, sep=" " )
-	if (.Platform$OS.type=="windows")
-	  cmd=.addQuotes(convSlashes(cmd))
+ 	#build command string
+ 	flags <- paste( flags, collapse=" " )
+	cmd <- paste( prog, flags, prefix, sep=" " )
+ 	if (.Platform$OS.type=="windows")
+ 		cmd=.addQuotes(convSlashes(cmd))
 
 	#add ADMB path to path env variable
-	.appendToPath( adp )
-	Sys.setenv( ADMB_HOME = gsub("/*$", "", adp ) ) #ensure no trailing slash (`/') exists
+	old_path <- Sys.getenv( "PATH" )
+	.setPath()
 
 	#pre cmd run
 	if (logfile & !add)
@@ -542,6 +520,7 @@ linkAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verb
 	if (verbose)
 		cat(out, sep="\n")
 
+	Sys.setenv( PATH = old_path )
 	invisible(out2)
 }
 
@@ -558,14 +537,12 @@ linkAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, add=TRUE, verb
 	invisible(Ttime)
 }
 
-makeAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, verbose=TRUE)
+makeAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
 {
-  convAD(prefix, raneff, logfile, add=FALSE, verbose)
-
-  compAD(prefix, raneff, safe, logfile, add=TRUE, verbose)
-
-  linkAD(prefix, raneff, safe, logfile, add=TRUE, verbose)
- }
+	convAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
+	compAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
+	linkAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
+}
 
 
 .win.makeAD=function(winName="PBSadmb") {
@@ -575,17 +552,17 @@ makeAD <- function(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, verbose=TRUE)
 	time0=proc.time()[1:3]
 	getWinVal(scope="L",winName=winName)
 
-	convAD(prefix=prefix,raneff=raneff) #,logfile=logfile,add=add,verbose=verbose)
+	convAD(prefix=prefix,raneff=raneff,logfile=logfile,add=add,verbose=verbose)
 	Ttime=round(proc.time()[1:3]-time0,2)
  time0=proc.time()[1:3]
 	setWinVal(list("Mtime[1,1]"=Ttime[1],"Mtime[1,2]"=Ttime[2],"Mtime[1,3]"=Ttime[3]),winName=winName)
 
-	compAD(prefix=prefix,raneff=raneff,safe=safe) #,logfile=logfile,add=add,verbose=verbose)
+	compAD(prefix=prefix,raneff=raneff,safe=safe,logfile=logfile,add=add,verbose=verbose)
 	Ttime=round(proc.time()[1:3]-time0,2)
  time0=proc.time()[1:3]
 	setWinVal(list("Mtime[2,1]"=Ttime[1],"Mtime[2,2]"=Ttime[2],"Mtime[2,3]"=Ttime[3]),winName=winName)
 
-	linkAD(prefix=prefix,raneff=raneff,safe=safe) #,logfile=logfile,add=add,verbose=verbose) 
+	linkAD(prefix=prefix,raneff=raneff,safe=safe,logfile=logfile,add=add,verbose=verbose) 
 	Ttime=round(proc.time()[1:3]-time0,2)
 	setWinVal(list("Mtime[3,1]"=Ttime[1],"Mtime[3,2]"=Ttime[2],"Mtime[3,3]"=Ttime[3]),winName=winName) 
 
