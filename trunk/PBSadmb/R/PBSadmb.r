@@ -401,7 +401,7 @@ convAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 	setWinVal(list(Mtime=matrix(NA,nrow=3,ncol=3)),winName=winName)
 	time0=proc.time()[1:3]
 	getWinVal(scope="L",winName=winName)
-	convAD(prefix=prefix,raneff=raneff) #,logfile=logfile,add=add,verbose=verbose)
+	convAD(prefix, raneff, safe, dll, debugsymbols, logfile, add, verbose)
 	Ttime=round(proc.time()[1:3]-time0,2)
 	setWinVal(list("Mtime[1,1]"=Ttime[1],"Mtime[1,2]"=Ttime[2],"Mtime[1,3]"=Ttime[3]),winName=winName) 
 	if( .Platform$OS.type == "unix" )
@@ -425,7 +425,7 @@ compAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
  	if( debug )
  		flags[ length( flags ) + 1 ] <- "-g"
  	if( safe )
- 		flags[ length( flags ) + 1 ] <- "-r"
+ 		flags[ length( flags ) + 1 ] <- "-s"
  	if( raneff )
  		flags[ length( flags ) + 1 ] <- "-r"
 
@@ -466,7 +466,7 @@ compAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
  if (!isOK) return()
 	time0=proc.time()[1:3]
 	getWinVal(scope="L",winName=winName)
-	compAD(prefix=prefix,raneff=raneff,safe=safe) #,logfile=logfile,add=add,verbose=verbose)
+	compAD(prefix, raneff, safe, dll, debugsymbols, logfile, add, verbose)
 	Ttime=round(proc.time()[1:3]-time0,2)
 	setWinVal(list("Mtime[2,1]"=Ttime[1],"Mtime[2,2]"=Ttime[2],"Mtime[2,3]"=Ttime[3]),winName=winName) 
 	if( .Platform$OS.type == "unix" ) cat("\n> ")
@@ -489,7 +489,7 @@ linkAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
  	if( debug )
  		flags[ length( flags ) + 1 ] <- "-g"
  	if( safe )
- 		flags[ length( flags ) + 1 ] <- "-r"
+ 		flags[ length( flags ) + 1 ] <- "-s"
  	if( raneff )
  		flags[ length( flags ) + 1 ] <- "-r"
 
@@ -530,7 +530,7 @@ linkAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
  if (!isOK) return()
 	time0=proc.time()[1:3]
 	getWinVal(scope="L",winName=winName)
-	linkAD(prefix=prefix,raneff=raneff,safe=safe) #,logfile=logfile,add=add,verbose=verbose) 
+	linkAD(prefix, raneff, safe, dll, debugsymbols, logfile, add, verbose)
 	Ttime=round(proc.time()[1:3]-time0,2)
 	setWinVal(list("Mtime[3,1]"=Ttime[1],"Mtime[3,2]"=Ttime[2],"Mtime[3,3]"=Ttime[3]),winName=winName) 
 	if( .Platform$OS.type == "unix" ) cat("\n> ")
@@ -539,35 +539,18 @@ linkAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 
 makeAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
 {
-	convAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
-	compAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
-	linkAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
+	convAD(prefix, raneff, safe, dll, debug, logfile, add, verbose)
+	compAD(prefix, raneff, safe, dll, debug, logfile, add, verbose)
+	linkAD(prefix, raneff, safe, dll, debug, logfile, add, verbose)
 }
 
 
 .win.makeAD=function(winName="PBSadmb") {
 	isOK=.win.checkADopts()
- if (!isOK) return()
-	setWinVal(list(Mtime=matrix(NA,nrow=3,ncol=3)),winName=winName)
-	time0=proc.time()[1:3]
-	getWinVal(scope="L",winName=winName)
-
-	convAD(prefix=prefix,raneff=raneff,logfile=logfile,add=add,verbose=verbose)
-	Ttime=round(proc.time()[1:3]-time0,2)
- time0=proc.time()[1:3]
-	setWinVal(list("Mtime[1,1]"=Ttime[1],"Mtime[1,2]"=Ttime[2],"Mtime[1,3]"=Ttime[3]),winName=winName)
-
-	compAD(prefix=prefix,raneff=raneff,safe=safe,logfile=logfile,add=add,verbose=verbose)
-	Ttime=round(proc.time()[1:3]-time0,2)
- time0=proc.time()[1:3]
-	setWinVal(list("Mtime[2,1]"=Ttime[1],"Mtime[2,2]"=Ttime[2],"Mtime[2,3]"=Ttime[3]),winName=winName)
-
-	linkAD(prefix=prefix,raneff=raneff,safe=safe,logfile=logfile,add=add,verbose=verbose) 
-	Ttime=round(proc.time()[1:3]-time0,2)
-	setWinVal(list("Mtime[3,1]"=Ttime[1],"Mtime[3,2]"=Ttime[2],"Mtime[3,3]"=Ttime[3]),winName=winName) 
-
-	if( .Platform$OS.type == "unix" ) cat("\n> ")
-	invisible()
+	if (!isOK) return()
+	.win.convAD( winName )
+	.win.compAD( winName )
+	.win.linkAD( winName )
 }
 
 runAD <- function(prefix, argvec="", logfile=TRUE, add=TRUE, verbose=TRUE)
