@@ -97,13 +97,19 @@ grid 3 1 sticky=""
 		label text="      Make times\nUsr     Sys     Elap" sticky=E
 		label text="" font="Courier 8"
 	grid 1 2 sticky=W
-		grid 2 3 sticky=W
+		grid 4 3 sticky=W
 			label text=Operation: sticky=NW
 			radio name=safe mode=logical value=TRUE  text=Safe sticky=W
 			radio name=safe mode=logical value=FALSE text=Optimize sticky=W
 			label text="Ran Eff:" sticky=NW
 			radio name=raneff mode=logical value=FALSE text=No  sticky=W
 			radio name=raneff mode=logical value=TRUE  text=Yes sticky=W
+			label text="create DLL:" sticky=NW
+			radio name=dll mode=logical value=FALSE text=No  sticky=W
+			radio name=dll mode=logical value=TRUE  text=Yes sticky=W
+			label text="debug symbols:" sticky=NW
+			radio name=debugsymbols mode=logical value=FALSE text=No  sticky=W
+			radio name=debugsymbols mode=logical value=TRUE  text=Yes sticky=W
 		matrix nrow=3 ncol=3 names=Mtime rowlabels=NULL collabels=NULL width=5 entrybg=grey94 sticky=N
 	grid 1 7
 		button text=Make    func=.win.makeAD  width=7 bg="#b9d7ff"
