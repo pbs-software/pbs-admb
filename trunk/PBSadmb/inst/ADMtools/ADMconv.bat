@@ -3,26 +3,21 @@ if not defined ADM_SETLOCAL (
 	SETLOCAL
 	SET ADM_SETLOCAL=1 )
 
-if "%1"=="" (
-  echo ERROR - you must specify a model
-  echo example: %0% vonb
-  goto end )
-
 SET ADM_NO_PAUSE=1
+
 call ADMcheck.bat
 
 if not defined ADM_ERROR (
 	if "%2"=="" (
-		tpl2cpp vonb
+		tpl2cpp %1
 	) else (
-		if "%2"=="-r" (
-			tpl2rem "%1" 
+		if "%1"=="-r" (
+			tpl2rem "%2" 
 		) else (
-			echo ERROR - the only option is '-r'
-			echo %0 vonb -r
+			echo ERROR - the only valid option is '-r'
+			echo Example - %0 -r %2
 			goto end
 		)
 	) )
 
 :end
-
