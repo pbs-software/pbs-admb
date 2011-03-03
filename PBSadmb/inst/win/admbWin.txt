@@ -20,11 +20,6 @@ menu nitems=7 label="View"
 menu nitems=@nitems label="Examples"
 	@menuitems
 
-menu nitems=2 label="Package"
-	menuitem label="R Code" func=.win.viewCode action=code
-	# this menuitem will be altered by admb()
-	menuitem label=Window func=doAction action=@editADfile
-
 menu nitems=4 label="Help"
 	menu nitems=3 label="Manuals"
 		#menuitem label="ADMB Manual" function=doAction action="openFile(`doc/Manual-ADMB.pdf`,package=`PBSadmb`)"
@@ -38,7 +33,7 @@ menu nitems=4 label="Help"
 		menuitem label="ADMB Examples" function=doAction action="browseURL(`http://otter-rsch.com/examples.htm`)"
 		menuitem label="ADMB RE Examples" function=doAction action="browseURL(`http://otter-rsch.com/admbre/examples.html`)"
 	menuitem label="User Guide" function=doAction action="openFile(`doc/PBSadmb-UG.pdf`,package=`PBSadmb`)"
-	menuitem label=About function=doAction action="editADfile(paste(system.file(package=`@pkg`),`/DESCRIPTION`,sep=``))"
+	menuitem label=About function=doAction action="editADfile(paste(system.file(package=`PBSadmb`),`/DESCRIPTION`,sep=``))"
 
 #----------------------------------- BUTTONS -----------------------------------
 
@@ -62,8 +57,8 @@ grid 7 1 sticky=W
 		null padx=85
 		label test name=chkstat sticky=W width=4 bg=lightgoldenrodyellow sticky=E
 	grid 1 2 sticky=E
-		entry name=admpath value=@admpath label="ADM path:" width=35 mode=character func=setGUIoptions action=admpath
-		button text=">" func=doAction action="selectDir(usewidget=\"admpath\")"
+		entry name=admbpath value="" label="ADM path:" width=35 mode=character func=setGUIoptions action=admbpath
+		button text=">" func=doAction action="selectDir(usewidget=\"admbpath\")"
 	grid 1 2 sticky=E
 		entry name=gccpath value="" label="GCC path:" width=35 mode=character func=setGUIoptions action=gccpath
 		button text=">" func=doAction action="selectDir(usewidget=\"gccpath\")"
@@ -75,7 +70,7 @@ grid 7 1 sticky=W
 	Label "Save/Load Options to/from Disk" sticky=W fg=blue font="bold 11"
 	grid 1 4 sticky=E
 		label text="Options: "
-		entry name=optfile value=@optfile label="" width=15 mode=character action=optfile
+		entry name=optfile value="" label="" width=15 mode=character action=optfile
 		button text="Load" func=.win.readADopts bg=palegoldenrod
 		button text="Save"  func=.win.writeADopts bg=lightgoldenrod1
 

@@ -6,11 +6,20 @@
 	if( exists( ".PBSadmb" ) ) 
 		return()
 
+	initial.options <- .guessDefaultPaths()
+	
+	#create instance of option manager - use this to get/set/save/load options
+	.PBSadmb <<- new( "PBSoptions", filename = "ADopts.txt", initial.options = initial.options, gui.prefix="" )
+}
+
+#return a list of guessed paths
+.guessDefaultPaths <- function()
+{
 	#first setup initial option values
 	initial.options <- list()
 
 	#search vector of programs for the first found path, if nothing is found return "failed" object
-	.guessPath <- function( programs, includefilename = FALSE, failed = "unknown" )
+	.guessPath <- function( programs, includefilename = FALSE, failed = "" )
 	{
 		for( p in programs ) {
 			found <- Sys.which( p )[ 1 ]
@@ -30,20 +39,67 @@
 		return( paste( x, collapse="/" ) )
 	}
 
+	#try different places to find the ADMB software for default values
+	#first see if it exists anywhere on the path
+	#if that fails, second, try installed versions under R's library
+
 	#guess ADMB path
-	initial.options$admpath <- .guessPath( "tpl2rem" )
+	initial.options$admbpath <- .guessPath( "tpl2rem" )
+	if( initial.options$admbpath != "" )
+		initial.options$admbpath <- .removeOneLevel( initial.options$gccpath )
+	else
+		initial.options$admbpath <- .findDownloadedSoftware( "admb64", "admb" )
+	if( is.null( initial.options$admbpath ) )
+		initial.options$admbpath <- "unknown"
 	
 	#guess gcc path
 	initial.options$gccpath <- .guessPath( "g++" )
-	if( initial.options$gccpath != "unknown" )
+	if( initial.options$gccpath != "" )
 		initial.options$gccpath <- .removeOneLevel( initial.options$gccpath )
-	
-	
+	else
+		initial.options$gccpath <- .findDownloadedSoftware( "gcc64", "gcc" )
+	if( is.null( initial.options$gccpath ) )
+		initial.options$gccpath <- "unknown"
+
 	#guess editor
 	initial.options$editor <- .guessPath( c( "gvim", "kate", "notepad" ), TRUE )
 
-	#create instance of option manager - use this to get/set/save/load options
-	.PBSadmb <<- new( "PBSoptions", filename = "ADopts.txt", initial.options = initial.options, gui.prefix="" )
+	return( initial.options )
+}
+
+.resetOptions <- function()
+{
+	initial.options <- .guessDefaultPaths()
+	setOptions( .PBSadmb, admbpath = initial.options$admbpath, gccpath = initial.options$gccpath, editor = initial.options$editor )
+
+}
+
+.findDownloadedSoftware <- function( ... )
+{
+	.findDownloadedSoftwareHelper <- function( name )
+	{
+		pkg.dir <- system.file(package="PBSadmb")
+		pkg.dir <- paste( pkg.dir, "/admb", sep="" )
+		pkg.dir <- paste( pkg.dir, name, sep="/" )
+		if( file.exists( pkg.dir ) == FALSE )
+			return( NULL )
+
+		#all software is then inside another directory which can be named anything (e.g. admb-10.0-mingw-gcc4.5.2-64bit)
+		d <- dir( pkg.dir )[ 1 ]
+
+		#if dir() returns nothing, we get a .../NA, which will then fail the file.exists
+		pkg.dir <- paste( pkg.dir, d, sep="/" )
+
+		if( file.exists( pkg.dir ) )
+			return( pkg.dir )
+		return( NULL )
+	}
+	for( i in c( ... ) ) {
+		path <- .findDownloadedSoftwareHelper( i )
+		if( is.null( path ) == FALSE )
+			return( path )
+	}
+	return( NULL )
 }
 
 #admb-----------------------------------2009-07-21
@@ -58,36 +114,16 @@ admb=function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 
 	#TODO rename to something else - too similar to .PBSadmb
 	assign("PBSadmb",list(pkg=pkg,func="admb",useCols=NULL),envir=.GlobalEnv)
-	#if (exists(".ADopts",envir=.GlobalEnv)) rm(.ADopts,envir=.GlobalEnv) # remove previous hidden object
 
 	pdir <- system.file(package=pkg)                 # package directory
-	wdir <- paste(pdir,"/win",sep="")                # window description file directory
-	adir <- paste(pdir,"/admb/admb-10.0-mingw-gcc4.5.0-32bit",sep="")               # ADMB directory
+	win.dir <- paste(pdir,"/win",sep="")                # window description file directory
 	edir <- paste(pdir,"/examples",sep="")           # examples directory
-	tdir <- tempdir()
-	tdir <- gsub("\\\\","/",tdir) # temporary directory for R
 	stripExt=function(x) { return(sub("[.].{1,3}$", "", x)) }
 
-	wnam <- paste(wdir,wdf,sep="/")
-	wtmp <- paste(tdir,wdf,sep="/")
-	temp <- readLines(wnam)
-	temp <- gsub("@editADfile",paste("\"editADfile(`",wtmp,"`)\"",sep=""),temp)
-	if (is.null(prefix) || prefix=="") prefix="vonb"
-	temp <- gsub("@prefix",prefix,temp)
-	if( file.exists( adir ) ) {
-		temp <- gsub("@admpath",adir,temp)
-		setOptions( .PBSadmb, admpath = adir )
-	} else {
-		temp <- gsub("@admpath","\"fillme\"",temp)
-		if( .Platform$OS.type == "windows" ) {
-			cat( "\nADMB is not installed in the default location - Windows users can run\n" )
-			cat( "installADMB() to automatically download and extract files into PBSadmb's\n" )
-			cat( "R library location. If ADMB is installed elsewhere, you can manually set\n" )
-			cat( "the ADM path value in the GUI to point to your own installation.\n\n" )
-		}
-	}
-	temp <- gsub("@optfile",optfile,temp)
-	#---examples---
+	win.filename <- paste(win.dir,wdf,sep="/")
+	temp <- readLines(win.filename)
+		
+	# insert examples into window description file menuitems
 	etpl <- basename(Sys.glob(file.path(edir,"*.tpl"))) # TPL files in examples directory
 	eprf <- stripExt(etpl)                              # strip off extensions
 	enew=character(0)
@@ -97,17 +133,28 @@ admb=function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 			i,".`,srcdir=`",edir,"`); convOS(paste(`",i,"`,c(`.tpl`,`.dat`,`.pin`,`.r`),sep=``))\"",sep=""))
 	temp <- gsub("@nitems",length(eprf),temp)
 	temp <- gsub("@menuitems",paste(enew,collapse="\n\t"),temp)
-	temp <- gsub("@pkg",pkg,temp)
 
+	#create the window (from temp string)
 	temp <- unlist( strsplit(temp, "\n" ) )
 	createWin(temp, TRUE)
+
+	#set some values
 	.load.prefix.droplist()
 	loadOptionsGUI( .PBSadmb )
-	.win.checkADopts()
+	isOK <- .win.checkADopts()
+
+	if( isOK == FALSE && .Platform$OS.type == "windows" ) {
+		cat( "\nADMB or GCC are not installed in the default location - Windows users can run\n" )
+		cat( "installADMB(\"32\") or installADMB(\"64\") to automatically download and install ADMB\n" )
+		cat( "and GCC for 32bit or 64bit versions of Windows respectively. These files will be \n" )
+		cat( "installed to the default R library location. If ADMB is installed elsewhere, you can \n" )
+		cat( "manually set the ADMB or GCC path values in the GUI to point to your own installations.\n" )
+	}
 
 	#TODO need centralized window variable init (is it done anywhere?)
 	setWinVal( list( currentdir.values = getwd() ) )
 	setWinVal( list( currentdir = getwd() ) )
+	setWinVal( list( optfile = optfile ) )
 
 	invisible() }
 #---------------------------------------------admb
@@ -122,39 +169,67 @@ admb=function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 	setWinVal( list( prefix = choices[ 1 ] ) )
 }
 
-installADMB <- function()
+installADMB <- function( arch = "32", skip.warning = FALSE )
 {
-	if( .Platform$OS.type != "windows" )
-		stop( "automatic installation of ADMB is only available for windows. Unix users must visit the admb website and install the corresponding copy manually" )
+	if( arch == "64" ) {
+		if( .Platform$r_arch != "x64" && skip.warning == FALSE )
+			stop( "attempting to install 64bit version on 32bit R. If you are certain you are on a 64bit computer (but are running the 32bit version of R for some reason), pass skip.warning=TRUE to continue" )
+		installADMB.windows( 
+			admb64 = "http://pbs-admb.googlecode.com/files/admb-10.0-mingw-gcc4.5.2-64bit.zip",
+			gcc64 = "http://pbs-admb.googlecode.com/files/gcc452-64bit.zip"
+		)
+	} else {
+		#32bit version
+		installADMB.windows( 
+			admb = "http://pbs-admb.googlecode.com/files/admb-10.0-mingw-gcc4.5.0-32bit.zip",
+			gcc = "http://pbs-admb.googlecode.com/files/gcc450.zip"
+		)
+	}
+	.resetOptions()
+	cat( "Please re-run admb() for changes to take effect\n" )
+}
 
+#usage: installADMB.windows( gcc = "http://some.url/to.download.zip" )
+# will be downloaded to gcc.zip, and extract to a directory under PBSadmb\gcc\...
+# any number of programs can be downloaded and unzipped this way
+installADMB.windows <- function( ... )
+{
+	
 	oldwd <- getwd()
-	url <- "http://admb-project.googlecode.com/files/admb-10.0-mingw-gcc4.5.0-32bit.zip"
 	download_to <- system.file(package="PBSadmb")
 	download_to <- paste( download_to, "/admb", sep="" )
-	print( download_to )
-	#create dir
 	if( file.exists( download_to ) == FALSE )
 		dir.create( download_to )
 	setwd( download_to )
-	#save as admb.zip in the dir
-	download.file( url, "admb.zip" )
-	unzip( "admb.zip" )
+
+	software <- c( ... )
+	for( i in 1:length( software ) ) {
+		name <- names( software )[ i ]
+		save_to <- paste( name, ".zip", sep="" )
+		url <- software[ i ]
+		if( file.exists( url ) )
+			file.copy( url, save_to )
+		else
+			download.file( url, save_to )
+		unzip( save_to, exdir=name )
+	}
+
 	setwd( oldwd )
-	cat( "Please re-run admb() for changes to take effect\n" )
-	return( paste( download_to, "/admb-win32-mingw", sep="" ) )
+	
 }
 
 
-makeADopts <- function( admpath, gccpath, editor )
+makeADopts <- function( admbpath, gccpath, editor )
 {
 	cat( "THIS FUNCTION IS DEPRECATED - use setADMBPath\n" )
-	setADMBPath( .PBSadmb, admpath = admpath, gccpath = gccpath, editor = editor )
+	setADMBPath( .PBSadmb, admbpath = admbpath, gccpath = gccpath, editor = editor )
 }
 
 setADMBPath <- function( admbpath, gccpath, editor )
 {
+	.initOptions()
 	if( missing( admbpath ) == FALSE )
-		setOptions( .PBSadmb, admpath = admbpath )
+		setOptions( .PBSadmb, admbpath = admbpath )
 	if( missing( gccpath ) == FALSE )
 		setOptions( .PBSadmb, gccpath = gccpath )
 	if( missing( editor ) == FALSE )
@@ -165,7 +240,7 @@ setADMBPath <- function( admbpath, gccpath, editor )
 .win.makeADopts=function(winName="PBSadmb")
 {
 	getWinVal(scope="L",winName=winName)
-	setADMBPath(admpath,gccpath,editor) 
+	setADMBPath(admbpath,gccpath,editor) 
 	.win.checkADopts()
 	invisible()
 }
@@ -202,7 +277,7 @@ readADopts <- function(optfile="ADopts.txt")
 	invisible()
 }
 
-checkADopts=function(opts=getOptions( .PBSadmb ), check=c("admpath","gccpath","editor"),
+checkADopts=function(opts=getOptions( .PBSadmb ), check=c("admbpath","gccpath","editor"),
      warn=TRUE, popup=FALSE)
 {
 	# Check that .ADopts has all required components and that links point to actual files on the hard drive.
@@ -213,7 +288,7 @@ checkADopts=function(opts=getOptions( .PBSadmb ), check=c("admpath","gccpath","e
 		if (!any(i==check))
 			next
 		ii=ipath=opts[[i]]
-		if (i=="admpath") {
+		if (i=="admbpath") {
 			ipath=paste(ii,"/bin/",sep="")
 			if( .Platform$OS.type == "windows" )
 				progs=c("tpl2cpp.exe","tpl2rem.exe")
@@ -257,7 +332,7 @@ checkADopts=function(opts=getOptions( .PBSadmb ), check=c("admpath","gccpath","e
 .win.checkADopts=function(winName="PBSadmb")
 {
 	getWinVal(scope="L",winName=winName)
-	chkstat=checkADopts(opts=list(admpath=admpath,gccpath=gccpath,editor=editor),popup=TRUE)
+	chkstat=checkADopts(opts=list(admbpath=admbpath,gccpath=gccpath,editor=editor),popup=TRUE)
 	#set label to OK/FIX with coloured background
 	setWinVal(list(chkstat=ifelse(chkstat," OK"," Fix")),winName=winName)
 	setWidgetColor( "chkstat", winName=winName, bg=ifelse(chkstat,"lightgreen","red") )
@@ -333,8 +408,8 @@ appendLog <- function(prefix, lines)
 	path_sep <- ifelse( .Platform$OS.type == "windows", ";", ":" )
 	dir_sep <- ifelse( .Platform$OS.type == "windows", "\\", "/" )
 
-	admb_home <- getOptions( .PBSadmb, "admpath" )
-	admb_path <- paste( getOptions( .PBSadmb, "admpath" ), "bin", sep = dir_sep )
+	admb_home <- getOptions( .PBSadmb, "admbpath" )
+	admb_path <- paste( getOptions( .PBSadmb, "admbpath" ), "bin", sep = dir_sep )
 	gcc_path <- paste( getOptions( .PBSadmb, "gccpath"), "bin", sep = dir_sep )
 	msys_path <- paste( getOptions( .PBSadmb, "gccpath"), "msys", "1.0", "bin", sep = dir_sep )
 
@@ -1159,7 +1234,7 @@ cleanAD <- function(prefix=NULL) {
 #parseCmd-------------------------------2009-08-11
 # Parse a command for an ADMB command.
 #-----------------------------------------------RH
-parseCmd = function(prefix, index, os=.Platform$OS, comp="GCC", admpath="", gccpath="") {
+parseCmd = function(prefix, index, os=.Platform$OS, comp="GCC", admbpath="", gccpath="") {
 	stop( "this will be removed" )
 	.addSlashes <- function( str ) return( gsub( "\\\\", "\\\\\\\\", str ) )
 	dat=ADMBcmd
@@ -1171,7 +1246,7 @@ parseCmd = function(prefix, index, os=.Platform$OS, comp="GCC", admpath="", gccp
 	cmd=idat$Command[1]
 	cmd=gsub("`","\"",cmd)
 	cmd=gsub("@prefix",.addSlashes(prefix),cmd)
-	cmd=gsub("@adHome",.addSlashes(admpath),cmd)
+	cmd=gsub("@adHome",.addSlashes(admbpath),cmd)
 	cmd=gsub("@ccPath",.addSlashes(gccpath),cmd)
 	return(cmd) } 
 
