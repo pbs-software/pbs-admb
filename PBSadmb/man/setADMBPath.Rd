@@ -1,12 +1,12 @@
-\name{makeADopts}
-\alias{makeADopts}
+\name{setADMBPath}
+\alias{setADMBPath}
 \title{ Creates the ADMB Options List }
 \description{
   Creates a global list object detailing the pathways to the ADMB directory, the GCC bin, 
   and the user's preferred text editor.
 }
 \usage{
-makeADopts(admbpath, gccpath, editor)
+setADMBPath(admbpath, gccpath, editor)
 }
 \arguments{
   \item{admbpath}{explicit path to the user's ADMB directory.}
@@ -17,9 +17,6 @@ makeADopts(admbpath, gccpath, editor)
   Creates a global, hidden list object called \code{.ADopts}.
 }
 \author{ Jon T. Schnute, Pacific Biological Station, Nanaimo BC, Canada }
-\note{
-  A wrapper function that can be called from a GUI exists as \code{.win.makeADopts}.
-}
 \seealso{ \code{\link{makeADopts}},  \code{\link{writeADopts}} }
 \keyword{ data }
 \keyword{ list }

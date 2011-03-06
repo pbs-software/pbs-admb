@@ -6,14 +6,17 @@
   \code{compAD}, and \code{linkAD}.
 }
 \usage{
-makeAD(prefix, raneff=FALSE, safe=TRUE, logfile=TRUE, verbose=TRUE)
+makeAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
 }
 \arguments{
   \item{prefix}{string name prefix of the ADMB project (e.g., \code{"vonb"}).}
   \item{raneff}{logical: use the random effects model, otherwise use the normal model.}
   \item{safe}{logical: if \code{TRUE}, use safe mode with bounds checking on all
     array objects, otherwise use optimized mode for fastest execution.}
+  \item{dll}{create dll (rather than executable)}
+  \item{debug}{compile with debug symbols}
   \item{logfile}{logical: if \code{TRUE}, create a log file of the messages from the shell call.}
+  \item{add}{logical: if \code{TRUE}, append shell call messages to an exsiting log file.}
   \item{verbose}{logical: if \code{TRUE}, report the shell call an its messages to the R console.}
 }
 \details{

@@ -195,13 +195,13 @@ installADMB <- function( arch = "32", skip.warning = FALSE )
 	if( arch == "64" ) {
 		if( .Platform$r_arch != "x64" && skip.warning == FALSE )
 			stop( "attempting to install 64bit version on 32bit R. If you are certain you are on a 64bit computer (but are running the 32bit version of R for some reason), run: installADMB( \"64\", skip.warning=TRUE ) to continue" )
-		installADMB.windows( 
+		.installADMB.windows( 
 			admb64 = "http://pbs-admb.googlecode.com/files/admb-10.0-mingw-gcc4.5.2-64bit.zip",
 			gcc64 = "http://pbs-admb.googlecode.com/files/gcc452-64bit.zip"
 		)
 	} else {
 		#32bit version
-		installADMB.windows( 
+		.installADMB.windows( 
 			admb = "http://pbs-admb.googlecode.com/files/admb-10.0-mingw-gcc4.5.0-32bit.zip",
 			gcc = "http://pbs-admb.googlecode.com/files/gcc450.zip"
 		)
@@ -210,10 +210,10 @@ installADMB <- function( arch = "32", skip.warning = FALSE )
 	admb()
 }
 
-#usage: installADMB.windows( gcc = "http://some.url/to.download.zip" )
+#usage: .installADMB.windows( gcc = "http://some.url/to.download.zip" )
 # will be downloaded to gcc.zip, and extract to a directory under PBSadmb\gcc\...
 # any number of programs can be downloaded and unzipped this way
-installADMB.windows <- function( ... )
+.installADMB.windows <- function( ... )
 {
 	
 	oldwd <- getwd()
@@ -244,7 +244,7 @@ installADMB.windows <- function( ... )
 makeADopts <- function( admbpath, gccpath, editor )
 {
 	cat( "THIS FUNCTION IS DEPRECATED - use setADMBPath\n" )
-	setADMBPath( .PBSadmb, admbpath = admbpath, gccpath = gccpath, editor = editor )
+	setADMBPath( admbpath = admbpath, gccpath = gccpath, editor = editor )
 }
 
 setADMBPath <- function( admbpath, gccpath, editor )
@@ -1261,25 +1261,6 @@ cleanAD <- function(prefix=NULL) {
  editADfile(fname)
 	invisible() }
 #------------------------------------.win.viewCode
-
-#parseCmd-------------------------------2009-08-11
-# Parse a command for an ADMB command.
-#-----------------------------------------------RH
-parseCmd = function(prefix, index, os=.Platform$OS, comp="GCC", admbpath="", gccpath="") {
-	stop( "this will be removed" )
-	.addSlashes <- function( str ) return( gsub( "\\\\", "\\\\\\\\", str ) )
-	dat=ADMBcmd
- dat$OS=tolower(dat$OS)
-	osdat = dat[dat$OS%in%os & dat$Comp%in%comp,]
-	if(nrow(osdat)==0) stop("No records for specified OS and compiler")
-	idat  = osdat[osdat$Index%in%index,]
-	if(nrow(idat)==0) stop("No records for specified index")
-	cmd=idat$Command[1]
-	cmd=gsub("`","\"",cmd)
-	cmd=gsub("@prefix",.addSlashes(prefix),cmd)
-	cmd=gsub("@adHome",.addSlashes(admbpath),cmd)
-	cmd=gsub("@ccPath",.addSlashes(gccpath),cmd)
-	return(cmd) } 
 
 #convOS---------------------------------2009-11-20
 # Convert text files to the default format
