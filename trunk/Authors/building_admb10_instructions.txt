@@ -1,0 +1,91 @@
+=building ADMB 10.0 on ubuntu linux=
+
+download source:
+wget http://admb-project.googlecode.com/files/admb-10.0.zip
+
+*follow the readme.txt instructions which use the commands:
+
+extract
+unzip admb-10.0.zip
+
+change dir
+cd admb-10.0
+
+./configure or ./configure BUILD_64BIT=yes (depending on 32bit or 64bit system)
+
+make
+
+sudo make install **this doesn't work, due to "cannot stat `scripts/g++/admb-bin': No such file or directory"
+
+
+but you can just adjust the path:
+
+Assuming a 64bit build, in the directory ~/admb
+
+export PATH=/home/$USER/admb/admb-10.0/build/admb-10.0-linux-gcc4.4.5-64bit/admb-10.0-linux-gcc4.4.5-64bit/bin/:$PATH
+export ADMB_HOME=/home/$USER/admb/admb-10.0/build/admb-10.0-linux-gcc4.4.5-64bit/admb-10.0-linux-gcc4.4.5-64bit
+
+==Testing with catage==
+cd ~
+mkdir tmp
+cd tmp
+cp $ADMB_HOME/examples/admb/catage/* .
+admb catage
+./catage
+
+==Testing with pheno (ran-eff)==
+cd ~
+mkdir tmp
+cd tmp
+cp $ADMB_HOME/examples/admb-re/pheno/* .
+admb -r pheno
+./pheno
+
+
+=building ADMB 10.0 on mingw (windows)=
+This assumes we do the build in the directory c:\admb_build
+
+==mingw==
+download the latest version from http://sourceforge.net/projects/mingw/files/
+At the time, the downloaded version was: mingw-get-inst-20110211.exe (561.0 KB)
+
+run mingw-get-inst-20101030.exe
+use pre-packaged repository catalogues
+accept agreement
+install to C:\admb_build\MinGW
+allow to create a start menu folder
+select components:
+-"C Compiler"
+-"C++ Compiler"
+-"MSYS Basic System"
+
+After the install finishes, verify that start->all programs->Mingw->MinGW Shell exists
+
+==ADMB==
+
+download http://admb-project.googlecode.com/files/admb-10.0.zip
+extract to C:\admb_build\admb-10.0
+
+start a mingw shell (start->mingw->mingw shell)
+cd /c/admb_build/admb-10.0
+./configure
+make
+
+export PATH=/c/admb_build/admb-10.0/build/admb-10.0-mingw-gcc4.5.2-32bit/admb-10.0-mingw-gcc4.5.2-32bit/bin:$PATH
+export ADMB_HOME=/c/admb_build/admb-10.0/build/admb-10.0-mingw-gcc4.5.2-32bit/admb-10.0-mingw-gcc4.5.2-32bit
+
+==Testing with catage==
+cd /c/admb_build
+mkdir tmp
+cd tmp
+cp $ADMB_HOME/examples/admb/catage/* .
+admb catage
+./catage
+
+==Testing with pheno (ran-eff)==
+cd /c/admb_build
+mkdir tmp
+cd tmp
+cp $ADMB_HOME/examples/admb-re/pheno/* .
+admb -r pheno
+./pheno
