@@ -1,6 +1,7 @@
 window name=PBSadmb title="PBS ADMB" #onclose=
 
 #------------------------------------ MENU -------------------------------------
+@install
 menu nitems=4 label="Edit"
 	menuitem label=TPL function=doAction action="editADfile(paste(getWinVal()$prefix,`.tpl`,sep=``))"
 	menuitem label=DAT function=doAction action="editADfile(paste(getWinVal()$prefix,`.dat`,sep=``))"
