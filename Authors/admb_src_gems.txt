@@ -1,0 +1,11 @@
+void KLUDGEX(void * p){;}
+
+void test_the_pointer(void)
+{
+ /*
+  pgse->func = (void (*)())(100);
+  pgse->dep_addr = (double*) 100;
+  pgse->ind_addr1 = (double*) 100;
+ */
+}
+
