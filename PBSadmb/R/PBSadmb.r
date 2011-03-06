@@ -145,6 +145,16 @@ admb=function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 	temp <- gsub("@nitems",length(eprf),temp)
 	temp <- gsub("@menuitems",paste(enew,collapse="\n\t"),temp)
 
+	#install menu (windows only)
+	if( .Platform$OS.type == "windows" ) {
+		install.menu <- "menu nitems=2 label=Install"
+		install.menu <- c( install.menu, "menuitem label=\"ADMB 32bit for windows\" function=doAction action=installADMB(`32`)" )
+		install.menu <- c( install.menu, "menuitem label=\"ADMB 64bit for windows\" function=doAction action=installADMB(`64`)" )
+		temp <- gsub( "@install", paste( install.menu, collapse="\n" ), temp )
+	} else {
+		temp <- gsub( "@install", "", temp )
+	}
+	
 	#create the window (from temp string)
 	temp <- unlist( strsplit(temp, "\n" ) )
 	createWin(temp, TRUE)
@@ -184,7 +194,7 @@ installADMB <- function( arch = "32", skip.warning = FALSE )
 {
 	if( arch == "64" ) {
 		if( .Platform$r_arch != "x64" && skip.warning == FALSE )
-			stop( "attempting to install 64bit version on 32bit R. If you are certain you are on a 64bit computer (but are running the 32bit version of R for some reason), pass skip.warning=TRUE to continue" )
+			stop( "attempting to install 64bit version on 32bit R. If you are certain you are on a 64bit computer (but are running the 32bit version of R for some reason), run: installADMB( \"64\", skip.warning=TRUE ) to continue" )
 		installADMB.windows( 
 			admb64 = "http://pbs-admb.googlecode.com/files/admb-10.0-mingw-gcc4.5.2-64bit.zip",
 			gcc64 = "http://pbs-admb.googlecode.com/files/gcc452-64bit.zip"
@@ -197,7 +207,7 @@ installADMB <- function( arch = "32", skip.warning = FALSE )
 		)
 	}
 	.resetOptions()
-	cat( "Please re-run admb() for changes to take effect\n" )
+	admb()
 }
 
 #usage: installADMB.windows( gcc = "http://some.url/to.download.zip" )
@@ -335,6 +345,9 @@ checkADopts=function(opts=getOptions( .PBSadmb ), check=c("admbpath","gccpath","
 			badmess=paste("Programs not found:\n",paste(names(vmess)[!vmess],collapse="\n"),
 				"\n\nEither alter '.ADopts' or remove it and alter 'ADopts.txt'.\n\n",
 				"If using the ADMB GUI, alter the appropriate entry.\n\n",sep="")
+			if (.Platform$OS.type=="windows" && popup) {
+				badmess <- paste( badmess, "You may also install ADMB directly by using the install dropdown menu.", sep="" )
+			}
 			if (warn) cat(badmess)
 			if (popup) showAlert(badmess,"User action required","warning") } }
 	options(stringsAsFactors=sAF)
