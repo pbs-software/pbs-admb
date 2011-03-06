@@ -6,9 +6,10 @@
   ADMB is installed under PBSadmb's library directory under R.
 }
 \usage{
-installADMB()
+installADMB( arch = "32", skip.warning = FALSE )
 }
-\value{
-	The path where ADMB was installed.
+\arguments{
+  \item{arch}{which version to install: "32" or "64" bit versions}
+  \item{skip.warning}{logical: if true, don't issue a warning when installing a 64bit version from a 32bit version of R}
 }
 \keyword{file}

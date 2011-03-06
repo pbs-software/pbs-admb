@@ -6,7 +6,7 @@
   that links point to actual files on the hard drive.
 }
 \usage{
-checkADopts(opts=getOptions(.PBSadmb), check=c("admpath","gccpath","editor"),
+checkADopts(opts=getOptions(.PBSadmb), check=c("admbpath","gccpath","editor"),
             warn=TRUE, popup=FALSE)
 }
 \arguments{
