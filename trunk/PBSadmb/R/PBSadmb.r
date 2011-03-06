@@ -19,7 +19,7 @@
 	initial.options <- list()
 
 	#search vector of programs for the first found path, if nothing is found return "failed" object
-	.guessPath <- function( programs, includefilename = FALSE, failed = "" )
+	.guessPath <- function( programs, includefilename = FALSE, failed = NULL )
 	{
 		for( p in programs ) {
 			found <- Sys.which( p )[ 1 ]
@@ -44,22 +44,33 @@
 	#if that fails, second, try installed versions under R's library
 
 	#guess ADMB path
-	initial.options$admbpath <- .guessPath( "tpl2rem" )
-	if( initial.options$admbpath != "" )
-		initial.options$admbpath <- .removeOneLevel( initial.options$gccpath )
-	else
-		initial.options$admbpath <- .findDownloadedSoftware( "admb64", "admb" )
-	if( is.null( initial.options$admbpath ) )
-		initial.options$admbpath <- "unknown"
+	#first try default install location
+	initial.options$admbpath <- .findDownloadedSoftware( "admb64", "admb" )
+	if( is.null( initial.options[["admbpath"]] ) ) {
+		#try to find it on the path otherwise
+		initial.options$admbpath <- .guessPath( "tpl2rem" )
+		if( is.null( initial.options[["admbpath"]] ) ) {
+			initial.options$admbpath <- "unknown"
+		} else {
+			initial.options$admbpath <- .removeOneLevel( initial.options$admbpath )
+		}
+		
+	}
 	
 	#guess gcc path
-	initial.options$gccpath <- .guessPath( "g++" )
-	if( initial.options$gccpath != "" )
-		initial.options$gccpath <- .removeOneLevel( initial.options$gccpath )
-	else
-		initial.options$gccpath <- .findDownloadedSoftware( "gcc64", "gcc" )
-	if( is.null( initial.options$gccpath ) )
-		initial.options$gccpath <- "unknown"
+	#first try default install location
+	initial.options$gccpath <- .findDownloadedSoftware( "gcc64", "gcc" )
+	if( is.null( initial.options[["gccpath"]] ) ) {
+		#try to find it on the path otherwise
+		initial.options$gccpath <- .guessPath( "g++" )
+		if( is.null( initial.options[["gccpath"]] ) ) {
+			initial.options$gccpath <- "unknown"
+		} else {
+			initial.options$gccpath <- .removeOneLevel( initial.options$gccpath )
+		}
+		
+	}
+
 
 	#guess editor
 	initial.options$editor <- .guessPath( c( "gvim", "kate", "notepad" ), TRUE )
@@ -212,6 +223,7 @@ installADMB.windows <- function( ... )
 		else
 			download.file( url, save_to )
 		unzip( save_to, exdir=name )
+		cat( paste( name, " has been installed to: ", download_to, "/", name, "\n\n", sep="" ) )
 	}
 
 	setwd( oldwd )
@@ -395,7 +407,7 @@ appendLog <- function(prefix, lines)
 .appendToPath <- function( path_to_add )
 {
 	path <- Sys.getenv( "PATH" )
-	path_sep <- ifelse( .Platform$OS.type == "windows", ";", ":" )
+	path_sep <- .Platform$path.sep
 	if( any( unlist( strsplit( path, path_sep ) ) == path_to_add ) == FALSE ) {
 		#path_to_add doesn't exist in path - append it, and reset env variable
 		path <- paste( path, path_to_add, sep = path_sep )
@@ -405,13 +417,19 @@ appendLog <- function(prefix, lines)
 
 .setPath <- function()
 {
-	path_sep <- ifelse( .Platform$OS.type == "windows", ";", ":" )
+	path_sep <- .Platform$path.sep
 	dir_sep <- ifelse( .Platform$OS.type == "windows", "\\", "/" )
 
 	admb_home <- getOptions( .PBSadmb, "admbpath" )
 	admb_path <- paste( getOptions( .PBSadmb, "admbpath" ), "bin", sep = dir_sep )
 	gcc_path <- paste( getOptions( .PBSadmb, "gccpath"), "bin", sep = dir_sep )
-	msys_path <- paste( getOptions( .PBSadmb, "gccpath"), "msys", "1.0", "bin", sep = dir_sep )
+
+	if( .Platform$OS.type == "windows" ) {
+		msys_path <- paste( getOptions( .PBSadmb, "gccpath"), "msys", "1.0", "bin", sep = dir_sep )
+	} else {
+		#linux must include original path so programs like cat, sed are found
+		msys_path <- Sys.getenv( "PATH" )
+	}
 
 	path <- paste( admb_path, gcc_path, msys_path, sep = path_sep )
 	Sys.setenv( PATH = path )
