@@ -15,6 +15,10 @@
 #return a list of guessed paths
 .guessDefaultPaths <- function()
 {
+	#used to track software installed via PBSadmb
+	fname = paste( system.file(package="PBSadmb"), "/pathconfig.txt", sep="" )
+	pkgOptions <- new( "PBSoptions", filename = fname, initial.options = list(admb="", gcc=""), gui.prefix="" )
+
 	#first setup initial option values
 	initial.options <- list()
 
@@ -45,7 +49,7 @@
 
 	#guess ADMB path
 	#first try default install location
-	initial.options$admbpath <- .findDownloadedSoftware( "admb64", "admb" )
+	initial.options$admbpath <- .findDownloadedSoftware( getOptions( pkgOptions, "admb" ) )
 	if( is.null( initial.options[["admbpath"]] ) ) {
 		#try to find it on the path otherwise
 		initial.options$admbpath <- .guessPath( "tpl2rem" )
@@ -59,7 +63,7 @@
 	
 	#guess gcc path
 	#first try default install location
-	initial.options$gccpath <- .findDownloadedSoftware( "gcc64", "gcc" )
+	initial.options$gccpath <- .findDownloadedSoftware(  getOptions( pkgOptions, "gcc" ) )
 	if( is.null( initial.options[["gccpath"]] ) ) {
 		#try to find it on the path otherwise
 		initial.options$gccpath <- .guessPath( "g++" )
@@ -89,14 +93,20 @@
 {
 	.findDownloadedSoftwareHelper <- function( name )
 	{
-		pkg.dir <- system.file(package="PBSadmb")
-		pkg.dir <- paste( pkg.dir, "/admb", sep="" )
-		pkg.dir <- paste( pkg.dir, name, sep="/" )
+		#pkg.dir <- system.file(package="PBSadmb")
+		#pkg.dir <- paste( pkg.dir, "/admb", sep="" )
+		#pkg.dir <- paste( pkg.dir, name, sep="/" )
+		pkg.dir <- name
 		if( file.exists( pkg.dir ) == FALSE )
 			return( NULL )
 
 		#all software is then inside another directory which can be named anything (e.g. admb-10.0-mingw-gcc4.5.2-64bit)
-		d <- dir( pkg.dir )[ 1 ]
+		d <- dir( pkg.dir )
+		#ignore the .zip file left behind from installation
+		d <- grep("^.*(?<!\\.zip)$", d, perl=T, value=T)
+		if( length( d ) == 0 )
+			return( NULL )
+		d <- d[ 1 ]
 
 		#if dir() returns nothing, we get a .../NA, which will then fail the file.exists
 		pkg.dir <- paste( pkg.dir, d, sep="/" )
@@ -116,7 +126,7 @@
 #admb-----------------------------------2009-07-21
 # Starts the primary GUI interface
 #-----------------------------------------------RH
-admb=function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
+admb <- function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 	.initOptions()
 	pkg="PBSadmb"
 	if (!require(PBSmodelling))
@@ -147,9 +157,8 @@ admb=function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 
 	#install menu (windows only)
 	if( .Platform$OS.type == "windows" ) {
-		install.menu <- "menu nitems=2 label=Install"
-		install.menu <- c( install.menu, "menuitem label=\"ADMB 32bit for windows\" function=doAction action=installADMB(`32`)" )
-		install.menu <- c( install.menu, "menuitem label=\"ADMB 64bit for windows\" function=doAction action=installADMB(`64`)" )
+		install.menu <- "menu nitems=1 label=Install"
+		install.menu <- c( install.menu, "menuitem label=\"ADMB and MinGW for Windows\" function=doAction action=installADMB()" )
 		temp <- gsub( "@install", paste( install.menu, collapse="\n" ), temp )
 	} else {
 		temp <- gsub( "@install", "", temp )
@@ -166,10 +175,9 @@ admb=function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 
 	if( isOK == FALSE && .Platform$OS.type == "windows" ) {
 		cat( "\nADMB or GCC are not installed in the default location - Windows users can run\n" )
-		cat( "installADMB(\"32\") or installADMB(\"64\") to automatically download and install ADMB\n" )
-		cat( "and GCC for 32bit or 64bit versions of Windows respectively. These files will be \n" )
-		cat( "installed to the default R library location. If ADMB is installed elsewhere, you can \n" )
-		cat( "manually set the ADMB or GCC path values in the GUI to point to your own installations.\n" )
+		cat( "installADMB() automatically download and install ADMB and MinGW\n" )
+		cat( "If ADMB is installed elsewhere, you can manually set the ADMB or GCC path values\n" )
+		cat( "in the GUI to point to your own installations.\n" )
 	}
 
 	#TODO need centralized window variable init (is it done anywhere?)
@@ -190,54 +198,186 @@ admb=function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 	setWinVal( list( prefix = choices[ 1 ] ) )
 }
 
-installADMB <- function( arch = "32", skip.warning = FALSE )
+#given a vector of paths, return the last directory name of each path
+.getDirName <- function( path )
 {
-	if( arch == "64" ) {
-		if( .Platform$r_arch != "x64" && skip.warning == FALSE )
-			stop( "attempting to install 64bit version on 32bit R. If you are certain you are on a 64bit computer (but are running the 32bit version of R for some reason), run: installADMB( \"64\", skip.warning=TRUE ) to continue" )
-		.installADMB.windows( 
-			admb64 = "http://pbs-admb.googlecode.com/files/admb-10.0-mingw-gcc4.5.2-64bit.zip",
-			gcc64 = "http://pbs-admb.googlecode.com/files/gcc452-64bit.zip"
-		)
-	} else {
-		#32bit version
-		.installADMB.windows( 
-			admb = "http://pbs-admb.googlecode.com/files/admb-10.0-mingw-gcc4.5.0-32bit.zip",
-			gcc = "http://pbs-admb.googlecode.com/files/gcc450.zip"
-		)
-	}
-	.resetOptions()
-	admb()
+	dirname <- gsub("\\\\", "/", path )
+	return( unlist( lapply( strsplit( dirname, "/" ), function(x) x[length(x)] ) ) )
 }
+
+installADMB <- function()
+{
+	if( .Platform$OS.type != "windows" )
+		stop( "installADMB is only supported for windows. Please refer to User Guide for installation instructions" )
+
+	#URLs to ADMB and MinGW on our google project page
+
+	#useful for dev, to avoid redownloading and spamming the servers
+	#gcc.url <- c( 
+	#	"32" = "C:\\Users\\alex\\Documents\\stuff\\projects\\dfo\\pbsadmb\\admb_binary/gcc450.zip",
+	#	"64" = "C:\\Users\\alex\\Documents\\stuff\\projects\\dfo\\pbsadmb\\admb_binary/gcc452-64bit.zip" )
+	#admb.url <- c( 
+	#	"32" = "C:\\Users\\alex\\Documents\\stuff\\projects\\dfo\\pbsadmb\\admb_binary/admb-10.0-mingw-gcc4.5.0-32bit.zip",
+	#	"64" = "C:\\Users\\alex\\Documents\\stuff\\projects\\dfo\\pbsadmb\\admb_binary/admb-10.0-mingw-gcc4.5.2-64bit.zip" )
+
+	gcc.url <- c( 
+		"32" = "http://pbs-admb.googlecode.com/files/gcc450.zip",
+		"64" = "http://pbs-admb.googlecode.com/files/gcc452-64bit.zip" )
+	admb.url <- c( 
+		"32" = "http://pbs-admb.googlecode.com/files/admb-10.0-mingw-gcc4.5.0-32bit.zip",
+		"64" = "http://pbs-admb.googlecode.com/files/admb-10.0-mingw-gcc4.5.2-64bit.zip" )
+
+	pkg="PBSadmb"
+	if (!require(PBSmodelling))
+		stop("!!!!!Install package PBSmodelling!!!!!")
+
+	#default install location
+	download_to <- system.file(package="PBSadmb")
+	download_to <- paste( download_to, "/software", sep="" )
+
+	#default directory names to install to
+	admbdir <- c( "32" = paste( download_to, "/admb", sep="" ), "64" = paste( download_to, "/admb64", sep="" ) )
+	gccdir <- c( "32" = paste( download_to, "/mingw", sep="" ), "64" = paste( download_to, "/mingw64", sep="" ) )
+
+
+	#given: arch: "32" or "64"
+	#       val: string of path in GUI, e.g. "c:/foo/bar"
+	#       defaults: vector of default path locations, with names matching arch
+	#                 e.g. c( "32" = "c:/foo/bar", "64" = "c:/foo/bar64" )
+	# returns: corrected value for GUI (e.g. updates the path from c:/otherfoo/bar to c:/otherfoo/bar64 when moving to arch=64)
+	.fixLastDirName <- function( arch, val, defaults )
+	{
+		#get last dir name of all paths
+		default.d <- .getDirName( defaults )
+		d <- .getDirName( val )
+
+		if( any( d == default.d ) ) {
+			val <- gsub("\\\\", "/", val )
+			val <- unlist( strsplit( val, "/" ) )
+			val[ length( val ) ] <- default.d[ arch ]
+			val <- paste( val, collapse = "/" )
+		}
+		return( val )
+	}
+
+	#called when software to install is toggled
+	checkSoft <- function()
+	{
+		getWinVal(scope="L")
+		
+		state <- ifelse( c(admb=admb, gcc=gcc), "normal", "disabled" )
+		setWidgetState( "admbdir", state["admb"] )
+		setWidgetState( "admbdirbutton", state["admb"] )
+		setWidgetState( "gccdir", state["gcc"] )
+		setWidgetState( "gccdirbutton", state["gcc"] )
+
+		#disable install button if nothing is selected
+		setWidgetState( "installbutton", ifelse( all( state == "disabled" ), "disabled", "normal" ) )
+	}
+
+	#called when arch is changed
+	changeArch <- function()
+	{
+		vals <- getWinVal()
+		arch <- vals[["arch"]]
+
+		setWinVal( list( 
+			admbdir = .fixLastDirName( arch, vals[["admbdir"]], admbdir ),
+			gccdir = .fixLastDirName( arch, vals[["gccdir"]], gccdir )
+		) )
+		
+	}
+	changeDir <- function()
+	{
+		vals <- getWinVal()
+		arch <- vals[["arch"]]
+		act <- getWinAct()[1]
+		old <- vals[[ act ]]
+
+		print( old )
+		d <- choose.dir( old )
+		
+		if( !is.na( d ) ) {
+			tmp <- list()
+			tmp[[ act ]] <- d
+			setWinVal( tmp )
+		}
+	}
+	install <- function()
+	{
+		getWinVal( scope="L" )
+
+		#keep track of installation files in this file
+		fname = paste( system.file(package="PBSadmb"), "/pathconfig.txt", sep="" )
+		pkgOptions <- new( "PBSoptions", filename = fname, initial.options = list(admb="", gcc=""), gui.prefix="" )
+
+		if( admb == TRUE ) {
+			#install ADMB to admbdir
+			.installADMB.windows( admb.url[ arch ], admbdir )
+			setOptions( pkgOptions, admb = admbdir )
+		} 
+		if( gcc == TRUE ) {
+			#install GCC to gccdir
+			.installADMB.windows( gcc.url[ arch ], gccdir )
+			setOptions( pkgOptions, gcc = gccdir )
+		}
+
+		#save locations where files were installed
+		saveOptions( pkgOptions )
+		cat( "\n\n-------------------------------------------\n" )
+		cat( "Installation complete: restarting admb()" )
+		cat( "\n-------------------------------------------\n\n" )
+
+		closeWin()
+		admb()
+	}
+	create <- function()
+	{
+		win <- system.file("win/installWin.txt", package="PBSadmb")
+		createWin( win, env = parent.env( environment() ) )
+	}
+	
+	#create the window
+	create()
+
+	#set default values
+	arch <- ifelse( .Platform$r_arch == "x64", "64", "32" ) 
+	setWinVal( list( 
+		arch = arch,
+		admbdir = admbdir[ arch ],
+		gccdir = gccdir[ arch ] ) )
+}
+
 
 #usage: .installADMB.windows( gcc = "http://some.url/to.download.zip" )
 # will be downloaded to gcc.zip, and extract to a directory under PBSadmb\gcc\...
 # any number of programs can be downloaded and unzipped this way
-.installADMB.windows <- function( ... )
+.installADMB.windows <- function( url, install.path )
 {
-	
+	cat( "\n\n-------------------------------------------\n" )
 	oldwd <- getwd()
-	download_to <- system.file(package="PBSadmb")
-	download_to <- paste( download_to, "/admb", sep="" )
-	if( file.exists( download_to ) == FALSE )
-		dir.create( download_to )
-	setwd( download_to )
-
-	software <- c( ... )
-	for( i in 1:length( software ) ) {
-		name <- names( software )[ i ]
-		save_to <- paste( name, ".zip", sep="" )
-		url <- software[ i ]
-		if( file.exists( url ) )
-			file.copy( url, save_to )
-		else
-			download.file( url, save_to )
-		unzip( save_to, exdir=name )
-		cat( paste( name, " has been installed to: ", download_to, "/", name, "\n\n", sep="" ) )
+	if( file.exists( install.path ) == FALSE ) {
+		dir.create( install.path, recursive=TRUE )
+		cat( paste( "creating directory:", install.path, "\n" ) )
 	}
+	setwd( install.path )
+
+	name <- .getDirName( install.path )
+	save_to <- paste( name, ".zip", sep="" )
+	cat( paste( "preparing to download:\n" ) )
+	cat( paste( "  URL:", url, "\n" ) )
+	cat( paste( "  Saving to:", install.path, "/", save_to, "\n", sep="" ) )
+	if( file.exists( url ) )
+		file.copy( url, save_to )
+	else
+		download.file( url, save_to )
+	cat( "Download complete.\nAttempting to unzip files\n" )
+	unzip( save_to, exdir="." )
+	cat( "Unzip complete.\n\n" )
+	cat( paste( name, " has been installed to: ", install.path, "\n", sep="" ) )
+	cat( "-------------------------------------------\n\n" )
 
 	setwd( oldwd )
-	
 }
 
 
