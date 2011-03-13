@@ -1,15 +1,17 @@
 \name{installADMB}
 \alias{installADMB}
-\title{ Install windows admb binary (for gcc) }
+\title{ Install windows ADMB and MinGW binaries }
 \description{
-  Only applicable for Windows: Downloads and installs the windows ADMB binary for gcc.
-  ADMB is installed under PBSadmb's library directory under R.
+  Only applicable for Windows: Downloads and installs the windows ADMB and MinGW binaries.
+
+  A user interface is displayed which allows to select to install either ADMB and/or MinGW
+  for either 32bit or 64bit versions of Windows. Default installation directories are suggested
+  for installation; however, a user may choose to install the binaries elsewhere.
+
+  A file "pathconfig.txt" is saved in the PBSadmb library (under R), which keeps track of the
+  most recently installed locations.
 }
 \usage{
-installADMB( arch = "32", skip.warning = FALSE )
-}
-\arguments{
-  \item{arch}{which version to install: "32" or "64" bit versions}
-  \item{skip.warning}{logical: if true, don't issue a warning when installing a 64bit version from a 32bit version of R}
+installADMB()
 }
 \keyword{file}

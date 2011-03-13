@@ -1,0 +1,23 @@
+window name=PBSadmbInst title="Install ADMB"
+
+label "ADMB and MinGW installer" sticky=W font=bold
+
+grid 1 3 sticky=W pady=10
+  label "architecture:" sticky=W font=underline
+  radio name=arch value=32 text="32 bit" mode=character function=changeArch
+  radio name=arch value=64 text="64 bit" mode=character function=changeArch
+
+grid 3 3
+  label software font=underline
+  label "install location" font=underline
+  null
+
+  check name=admb text="ADMB" function=checkSoft sticky=W checked=T
+  entry name=admbdir width=70 mode=character
+  button "..." name=admbdirbutton function=changeDir action="admbdir"
+
+  check name=gcc text="MinGW (g++)" function=checkSoft sticky=W checked=T
+  entry name=gccdir width=70 mode=character
+  button "..." name=gccdirbutton function=changeDir action="gccdir"
+
+button "Download and Install" pady="10 0" function=install name=installbutton
