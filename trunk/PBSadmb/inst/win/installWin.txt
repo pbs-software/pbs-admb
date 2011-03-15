@@ -12,11 +12,11 @@ grid 3 3
   label "install location" font=underline
   null
 
-  check name=admb text="ADMB" function=checkSoft sticky=W checked=T
+  check name=chkadmb text="ADMB" function=checkSoft sticky=W checked=T
   entry name=admbdir width=70 mode=character
   button "..." name=admbdirbutton function=changeDir action="admbdir"
 
-  check name=gcc text="MinGW (g++)" function=checkSoft sticky=W checked=T
+  check name=chkgcc text="MinGW (g++)" function=checkSoft sticky=W checked=T
   entry name=gccdir width=70 mode=character
   button "..." name=gccdirbutton function=changeDir action="gccdir"
 
