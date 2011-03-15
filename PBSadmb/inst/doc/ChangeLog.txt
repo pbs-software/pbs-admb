@@ -1,7 +1,11 @@
 PBSadmb Changes
 ===============
-0.62  2011-02-22  Authors
+0.62  2011-03-15  Authors
   - (keep adding changes here until sent to CRAN as v.0.62)
+  - Modified function '.load.prefix.droplist' to choose 'vonb' first if it exists. (RH 3/15)
+  - Modified function '.changeWD' to refresh the available 'prefix.values' after changing to a new directory. (RH 3/15)
+  - Modified function '.installADMB' to write any installed directory paths to the 'PBSadmb" GUI. (RH 3/15)
+	Also renamed the Boolean variables 'admb' and 'gcc' to 'chkadmb' and 'chkgcc', respectively.
   - Added ADM scripts in 'ADMtools' under 'inst' directory (RH 2/22)
   - Started integrating batch wrappers for PBSadmb (ACB 2/21)
   - Modified functions 'runMC' and '.win.runMC' so that script version doesn't require GUI. (RH 10/8)

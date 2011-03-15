@@ -195,7 +195,8 @@ admb <- function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 {
 	choices <- findPrefix( ".tpl" )
 	setWinVal( list( prefix.values = choices ) )
-	setWinVal( list( prefix = choices[ 1 ] ) )
+	if (any(choices=="vonb")) ch1 = grep("vonb",choices) else ch1 = 1
+	setWinVal( list( prefix = choices[ ch1 ] ) )
 }
 
 #given a vector of paths, return the last directory name of each path
@@ -265,7 +266,7 @@ installADMB <- function()
 	{
 		getWinVal(scope="L")
 		
-		state <- ifelse( c(admb=admb, gcc=gcc), "normal", "disabled" )
+		state <- ifelse( c(admb=chkadmb, gcc=chkgcc), "normal", "disabled" )
 		setWidgetState( "admbdir", state["admb"] )
 		setWidgetState( "admbdirbutton", state["admb"] )
 		setWidgetState( "gccdir", state["gcc"] )
@@ -311,12 +312,12 @@ installADMB <- function()
 		fname = paste( system.file(package="PBSadmb"), "/pathconfig.txt", sep="" )
 		pkgOptions <- new( "PBSoptions", filename = fname, initial.options = list(admb="", gcc=""), gui.prefix="" )
 
-		if( admb == TRUE ) {
+		if( chkadmb ) {
 			#install ADMB to admbdir
 			.installADMB.windows( admb.url[ arch ], admbdir )
 			setOptions( pkgOptions, admb = admbdir )
 		} 
-		if( gcc == TRUE ) {
+		if( chkgcc ) {
 			#install GCC to gccdir
 			.installADMB.windows( gcc.url[ arch ], gccdir )
 			setOptions( pkgOptions, gcc = gccdir )
@@ -330,6 +331,8 @@ installADMB <- function()
 
 		closeWin()
 		admb()
+		if( chkadmb ) setWinVal(list(admbpath=admbdir),winName="PBSadmb")
+		if(  chkgcc ) setWinVal(list(gccpath =gccdir), winName="PBSadmb")
 	}
 	create <- function()
 	{
@@ -1427,6 +1430,7 @@ convOS = function(inam, onam=inam, path=getwd()) {
 		setWinVal( list( currentdir.values = currentdir.values ) )
 		setWinVal( list( currentdir = wd ) )
 		setwd( wd )
+		.load.prefix.droplist()
 	}
 }
 
