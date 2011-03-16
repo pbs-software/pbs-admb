@@ -43,13 +43,15 @@
 		return( paste( x, collapse="/" ) )
 	}
 
-	#try different places to find the ADMB software for default values
-	#first see if it exists anywhere on the path
-	#if that fails, second, try installed versions under R's library
+	#try different places to find the ADMB software in the following order:
+	# 1) installed via installADMB - which is registered in the pkgOptions option class
+	# 2) check if it's found anywhere on the system PATH
+	# 3) set value to "unknown" (failure case)
 
 	#guess ADMB path
 	#first try default install location
 	initial.options$admbpath <- .findDownloadedSoftware( getOptions( pkgOptions, "admb" ) )
+	print( initial.options )
 	if( is.null( initial.options[["admbpath"]] ) ) {
 		#try to find it on the path otherwise
 		initial.options$admbpath <- .guessPath( "tpl2rem" )
@@ -89,30 +91,14 @@
 
 }
 
+#given any number of directories, return the first one that actually exists; null if nothing else is found
+#ex: .findDownloadedSoftware( "c:/fake/dir", "c:/windows", "c:/") returns "c:/windows"
 .findDownloadedSoftware <- function( ... )
 {
 	.findDownloadedSoftwareHelper <- function( name )
 	{
-		#pkg.dir <- system.file(package="PBSadmb")
-		#pkg.dir <- paste( pkg.dir, "/admb", sep="" )
-		#pkg.dir <- paste( pkg.dir, name, sep="/" )
-		pkg.dir <- name
-		if( file.exists( pkg.dir ) == FALSE )
-			return( NULL )
-
-		#all software is then inside another directory which can be named anything (e.g. admb-10.0-mingw-gcc4.5.2-64bit)
-		d <- dir( pkg.dir )
-		#ignore the .zip file left behind from installation
-		d <- grep("^.*(?<!\\.zip)$", d, perl=T, value=T)
-		if( length( d ) == 0 )
-			return( NULL )
-		d <- d[ 1 ]
-
-		#if dir() returns nothing, we get a .../NA, which will then fail the file.exists
-		pkg.dir <- paste( pkg.dir, d, sep="/" )
-
-		if( file.exists( pkg.dir ) )
-			return( pkg.dir )
+		if( file.exists( name ) )
+			return( name )
 		return( NULL )
 	}
 	for( i in c( ... ) ) {
@@ -330,9 +316,11 @@ installADMB <- function()
 		cat( "\n-------------------------------------------\n\n" )
 
 		closeWin()
+		.resetOptions()
 		admb()
-		if( chkadmb ) setWinVal(list(admbpath=admbdir),winName="PBSadmb")
-		if(  chkgcc ) setWinVal(list(gccpath =gccdir), winName="PBSadmb")
+		#only benifit to this is that if an existing ADopts.txt file exists, these values will still override it. .resetOptions won't
+		#if( chkadmb ) setWinVal(list(admbpath=admbdir),winName="PBSadmb")
+		#if(  chkgcc ) setWinVal(list(gccpath =gccdir), winName="PBSadmb")
 	}
 	create <- function()
 	{
@@ -454,7 +442,7 @@ checkADopts=function(opts=getOptions( .PBSadmb ), check=c("admbpath","gccpath","
 			next
 		ii=ipath=opts[[i]]
 		if (i=="admbpath") {
-			ipath=paste(ii,"/bin/",sep="")
+			ipath=paste(ii,"/bin",sep="")
 			if( .Platform$OS.type == "windows" )
 				progs=c("tpl2cpp.exe","tpl2rem.exe")
 			else
