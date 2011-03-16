@@ -38,16 +38,17 @@ menu nitems=4 label="Help"
 
 #----------------------------------- BUTTONS -----------------------------------
 
-Grid 2 2 sticky=E
+Grid 2 3 sticky=E
 	label "Current directory:" sticky=WN
-	grid 1 2
 	droplist name=currentdir value="'' '<change path>'" add=T width=40 func=.changeWDEnter
-	grid 1 2 sticky=E
+	grid 1 2 sticky=W
 		button text="Set" function=.changeWD
 		button text="Open" func=doAction action="openFile(\".\")"
 
 	label "Prefix:" sticky=W
-	droplist name=prefix mode=character sticky=W width=30 values="" add=T 
+	droplist name=prefix mode=character sticky=W width=40 values="" add=T 
+	button text="Refresh" sticky=W function=.load.prefix.droplist
+		
 
 notebook tabs="Setup Make Run Output" pady="5 0"
 
