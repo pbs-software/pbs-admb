@@ -200,19 +200,23 @@ installADMB <- function()
 	#URLs to ADMB and MinGW on our google project page
 
 	#useful for dev, to avoid redownloading and spamming the servers
-	#gcc.url <- c( 
-	#	"32" = "C:\\Users\\alex\\Documents\\stuff\\projects\\dfo\\pbsadmb\\admb_binary/gcc450.zip",
-	#	"64" = "C:\\Users\\alex\\Documents\\stuff\\projects\\dfo\\pbsadmb\\admb_binary/gcc452-64bit.zip" )
-	#admb.url <- c( 
-	#	"32" = "C:\\Users\\alex\\Documents\\stuff\\projects\\dfo\\pbsadmb\\admb_binary/admb-10.0-mingw-gcc4.5.0-32bit.zip",
-	#	"64" = "C:\\Users\\alex\\Documents\\stuff\\projects\\dfo\\pbsadmb\\admb_binary/admb-10.0-mingw-gcc4.5.2-64bit.zip" )
+	#gcc.url <- list( 
+	#	"32" = c( url="C:\\Users\\alex\\Documents\\stuff\\projects\\dfo\\pbsadmb\\admb_binary\\gcc450.zip", hash="8a210c2136a5075389a368b558ada0eebe164642" ),
+	#	"64" = c( url="C:\\Users\\alex\\Documents\\stuff\\projects\\dfo\\pbsadmb\\admb_binary\\gcc452-64bit.zip", hash="231e56d8f82ef54bfd5b2d7257e42fd429977d5b" )
+	#	)
+	#admb.url <- list( 
+	#	"32" = c( url="C:\\Users\\alex\\Documents\\stuff\\projects\\dfo\\pbsadmb\\admb_binary\\admb-10.0-mingw-gcc4.5.0-32bit.zip", hash="bb4b13634aba91625e627e5950870d482568110f"),
+	#	"64" = c( url="C:\\Users\\alex\\Documents\\stuff\\projects\\dfo\\pbsadmb\\admb_binary\\admb-10.0-mingw-gcc4.5.2-64bit.zip", hash="db334b21f393fb397f81a17eecba02c5345fe223")
+	#	)
 
-	gcc.url <- c( 
-		"32" = "http://pbs-admb.googlecode.com/files/gcc450.zip",
-		"64" = "http://pbs-admb.googlecode.com/files/gcc452-64bit.zip" )
-	admb.url <- c( 
-		"32" = "http://pbs-admb.googlecode.com/files/admb-10.0-mingw-gcc4.5.0-32bit.zip",
-		"64" = "http://pbs-admb.googlecode.com/files/admb-10.0-mingw-gcc4.5.2-64bit.zip" )
+	gcc.url <- list( 
+		"32" = c( url="http://pbs-admb.googlecode.com/files/gcc450.zip", hash="8a210c2136a5075389a368b558ada0eebe164642" ),
+		"64" = c( url="http://pbs-admb.googlecode.com/files/gcc452-64bit.zip", hash="231e56d8f82ef54bfd5b2d7257e42fd429977d5b" )
+		)
+	admb.url <- list( 
+		"32" = c( url="http://pbs-admb.googlecode.com/files/admb-10.0-mingw-gcc4.5.0-32bit.zip", hash="bb4b13634aba91625e627e5950870d482568110f"),
+		"64" = c( url="http://pbs-admb.googlecode.com/files/admb-10.0-mingw-gcc4.5.2-64bit.zip", hash="db334b21f393fb397f81a17eecba02c5345fe223")
+		)
 
 	pkg="PBSadmb"
 	if (!require(PBSmodelling))
@@ -300,13 +304,26 @@ installADMB <- function()
 
 		if( chkadmb ) {
 			#install ADMB to admbdir
-			.installADMB.windows( admb.url[ arch ], admbdir )
-			setOptions( pkgOptions, admb = admbdir )
+			ok.admb <- .installADMB.windows( admb.url[[ arch ]][ "url" ], admbdir, admb.url[[ arch ]][ "hash" ] )
+			if( ok.admb == FALSE ) 
+				showAlert( "Failed to install ADMB - see R console for details" )
+			else
+				setOptions( pkgOptions, admb = admbdir )
 		} 
 		if( chkgcc ) {
 			#install GCC to gccdir
-			.installADMB.windows( gcc.url[ arch ], gccdir )
-			setOptions( pkgOptions, gcc = gccdir )
+			ok.gcc <- .installADMB.windows( gcc.url[[ arch ]][ "url" ], gccdir, gcc.url[[ arch ]][ "hash" ] )
+			if( ok.gcc == FALSE ) 
+				showAlert( "Failed to install ADMB - see R console for details" )
+			else
+				setOptions( pkgOptions, gcc = gccdir )
+		}
+
+		if( ok.admb == FALSE || ok.gcc == FALSE ) {
+			cat( "\n\n-------------------------------------------\n" )
+			cat( "Installation Failed" )
+			cat( "\n-------------------------------------------\n\n" )
+			return( FALSE )
 		}
 
 		#save locations where files were installed
@@ -343,8 +360,13 @@ installADMB <- function()
 #usage: .installADMB.windows( gcc = "http://some.url/to.download.zip" )
 # will be downloaded to gcc.zip, and extract to a directory under PBSadmb\gcc\...
 # any number of programs can be downloaded and unzipped this way
-.installADMB.windows <- function( url, install.path )
+#hash: sha1 hash of file to download (can be viewed on google-code), if missing, no checks are performed
+.installADMB.windows <- function( url, install.path, hash = NULL )
 {
+	if( !is.null( hash ) ) {
+		if( !require( digest ) )
+			stop("!!!!!Install package digest!!!!!")
+	}
 	cat( "\n\n-------------------------------------------\n" )
 	oldwd <- getwd()
 	if( file.exists( install.path ) == FALSE ) {
@@ -359,9 +381,22 @@ installADMB <- function()
 	cat( paste( "  URL:", url, "\n" ) )
 	cat( paste( "  Saving to:", install.path, "/", save_to, "\n", sep="" ) )
 	if( file.exists( url ) )
-		file.copy( url, save_to )
+		file.copy( url, save_to, overwrite=TRUE )
 	else
 		download.file( url, save_to )
+
+	#check hash
+	if( !is.null( hash ) ) {
+		file.hash <- digest( save_to, "sha1", file=T )
+		if( file.hash != hash ) {
+			cat( "!!!!!!!!!!!! File hashes do not match !!!!!!!!!!!!!!\n" )
+			cat( paste( "expected:  ", hash, "\n" ) )
+			cat( paste( "calculated:", file.hash, "\n" ) )
+			return( FALSE )
+		}	
+		cat( paste( "calculated file hash matches:", file.hash, "\n" ) )
+	}
+
 	cat( "Download complete.\nAttempting to unzip files\n" )
 	unzip( save_to, exdir="." )
 	cat( "Unzip complete.\n\n" )
@@ -369,6 +404,7 @@ installADMB <- function()
 	cat( "-------------------------------------------\n\n" )
 
 	setwd( oldwd )
+	return( TRUE )
 }
 
 
