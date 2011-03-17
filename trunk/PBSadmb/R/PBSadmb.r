@@ -197,28 +197,6 @@ installADMB <- function()
 	if( .Platform$OS.type != "windows" )
 		stop( "installADMB is only supported for windows. Please refer to User Guide for installation instructions" )
 
-	#URLs to ADMB and MinGW on our google project page
-
-	#useful for dev, to avoid redownloading and spamming the servers
-	#gcc.url <- list( 
-	#	"32" = c( url="C:\\Users\\alex\\Documents\\stuff\\projects\\dfo\\pbsadmb\\admb_binary\\gcc450.zip", hash="8a210c2136a5075389a368b558ada0eebe164642" ),
-	#	"64" = c( url="C:\\Users\\alex\\Documents\\stuff\\projects\\dfo\\pbsadmb\\admb_binary\\gcc452-64bit.zip", hash="231e56d8f82ef54bfd5b2d7257e42fd429977d5b" )
-	#	)
-	#admb.url <- list( 
-	#	"32" = c( url="C:\\Users\\alex\\Documents\\stuff\\projects\\dfo\\pbsadmb\\admb_binary\\admb-10.0-mingw-gcc4.5.0-32bit.zip", hash="bb4b13634aba91625e627e5950870d482568110f"),
-	#	"64" = c( url="C:\\Users\\alex\\Documents\\stuff\\projects\\dfo\\pbsadmb\\admb_binary\\admb-10.0-mingw-gcc4.5.2-64bit.zip", hash="db334b21f393fb397f81a17eecba02c5345fe223")
-	#	)
-
-	gcc.url <- list( 
-		"32" = c( url="http://pbs-admb.googlecode.com/files/gcc450.zip", hash="8a210c2136a5075389a368b558ada0eebe164642" ),
-		"64" = c( url="http://pbs-admb.googlecode.com/files/gcc452-64bit.zip", hash="231e56d8f82ef54bfd5b2d7257e42fd429977d5b" )
-		)
-	admb.url <- list( 
-		"32" = c( url="http://pbs-admb.googlecode.com/files/admb-10.0-mingw-gcc4.5.0-32bit.zip", hash="bb4b13634aba91625e627e5950870d482568110f"),
-		"64" = c( url="http://pbs-admb.googlecode.com/files/admb-10.0-mingw-gcc4.5.2-64bit.zip", hash="db334b21f393fb397f81a17eecba02c5345fe223")
-		)
-
-	pkg="PBSadmb"
 	if (!require(PBSmodelling))
 		stop("!!!!!Install package PBSmodelling!!!!!")
 
@@ -296,30 +274,74 @@ installADMB <- function()
 	}
 	install <- function()
 	{
+		.get.url <- function( fname )
+		{
+			#ensure the url ends with /
+			base.url <- "http://pbs-admb.googlecode.com/files/"
+			#base.url <- "C:\\Users\\alex\\Documents\\stuff\\projects\\dfo\\pbsadmb\\admb_binary\\"
+			return( paste( base.url, fname, sep="" ) )
+		}
+	
+		#load list of software from google code
+		software <- read.table( .get.url( "versions.txt" ), header=T, stringsAsFactors=F )
+		software$url <- .get.url( software$filename )
+
+		#software should be a data.frame with columns: software, filename, hash, and url (added after reading)
+		#example:
+		#   software                           filename                                     hash  |  url (added after reading)
+		#1 ADMBgcc32 admb-10.0-mingw-gcc4.5.0-32bit.zip bb4b13634aba91625e627e5950870d482568110f  |  http://.../admb-10.0-mingw-gcc4.5.0-32bit.zip
+		#2 ADMBgcc64 admb-10.0-mingw-gcc4.5.2-64bit.zip db334b21f393fb397f81a17eecba02c5345fe223  |  http://.../admb-10.0-mingw-gcc4.5.2-64bit.zip
+		#3     gcc32                         gcc450.zip 8a210c2136a5075389a368b558ada0eebe164642  |  http://.../gcc450.zip
+		#4     gcc64                   gcc452-64bit.zip 231e56d8f82ef54bfd5b2d7257e42fd429977d5b  |  http://.../gcc452-64bit.zip
+
+		#give: software: table defined above
+		#	name: software name: "gcc", or "ADMBgcc"
+		#	arch: "32" or "64"
+		#returns: a row of the software table, or NULL if not found
+		.getSoftwareRow <- function( software, name, arch )
+		{
+			name <- paste( name, arch, sep="" )
+			x <- software[ software$software == name, ]
+			if( nrow( x ) == 0 )
+				return( NULL )
+			return( x )
+		}
+
 		getWinVal( scope="L" )
 
 		#keep track of installation files in this file
 		fname = paste( system.file(package="PBSadmb"), "/pathconfig.txt", sep="" )
 		pkgOptions <- new( "PBSoptions", filename = fname, initial.options = list(admb="", gcc=""), gui.prefix="" )
 
+		install.ok <- TRUE
 		if( chkadmb ) {
-			#install ADMB to admbdir
-			ok.admb <- .installADMB.windows( admb.url[[ arch ]][ "url" ], admbdir, admb.url[[ arch ]][ "hash" ] )
-			if( ok.admb == FALSE ) 
-				showAlert( "Failed to install ADMB - see R console for details" )
-			else
+			ok.admb = FALSE
+			x <- .getSoftwareRow( software, "ADMBgcc", arch )
+			if( !is.null( x ) ) {
+				#install ADMB to admbdir
+				ok.admb <- .installADMB.windows( x$url, admbdir, x$hash )
+			}
+			if( ok.admb == TRUE ) 
 				setOptions( pkgOptions, admb = admbdir )
+			else
+				showAlert( "Failed to install ADMB - see R console for details" )
+			install.ok <- install.ok && ok.admb
 		} 
 		if( chkgcc ) {
-			#install GCC to gccdir
-			ok.gcc <- .installADMB.windows( gcc.url[[ arch ]][ "url" ], gccdir, gcc.url[[ arch ]][ "hash" ] )
-			if( ok.gcc == FALSE ) 
-				showAlert( "Failed to install ADMB - see R console for details" )
-			else
+			ok.gcc = FALSE
+			x <- .getSoftwareRow( software, "gcc", arch )
+			if( !is.null( x ) ) {
+				#install gcc to gccdir
+				ok.gcc <- .installADMB.windows( x$url, gccdir, x$hash )
+			}
+			if( ok.gcc == TRUE ) 
 				setOptions( pkgOptions, gcc = gccdir )
+			else
+				showAlert( "Failed to install gcc - see R console for details" )
+			install.ok <- install.ok && ok.gcc
 		}
 
-		if( ok.admb == FALSE || ok.gcc == FALSE ) {
+		if( install.ok == FALSE ) {
 			cat( "\n\n-------------------------------------------\n" )
 			cat( "Installation Failed" )
 			cat( "\n-------------------------------------------\n\n" )
@@ -363,10 +385,10 @@ installADMB <- function()
 #hash: sha1 hash of file to download (can be viewed on google-code), if missing, no checks are performed
 .installADMB.windows <- function( url, install.path, hash = NULL )
 {
-	if( !is.null( hash ) ) {
-		if( !require( digest ) )
-			stop("!!!!!Install package digest!!!!!")
-	}
+	use.digest <- require( digest, quietly = TRUE )
+	if( use.digest == FALSE )
+		hash <- NULL
+	
 	cat( "\n\n-------------------------------------------\n" )
 	oldwd <- getwd()
 	if( file.exists( install.path ) == FALSE ) {
