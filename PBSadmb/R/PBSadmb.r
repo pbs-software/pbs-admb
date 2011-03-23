@@ -6,90 +6,9 @@
 	if( exists( ".PBSadmb" ) ) 
 		return()
 
-	initial.options <- .guessDefaultPaths()
-	
-	#create instance of option manager - use this to get/set/save/load options
-	.PBSadmb <<- new( "PBSoptions", filename = "ADopts.txt", initial.options = initial.options, gui.prefix="" )
+	readADopts()
 }
 
-#return a list of guessed paths
-.guessDefaultPaths <- function()
-{
-	#used to track software installed via PBSadmb
-	fname = paste( system.file(package="PBSadmb"), "/pathconfig.txt", sep="" )
-	pkgOptions <- new( "PBSoptions", filename = fname, initial.options = list(admb="", gcc=""), gui.prefix="" )
-
-	#first setup initial option values
-	initial.options <- list()
-
-	#search vector of programs for the first found path, if nothing is found return "failed" object
-	.guessPath <- function( programs, includefilename = FALSE, failed = NULL )
-	{
-		for( p in programs ) {
-			found <- Sys.which( p )[ 1 ]
-			if( found != "" ) {
-				if( includefilename )
-					return( found )
-				return( dirname( found ) )
-			}
-		}
-		return( failed )
-	}
-
-	.removeOneLevel <- function( path )
-	{
-		x <- strsplit( path, "/" )[[1]]
-		x <- x[ -length( x ) ]
-		return( paste( x, collapse="/" ) )
-	}
-
-	#try different places to find the ADMB software in the following order:
-	# 1) installed via installADMB - which is registered in the pkgOptions option class
-	# 2) check if it's found anywhere on the system PATH
-	# 3) set value to "unknown" (failure case)
-
-	#guess ADMB path
-	#first try default install location
-	initial.options$admbpath <- .findDownloadedSoftware( getOptions( pkgOptions, "admb" ) )
-	print( initial.options )
-	if( is.null( initial.options[["admbpath"]] ) ) {
-		#try to find it on the path otherwise
-		initial.options$admbpath <- .guessPath( "tpl2rem" )
-		if( is.null( initial.options[["admbpath"]] ) ) {
-			initial.options$admbpath <- "unknown"
-		} else {
-			initial.options$admbpath <- .removeOneLevel( initial.options$admbpath )
-		}
-		
-	}
-	
-	#guess gcc path
-	#first try default install location
-	initial.options$gccpath <- .findDownloadedSoftware(  getOptions( pkgOptions, "gcc" ) )
-	if( is.null( initial.options[["gccpath"]] ) ) {
-		#try to find it on the path otherwise
-		initial.options$gccpath <- .guessPath( "g++" )
-		if( is.null( initial.options[["gccpath"]] ) ) {
-			initial.options$gccpath <- "unknown"
-		} else {
-			initial.options$gccpath <- .removeOneLevel( initial.options$gccpath )
-		}
-		
-	}
-
-
-	#guess editor
-	initial.options$editor <- .guessPath( c( "gvim", "kate", "notepad" ), TRUE )
-
-	return( initial.options )
-}
-
-.resetOptions <- function()
-{
-	initial.options <- .guessDefaultPaths()
-	setOptions( .PBSadmb, admbpath = initial.options$admbpath, gccpath = initial.options$gccpath, editor = initial.options$editor )
-
-}
 
 #given any number of directories, return the first one that actually exists; null if nothing else is found
 #ex: .findDownloadedSoftware( "c:/fake/dir", "c:/windows", "c:/") returns "c:/windows"
@@ -114,6 +33,7 @@
 #-----------------------------------------------RH
 admb <- function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 	.initOptions()
+	readADopts()
 	pkg="PBSadmb"
 	if (!require(PBSmodelling))
 		stop("!!!!!Install package PBSmodelling!!!!!")
@@ -263,7 +183,6 @@ installADMB <- function()
 		act <- getWinAct()[1]
 		old <- vals[[ act ]]
 
-		print( old )
 		d <- choose.dir( old )
 		
 		if( !is.na( d ) ) {
@@ -310,35 +229,49 @@ installADMB <- function()
 		getWinVal( scope="L" )
 
 		#keep track of installation files in this file
-		fname = paste( system.file(package="PBSadmb"), "/pathconfig.txt", sep="" )
-		pkgOptions <- new( "PBSoptions", filename = fname, initial.options = list(admb="", gcc=""), gui.prefix="" )
+		fname = paste( system.file(package="PBSadmb"), "/ADopts.txt", sep="" )
+		pkgOptions <- new( "PBSoptions", filename = fname, initial.options = list(admbpath="", gccpath=""), gui.prefix="" )
+
+		previous.settings.ok <- checkADopts(check=c("admbpath","gccpath"), warn=FALSE)
 
 		install.ok <- TRUE
 		if( chkadmb ) {
-			ok.admb = FALSE
-			x <- .getSoftwareRow( software, "ADMBgcc", arch )
-			if( !is.null( x ) ) {
-				#install ADMB to admbdir
-				ok.admb <- .installADMB.windows( x$url, admbdir, x$hash )
+			version.fname = paste( admbdir, "/version.txt", sep="" )
+			if( !file.exists( version.fname ) || getYes( paste( "You already have version", readLines(version.fname,warn=F)[1], "installed in", admbdir, "\nDo you want to overwrite?" ) ) ) {
+				x <- .getSoftwareRow( software, "ADMBgcc", arch )
+				ok.admb = FALSE
+				if( !is.null( x ) ) {
+					#install ADMB to admbdir
+					ok.admb <- .installADMB.windows( x$url, admbdir, x$hash )
+				}
+				if( ok.admb == TRUE ) 
+					setOptions( .PBSadmb, admbpath = admbdir )
+				else
+					showAlert( "Failed to install ADMB - see R console for details" )
+				install.ok <- install.ok && ok.admb
+			} else {
+				#user hit no
+				chkadmb <- FALSE
 			}
-			if( ok.admb == TRUE ) 
-				setOptions( pkgOptions, admb = admbdir )
-			else
-				showAlert( "Failed to install ADMB - see R console for details" )
-			install.ok <- install.ok && ok.admb
 		} 
 		if( chkgcc ) {
-			ok.gcc = FALSE
-			x <- .getSoftwareRow( software, "gcc", arch )
-			if( !is.null( x ) ) {
-				#install gcc to gccdir
-				ok.gcc <- .installADMB.windows( x$url, gccdir, x$hash )
+			version.fname = paste( gccdir, "/version.txt", sep="" )
+			if( !file.exists( version.fname ) || getYes( paste( "You already have version", readLines(version.fname,warn=F)[1], "installed in", gccdir, "\nDo you want to overwrite?" ) ) ) {
+				ok.gcc = FALSE
+				x <- .getSoftwareRow( software, "gcc", arch )
+				if( !is.null( x ) ) {
+					#install gcc to gccdir
+					ok.gcc <- .installADMB.windows( x$url, gccdir, x$hash )
+				}
+				if( ok.gcc == TRUE ) 
+					setOptions( .PBSadmb, gccpath = gccdir )
+				else
+					showAlert( "Failed to install gcc - see R console for details" )
+				install.ok <- install.ok && ok.gcc
+			} else {
+				#user hit no
+				chkgcc <- FALSE
 			}
-			if( ok.gcc == TRUE ) 
-				setOptions( pkgOptions, gcc = gccdir )
-			else
-				showAlert( "Failed to install gcc - see R console for details" )
-			install.ok <- install.ok && ok.gcc
 		}
 
 		if( install.ok == FALSE ) {
@@ -348,18 +281,22 @@ installADMB <- function()
 			return( FALSE )
 		}
 
-		#save locations where files were installed
-		saveOptions( pkgOptions )
+		
+		#save locations where files were installed (and previous settings were incorrect)
+		new.settings.ok <- checkADopts(check=c("admbpath","gccpath"), warn=FALSE)
+		if( previous.settings.ok == FALSE && new.settings.ok == TRUE ) {
+			writeADopts()
+		}
 		cat( "\n\n-------------------------------------------\n" )
-		cat( "Installation complete: restarting admb()" )
+		cat( "Installation complete" )
 		cat( "\n-------------------------------------------\n\n" )
 
-		closeWin()
-		.resetOptions()
-		admb()
-		#only benifit to this is that if an existing ADopts.txt file exists, these values will still override it. .resetOptions won't
-		#if( chkadmb ) setWinVal(list(admbpath=admbdir),winName="PBSadmb")
-		#if(  chkgcc ) setWinVal(list(gccpath =gccdir), winName="PBSadmb")
+		closeWin("PBSadmbInst")
+
+		#update GUI with new values
+		if( chkadmb ) setWinVal(list(admbpath=admbdir),winName="PBSadmb")
+		if(  chkgcc ) setWinVal(list(gccpath=gccdir), winName="PBSadmb")
+		.win.makeADopts()
 	}
 	create <- function()
 	{
@@ -445,7 +382,6 @@ setADMBPath <- function( admbpath, gccpath, editor )
 		setOptions( .PBSadmb, gccpath = gccpath )
 	if( missing( editor ) == FALSE )
 		setOptions( .PBSadmb, editor = editor )
-	print( getOptions( .PBSadmb ) )
 }
 	
 .win.makeADopts=function(winName="PBSadmb")
@@ -458,7 +394,17 @@ setADMBPath <- function( admbpath, gccpath, editor )
 
 writeADopts <- function(optfile="ADopts.txt")
 {
+	#save to current dir
 	saveOptions( .PBSadmb, optfile )
+
+	#save to pkg dir (don't change fname)
+	#TODO: hack until http://code.google.com/p/pbs-modelling/issues/detail?id=81 is solved
+	opts <- getOptions( .PBSadmb )
+	tmp <- list( .PBSadmb.pkgOptions )
+	tmp[ names( opts ) ] <- opts
+	do.call( setOptions, tmp )
+	saveOptions( .PBSadmb.pkgOptions )
+	return(invisible(NULL))
 }
 
 .win.writeADopts=function(winName="PBSadmb")
@@ -472,7 +418,29 @@ writeADopts <- function(optfile="ADopts.txt")
 
 readADopts <- function(optfile="ADopts.txt")
 {
-	loadOptions( .PBSadmb, optfile )
+	#create instance of option manager - use this to get/set/save/load options
+	#first attempt to load options from the package, then attempt to load options from the current dir (which will override pkg options)
+	pkg_fname = paste( system.file(package="PBSadmb"), "/ADopts.txt", sep="" )
+	.PBSadmb.pkgOptions <<- new( "PBSoptions", filename = pkg_fname, initial.options = list(admbpath="", gccpath="",editor=""), gui.prefix="" )
+
+	#load from current dir, using pkgOptions as default values
+	.PBSadmb <<- new( "PBSoptions", filename = optfile, initial.options = getOptions( .PBSadmb.pkgOptions ), gui.prefix="" )
+
+	.guessPath <- function( programs, includefilename = FALSE, failed = NULL )
+	{
+		for( p in programs ) {
+			found <- Sys.which( p )[ 1 ]
+			if( found != "" ) {
+				if( includefilename )
+					return( found )
+				return( dirname( found ) )
+			}
+		}
+		return( failed )
+	}
+
+	if( getOptions( .PBSadmb, "editor" ) == "" )
+		setOptions( .PBSadmb, editor = .guessPath( c( "kate", "notepad" ), TRUE ) )
 }
 
 .win.readADopts=function(winName="PBSadmb")
@@ -597,7 +565,7 @@ appendLog <- function(prefix, lines)
 		out=shell(dots,intern=TRUE) }
 	else {
 		cmd <- unlist(list(...))
-		print( cmd )
+		#print( cmd )
 		if( wait == FALSE )
 	   		out=system(cmd,wait=FALSE)
 		else
