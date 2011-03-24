@@ -213,6 +213,12 @@ installADMB <- function()
 		#3     gcc32                         gcc450.zip 8a210c2136a5075389a368b558ada0eebe164642  |  http://.../gcc450.zip
 		#4     gcc64                   gcc452-64bit.zip 231e56d8f82ef54bfd5b2d7257e42fd429977d5b  |  http://.../gcc452-64bit.zip
 
+		#When a new version of ADMB is to be added:
+		#1) make sure there is a version.txt file included in the installation zip which indicates the version of ADMB (or gcc) on a single line
+		#2) upload it to google
+		#3) modify the versions.txt file on google, updating the filename and hash field of the updated software (note: the sha1 hash can be obtained on google's download info page)
+		#4) test that it works
+
 		#give: software: table defined above
 		#	name: software name: "gcc", or "ADMBgcc"
 		#	arch: "32" or "64"
@@ -234,43 +240,63 @@ installADMB <- function()
 
 		previous.settings.ok <- checkADopts(check=c("admbpath","gccpath"), warn=FALSE)
 
+		#each row is a software component the user can install, with GUI options
+		software.to.install <<- data.frame(
+			selected = c( chkadmb, chkgcc ),
+			dir = c( admbdir, gccdir ),
+			name = c( "ADMBgcc", "gcc" ),
+			option.name = c( "admbpath", "gccpath" ),
+			ok = c( FALSE, FALSE ),
+			stringsAsFactors=FALSE
+			)
+		
+		#only select the selected software components
+		software.to.install <- software.to.install[ software.to.install$selected, ]
+		
 		install.ok <- TRUE
-		if( chkadmb ) {
-			version.fname = paste( admbdir, "/version.txt", sep="" )
-			if( !file.exists( version.fname ) || getYes( paste( "You already have version", readLines(version.fname,warn=F)[1], "installed in", admbdir, "\nDo you want to overwrite?" ) ) ) {
-				x <- .getSoftwareRow( software, "ADMBgcc", arch )
-				ok.admb = FALSE
-				if( !is.null( x ) ) {
-					#install ADMB to admbdir
-					ok.admb <- .installADMB.windows( x$url, admbdir, x$hash )
+
+		#iterate each row of software.to.install data.frame
+		if( nrow( software.to.install ) ) {
+			for( i in 1:nrow( software.to.install ) ) {
+				to.install <- software.to.install[ i, ]
+
+				#install ok flag
+				ok <- FALSE
+
+				version.fname = paste( to.install$dir, "/version.txt", sep="" )
+				if( file.exists( version.fname ) ) {
+					#should be two lines: line 1) version number, 2) name of zip file used to install this
+					version.info <- readLines( version.fname, warn=F )[1]
+					if( getYes( paste( "You already have version", version.info, "installed in", to.install$dir, "\nDo you want to overwrite?" ) ) ) {
+						#remove installed files
+						zip.fname <- paste( to.install$dir, "/", .getDirName( to.install$dir ), ".zip", sep="" )
+						cat( paste( "Deleting old ", to.install$name, " files in ", to.install$dir, ".\n", sep="" ) )
+						ok <- .deleteExtractedZipFiles( zip.fname )
+						cat( paste( "cleanup done.\n", sep="" ) )
+						if( ok == FALSE )
+							showAlert( paste( "Unable to uninstall previous version of ", to.install$name, ".\n\nThe zip file \"", zip.fname, "\" is missing and is required for building the list of previously installed files to delete.\n\nTry manually deleting the contents of the directory: \"", to.install$dir, "\"", sep="" ) )
+					}
 				}
-				if( ok.admb == TRUE ) 
-					setOptions( .PBSadmb, admbpath = admbdir )
-				else
-					showAlert( "Failed to install ADMB - see R console for details" )
-				install.ok <- install.ok && ok.admb
-			} else {
-				#user hit no
-				chkadmb <- FALSE
-			}
-		} 
-		if( chkgcc ) {
-			version.fname = paste( gccdir, "/version.txt", sep="" )
-			if( !file.exists( version.fname ) || getYes( paste( "You already have version", readLines(version.fname,warn=F)[1], "installed in", gccdir, "\nDo you want to overwrite?" ) ) ) {
-				ok.gcc = FALSE
-				x <- .getSoftwareRow( software, "gcc", arch )
-				if( !is.null( x ) ) {
-					#install gcc to gccdir
-					ok.gcc <- .installADMB.windows( x$url, gccdir, x$hash )
+				if( !file.exists( version.fname ) ) {
+					x <- .getSoftwareRow( software, to.install$name, arch )
+					if( !is.null( x ) ) {
+						#install gcc to gccdir
+						ok <- .installADMB.windows( x$url, to.install$dir, x$hash )
+						software.to.install[i,"ok"] <- ok
+					}
+					if( ok == TRUE ) {
+						#save the option: key: option.name, val: dir. e.g. gccpath = gccdir, or admbpath = admbdir
+						tmp <- list( .PBSadmb )
+						tmp[[ to.install$option.name ]] <- to.install$dir
+						do.call( setOptions, tmp )
+					} else {
+						showAlert( paste( "Failed to install", to.install$name, "- see R console for details" ) )
+					}
+					install.ok <- install.ok && ok
+				} else {
+					#user hit no
+					chkgcc <- FALSE
 				}
-				if( ok.gcc == TRUE ) 
-					setOptions( .PBSadmb, gccpath = gccdir )
-				else
-					showAlert( "Failed to install gcc - see R console for details" )
-				install.ok <- install.ok && ok.gcc
-			} else {
-				#user hit no
-				chkgcc <- FALSE
 			}
 		}
 
@@ -363,6 +389,30 @@ installADMB <- function()
 	cat( "-------------------------------------------\n\n" )
 
 	setwd( oldwd )
+	return( TRUE )
+}
+
+.deleteExtractedZipFiles <- function( zip.fname )
+{
+	if( !file.exists( zip.fname ) ) {
+		return( FALSE )
+	}
+	files <<- as.character( unzip( zip.fname, list=TRUE )$Name )
+	#directories have a trailing /, which causes file.info to report NA for isdir
+	files <<- gsub( "/$", "", files )
+	files <<- paste( dirname( zip.fname ), files, sep="/" )
+	isdir <<- file.info( files )[,"isdir"]
+
+	#delete all files
+	lapply( files[ !isdir ], unlink )
+
+	#delete all directories, sorted from most nested dir, to least nested dir (to delete a child before the parent)
+	#To be safe, don't delete a dir unless it is empty (unlink fails to delete a dir with recursive=FALSE)
+	lapply( rev( sort( files[ isdir ] ) ), 
+		function(f) {
+			if( length( dir(f) ) == 0 ) { unlink(f,recursive=TRUE) }
+		}
+	)
 	return( TRUE )
 }
 
