@@ -74,6 +74,24 @@ make
 export PATH=/c/admb_build/admb-10.0/build/admb-10.0-mingw-gcc4.5.2-32bit/admb-10.0-mingw-gcc4.5.2-32bit/bin:$PATH
 export ADMB_HOME=/c/admb_build/admb-10.0/build/admb-10.0-mingw-gcc4.5.2-32bit/admb-10.0-mingw-gcc4.5.2-32bit
 
+===64bit===
+
+Download and install x86_64-w64-mingw32 (follow instructions on http://www.murdoch-sutherland.com/Rtools/)
+
+locate x86_64-w64-mingw32-g++ and copy/rename to g++
+
+open mingw shell
+
+export PATH=/c/path/to/Win64No_toolchain/bin:$PATH
+
+hint: run which g++, and g++ --version to double check the correct g++ is being hit.
+
+./configure BUILD_64BIT=yes
+
+make
+
+Verify build/admb-10.0-mingw-gcc4.5.2-64bit exists and works
+
 ==Testing with catage==
 cd /c/admb_build
 mkdir tmp
