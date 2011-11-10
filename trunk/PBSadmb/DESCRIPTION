@@ -1,6 +1,6 @@
 Package: PBSadmb
-Version: 0.62
-Date: 2011-03-15
+Version: 0.63
+Date: 2011-11-10
 Title: ADMB for R Using Scripts or GUI
 Author: Jon T. Schnute, Rowan Haigh, Alex Couture-Beil
 Maintainer: Jon T. Schnute <Jon.Schnute@dfo-mpo.gc.ca>
