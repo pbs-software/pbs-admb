@@ -1,7 +1,10 @@
 PBSadmb Changes
 ===============
+0.63  2011-11-10  Authors
+  - (keep adding changes here until sent to CRAN as v.0.63)
+  - R-2.14.0 requires namespace and loading via '.onLoad'. (RH 11/10)
+
 0.62  2011-03-15  Authors
-  - (keep adding changes here until sent to CRAN as v.0.62)
   - Modified function '.load.prefix.droplist' to choose 'vonb' first if it exists. (RH 3/15)
   - Modified function '.changeWD' to refresh the available 'prefix.values' after changing to a new directory. (RH 3/15)
   - Modified function '.installADMB' to write any installed directory paths to the 'PBSadmb" GUI. (RH 3/15)

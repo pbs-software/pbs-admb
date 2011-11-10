@@ -1,24 +1,28 @@
-.First.lib <- function(lib,pkg)
+.onLoad <- function(lib,pkg)
 {
 	.initOptions()
 
-	pkg_info <- utils::sessionInfo( package=pkg )$otherPkgs[[ pkg ]]
-	pkg_date <- strsplit( pkg_info$Packaged, " " )[[1]][1]
+	pkg_info <- utils::sessionInfo( package="PBSadmb" )$otherPkgs$PBSadmb
+	if( is.character( pkg_info$Packaged ) )
+		pkg_date <- strsplit( pkg_info$Packaged, " " )[[1]][1]
+	else
+		pkg_date  <- "unkown"
 	
-	userguide_path <- system.file( "doc/PBSadmbwin-UG.pdf", package = pkg )
+	userguide_path <- system.file( "doc/PBSadmb-UG.pdf", package = "PBSadmb" )
 	
 	cat("
-PBS ADMB", pkg_info$Version, "-- Copyright (C) 2008-09 Fisheries and Oceans Canada
+-----------------------------------------------------------
+PBS ADMB", pkg_info$Version, "-- Copyright (C) 2008-2011 Fisheries and Oceans Canada
 
-A complete user guide 'PBSadmbwin-UG.pdf' is located at 
+A complete user guide 'PBSadmb-UG.pdf' is located at 
 ", userguide_path, "
 
 Packaged on", pkg_date, "
 Pacific Biological Station, Nanaimo
 
 Type admb() to start a GUI for operating ADMB.
+-----------------------------------------------------------
 
 
 ")
-
 }
