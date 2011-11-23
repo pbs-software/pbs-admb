@@ -1,8 +1,10 @@
 PBSadmb Changes
 ===============
-0.63  2011-11-10  Authors
-  - (keep adding changes here until sent to CRAN as v.0.63)
+0.63  2011-11-22  Authors
+  - Revised UG to reflect new GUI and for eventual upgrading to discuss new install methodology. (RH 11/22)
+  - Altered GUI so that output controls appear on Make and Run tabs. (JTS 11/22)
   - R-2.14.0 requires namespace and loading via '.onLoad'. (RH 11/10)
+  - Advance to version 0.63 for next CRAN release.
 
 0.62  2011-03-15  Authors
   - Modified function '.load.prefix.droplist' to choose 'vonb' first if it exists. (RH 3/15)
