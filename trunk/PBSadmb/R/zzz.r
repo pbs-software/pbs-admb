@@ -10,14 +10,14 @@
 	
 	userguide_path <- system.file( "doc/PBSadmb-UG.pdf", package = "PBSadmb" )
 	
-	cat("
+	packageStartupMessage("
 -----------------------------------------------------------
-PBS ADMB", pkg_info$Version, "-- Copyright (C) 2008-2011 Fisheries and Oceans Canada
+PBS ADMB ", pkg_info$Version, " -- Copyright (C) 2008-2011 Fisheries and Oceans Canada
 
 A complete user guide 'PBSadmb-UG.pdf' is located at 
 ", userguide_path, "
 
-Packaged on", pkg_date, "
+Packaged on ", pkg_date, "
 Pacific Biological Station, Nanaimo
 
 Type admb() to start a GUI for operating ADMB.
@@ -26,3 +26,4 @@ Type admb() to start a GUI for operating ADMB.
 
 ")
 }
+
