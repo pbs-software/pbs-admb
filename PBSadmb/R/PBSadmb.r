@@ -235,7 +235,7 @@ installADMB <- function()
 
 		#keep track of installation files in this file
 		fname = paste( system.file(package="PBSadmb"), "/ADopts.txt", sep="" )
-		pkgOptions <- methods::new( "PBSoptions", filename = fname, initial.options = list(admbpath="", gccpath=""), gui.prefix="" )
+		pkgOptions <- new( "PBSoptions", filename = fname, initial.options = list(admbpath="", gccpath=""), gui.prefix="" )
 
 		previous.settings.ok <- checkADopts(check=c("admbpath","gccpath"), warn=FALSE)
 
@@ -347,10 +347,8 @@ installADMB <- function()
 #hash: sha1 hash of file to download (can be viewed on google-code), if missing, no checks are performed
 .installADMB.windows <- function( url, install.path, hash = NULL )
 {
-	#use.digest = "digest" %in% base::.packages(all.available=TRUE)
-	#if (use.digest) require(digest,quietly=TRUE)
-	#else hash = NULL
-	use.digest <- require( digest, quietly = TRUE )
+	#use.digest <- require( digest, quietly = TRUE )
+	use.digest = FALSE
 	if( use.digest == FALSE ) hash <- NULL
 	
 	cat( "\n\n-------------------------------------------\n" )
@@ -471,11 +469,12 @@ readADopts <- function(optfile="ADopts.txt")
 {
 	#create instance of option manager - use this to get/set/save/load options
 	#first attempt to load options from the package, then attempt to load options from the current dir (which will override pkg options)
+	require(methods,quietly=TRUE)
 	pkg_fname = paste( system.file(package="PBSadmb"), "/ADopts.txt", sep="" )
-	.PBSadmb.pkgOptions <<- methods::new( "PBSoptions", filename = pkg_fname, initial.options = list(admbpath="", gccpath="",editor=""), gui.prefix="" )
+	.PBSadmb.pkgOptions <<- new( "PBSoptions", filename = pkg_fname, initial.options = list(admbpath="", gccpath="",editor=""), gui.prefix="" )
 
 	#load from current dir, using pkgOptions as default values
-	.PBSadmb <<- methods::new( "PBSoptions", filename = optfile, initial.options = getOptions( .PBSadmb.pkgOptions ), gui.prefix="" )
+	.PBSadmb <<- new( "PBSoptions", filename = optfile, initial.options = getOptions( .PBSadmb.pkgOptions ), gui.prefix="" )
 
 	.guessPath <- function( programs, includefilename = FALSE, failed = NULL )
 	{
@@ -950,7 +949,7 @@ runMC <- function(prefix, nsims=2000, nthin=20, outsuff=".mc.dat",
 #-------------------------------------------JTS/RH
 editADfile <- function(fname)
 {
-	if (!checkADopts(warn=FALSE)) {cat("Invalid options for PBSadmb\n") stop()}
+	if (!checkADopts(warn=FALSE)) {cat("Invalid options for PBSadmb\n"); stop()}
 	#f.edit <- paste("start \"\"",.addQuotes(convSlashes(.ADopts$editor)),.addQuotes(convSlashes(fname)),sep=" ");
 	if (.Platform$OS.type=="windows") {
 		f.edit <- paste(.addQuotes(convSlashes(getOptions(.PBSadmb,"editor"))),.addQuotes(convSlashes(fname)),sep=" ")
