@@ -1,4 +1,4 @@
-.onLoad <- function(lib,pkg)
+.onLoad <- function(libname, pkgname)
 {
 	.initOptions()
 

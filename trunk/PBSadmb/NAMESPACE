@@ -1,7 +1,14 @@
 # Export all names from PBSadmb
-exportPattern(".")
+# exportPattern(".")
+
+exportPattern("^[^\\.]")
+exportPattern("[^\\.win\\.]")
+export(.initOptions)
 
 # Import all packages listed as Imports or Depends
-import(
-  methods, PBSmodelling
-)
+import( PBSmodelling )
+
+# Import the S4 options manager from PBSmodelling
+#importClassesFrom(PBSmodelling, PBSoptions)
+#importMethodsFrom(PBSmodelling, initialize, print, show)
+
