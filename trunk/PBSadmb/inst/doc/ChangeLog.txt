@@ -1,6 +1,7 @@
 PBSadmb Changes
 ===============
-0.63  2011-11-22  Authors
+0.63  2011-11-24  Authors
+  - Moved '.initOptions' from '.onLoad' to '.onAttach'. (RH 11/24)
   - Revised UG to reflect new GUI and for eventual upgrading to discuss new install methodology. (RH 11/22)
   - Altered GUI so that output controls appear on Make and Run tabs. (JTS 11/22)
   - R-2.14.0 requires namespace and loading via '.onLoad'. (RH 11/10)
