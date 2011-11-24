@@ -467,13 +467,12 @@ writeADopts <- function(optfile="ADopts.txt")
 
 readADopts <- function(optfile="ADopts.txt")
 {
-	#create instance of option manager - use this to get/set/save/load options
-	#first attempt to load options from the package, then attempt to load options from the current dir (which will override pkg options)
-	require(methods,quietly=TRUE)
+	# Create instance of option manager - use this to get/set/save/load options
+	# First attempt to load options from the package, then attempt to load options from the current dir (which will override pkg options)
 	pkg_fname = paste( system.file(package="PBSadmb"), "/ADopts.txt", sep="" )
 	.PBSadmb.pkgOptions <<- new( "PBSoptions", filename = pkg_fname, initial.options = list(admbpath="", gccpath="",editor=""), gui.prefix="" )
 
-	#load from current dir, using pkgOptions as default values
+	# Load from current dir, using pkgOptions as default values
 	.PBSadmb <<- new( "PBSoptions", filename = optfile, initial.options = getOptions( .PBSadmb.pkgOptions ), gui.prefix="" )
 
 	.guessPath <- function( programs, includefilename = FALSE, failed = NULL )

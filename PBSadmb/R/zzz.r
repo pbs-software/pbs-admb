@@ -1,7 +1,6 @@
 .onLoad <- function(libname, pkgname)
 {
-	.initOptions()
-
+#	.initOptions()
 	pkg_info <- utils::sessionInfo( package="PBSadmb" )$otherPkgs$PBSadmb
 	if( is.character( pkg_info$Packaged ) )
 		pkg_date <- strsplit( pkg_info$Packaged, " " )[[1]][1]
@@ -25,5 +24,8 @@ Type admb() to start a GUI for operating ADMB.
 
 
 ")
+}
+.onAttach = function(libname, pkgname){
+	.initOptions()
 }
 
