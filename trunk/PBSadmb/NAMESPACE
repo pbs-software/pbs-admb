@@ -3,6 +3,7 @@
 
 exportPattern("^[^\\.]")
 exportPattern("^\\.win\\.")
+exportPattern("^\\.clean")
 export(.initOptions)
 
 # Import all packages listed as Imports or Depends
