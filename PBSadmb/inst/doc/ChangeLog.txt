@@ -5,6 +5,7 @@ Authors:  JTS = Jon T. Schnute
           ACB = Alex Couture-Beil
 -----------------------------------
 0.64  2012-06-05  Authors
+  - Exported the '.clean' functions from the namespace. (RH 6/5)
   - Modified GUI so that user can view the window description file and the project's R code. (RH 6/5)
   - Modified function 'runAD' to remove trailing whitespace if the executable has no arguments. (RH 6/5)
   - Advance to version 0.64 for next CRAN release.
