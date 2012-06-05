@@ -84,17 +84,19 @@ grid 4 1 sticky=""
 	#	label "Prefix:"
 	#	droplist name=prefix mode=character sticky=W width=20 values="" add=T
 
-	grid 1 9 sticky=W
+	grid 1 8 sticky=W
 		label text=Make font="bold 11" sticky=W fg=blue padx="0 10"
 		button text="tpl" func=doAction action="editAD(getWinVal()$prefix,c(`.tpl`))" 
 		button text="dat pin" func=doAction action="editAD(getWinVal()$prefix,c(`.dat`,`.pin`))" 
 		button text="cpp log" func=doAction action="editAD(getWinVal()$prefix,c(`.cpp`,`.log`))" 
-		button text="R" func=doAction action="editADfile(paste(getWinVal()$prefix,`.r`,sep=``))"
-		button text=Docs func=doAction action="openFile(paste(getWinVal()$prefix,`.pdf`,sep=``))"
-		label text=" " font="Courier 8"
-		label text="      Make times\nUsr        Sys        Elap" sticky=E
-		label text="" font="Courier 8"
-	grid 1 2 sticky=W
+		button text="Rex" func=doAction action="editADfile(paste(getWinVal()$prefix,`.r`,sep=``))"
+		button text="Rcode" func=doAction action="viewCode(pkg=`PBSadmb`)"
+		button text="WDF" func=doAction action="openFile(`@wdf`)"
+		button text=Docs func=doAction action="openUG(pkg=`PBSadmb`)"
+		#label text=" " font="Courier 8"
+		#label text="      Make times\nUsr        Sys        Elap" sticky=E
+		#label text="" font="Courier 8"
+	grid 1 2 sticky=W pady="5 0"
 		grid 4 3 sticky=W
 			label text=Operation: sticky=NW
 			radio name=safe mode=logical value=TRUE  text=Safe sticky=W
@@ -108,7 +110,9 @@ grid 4 1 sticky=""
 			label text="debug symbols:" sticky=NW
 			radio name=debugsymbols mode=logical value=FALSE text=No  sticky=W
 			radio name=debugsymbols mode=logical value=TRUE  text=Yes sticky=W
-		matrix nrow=3 ncol=3 names=Mtime rowlabels=NULL collabels=NULL width=7 entrybg=grey94 sticky=N
+		grid 2 1
+			label text="         Make times\nUsr          Sys           Elap  " sticky=E
+			matrix nrow=3 ncol=3 names=Mtime rowlabels=NULL collabels=NULL width=7 entrybg=grey94 sticky=N
 	grid 1 7
 		button text=Make    func=.win.makeAD  width=7 bg="#b9d7ff"
 		null padx=1 pady=5
@@ -120,7 +124,7 @@ grid 4 1 sticky=""
 	grid 1 4
 		label text="Output:" 
 		check name=logfile text=logfile checked=T sticky=W
-		check name=add text=add checked=T sticky=W
+		check name=add text=add checked=F sticky=W
 		check name=verbose text=verbose checked=T sticky=W
 
 #Run
