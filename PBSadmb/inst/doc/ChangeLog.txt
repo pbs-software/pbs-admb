@@ -1,11 +1,19 @@
 PBSadmb Changes
 ===============
+Authors:  JTS = Jon T. Schnute
+          RH  = Rowan Haigh
+          ACB = Alex Couture-Beil
+-----------------------------------
+0.64  2012-06-05  Authors
+  - Modified GUI so that user can view the window description file and the project's R code. (RH 6/5)
+  - Modified function 'runAD' to remove trailing whitespace if the executable has no arguments. (RH 6/5)
+  - Advance to version 0.64 for next CRAN release.
+
 0.63  2011-11-24  Authors
   - Moved '.initOptions' from '.onLoad' to '.onAttach'. (RH 11/24)
   - Revised UG to reflect new GUI and for eventual upgrading to discuss new install methodology. (RH 11/22)
   - Altered GUI so that output controls appear on Make and Run tabs. (JTS 11/22)
   - R-2.14.0 requires namespace and loading via '.onLoad'. (RH 11/10)
-  - Advance to version 0.63 for next CRAN release.
 
 0.62  2011-03-15  Authors
   - Modified function '.load.prefix.droplist' to choose 'vonb' first if it exists. (RH 3/15)
