@@ -1,6 +1,6 @@
 # Authors: Jon T. Schnute, Rowan Haigh, Alex Couture-Beil
 
-#admb-----------------------------------2012-06-05
+#admb-----------------------------------2012-10-31
 # Starts the primary GUI interface
 #-----------------------------------------------RH
 admb <- function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
@@ -12,7 +12,7 @@ admb <- function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 	require(tcltk,quietly=TRUE)
 
 	#TODO rename to something else - too similar to .PBSadmb
-	assign("PBSadmb",list(pkg=pkg,func="admb",useCols=NULL),envir=.GlobalEnv)
+	assign("PBSadmb",list(pkg=pkg,call=match.call(),args=args(admb),useCols=NULL),envir=.GlobalEnv)
 
 	pdir <- system.file(package=pkg)          # package directory
 	wdir <- paste(pdir,"/win",sep="")         # window description file directory
@@ -249,14 +249,14 @@ installADMB <- function()
 		previous.settings.ok <- checkADopts(check=c("admbpath","gccpath"), warn=FALSE)
 
 		#each row is a software component the user can install, with GUI options
-		software.to.install <<- data.frame(
+		eval(parse(text= "software.to.install <<- data.frame(
 			selected = c( chkadmb, chkgcc ),
 			dir = c( admbdir, gccdir ),
-			name = c( "ADMBgcc", "gcc" ),
-			option.name = c( "admbpath", "gccpath" ),
+			name = c( \"ADMBgcc\", \"gcc\" ),
+			option.name = c( \"admbpath\", \"gccpath\" ),
 			ok = c( FALSE, FALSE ),
 			stringsAsFactors=FALSE
-			)
+			)"))
 		
 		#only select the selected software components
 		software.to.install <- software.to.install[ software.to.install$selected, ]
@@ -405,11 +405,11 @@ installADMB <- function()
 	if( !file.exists( zip.fname ) ) {
 		return( FALSE )
 	}
-	files <<- as.character( unzip( zip.fname, list=TRUE )$Name )
+	eval(parse(text="files <<- as.character( unzip( zip.fname, list=TRUE )$Name )"))
 	#directories have a trailing /, which causes file.info to report NA for isdir
-	files <<- gsub( "/$", "", files )
-	files <<- paste( dirname( zip.fname ), files, sep="/" )
-	isdir <<- file.info( files )[,"isdir"]
+	eval(parse(text="files <<- gsub( \"/$\", \"\", files )"))
+	eval(parse(text="files <<- paste( dirname( zip.fname ), files, sep=\"/\" )"))
+	eval(parse(text="isdir <<- file.info( files )[,\"isdir\"]"))
 
 	#delete all files
 	lapply( files[ !isdir ], unlink )
@@ -479,10 +479,10 @@ readADopts <- function(optfile="ADopts.txt")
 	# Create instance of option manager - use this to get/set/save/load options
 	# First attempt to load options from the package, then attempt to load options from the current dir (which will override pkg options)
 	pkg_fname = paste( system.file(package="PBSadmb"), "/ADopts.txt", sep="" )
-	.PBSadmb.pkgOptions <<- new( "PBSoptions", filename = pkg_fname, initial.options = list(admbpath="", gccpath="",editor=""), gui.prefix="" )
+	eval(parse(text=".PBSadmb.pkgOptions <<- new( \"PBSoptions\", filename = pkg_fname, initial.options = list(admbpath=\"\", gccpath=\"\",editor=\"\"), gui.prefix=\"\" )"))
 
 	# Load from current dir, using pkgOptions as default values
-	.PBSadmb <<- new( "PBSoptions", filename = optfile, initial.options = getOptions( .PBSadmb.pkgOptions ), gui.prefix="" )
+	eval(parse(text=".PBSadmb <<- new( \"PBSoptions\", filename = optfile, initial.options = getOptions( .PBSadmb.pkgOptions ), gui.prefix=\"\" )"))
 
 	.guessPath <- function( programs, includefilename = FALSE, failed = NULL )
 	{
@@ -946,7 +946,7 @@ runMC <- function(prefix, nsims=2000, nthin=20, outsuff=".mc.dat",
 	runMC(prefix=prefix,nsims=nsims,nthin=nthin,logfile=logfile,add=add,verbose=verbose)
 	Ttime=round(proc.time()[1:3]-time0,2)
 	setWinVal(list("Rtime[1,1]"=Ttime[1],"Rtime[1,2]"=Ttime[2],"Rtime[1,3]"=Ttime[3]),winName=winName)
-	PBSadmb$useCols<<-NULL
+	eval(parse(text="PBSadmb$useCols <<- NULL"))
 	invisible(Ttime)
 }
 
@@ -1477,7 +1477,7 @@ cleanAD <- function(prefix=NULL) {
 	eval(parse(text=paste("if(!require(",pkg,",quietly=TRUE)) stop(\"",pkg," package is required\")",sep="")))
 	tdir <- tempdir()
 	tdir <- gsub("\\\\","/",tdir)                      # temporary directory for R
-	pkgO=ls(paste("package:",pkg,sep=""),all=TRUE)                        # package objects
+	pkgO=ls(paste("package:",pkg,sep=""),all.names=TRUE)                        # package objects
 	z=sapply(pkgO,function(x){f=get(x);is.function(f)}); pkgF=names(z)[z] # package functions
 	bad=regexpr("[\\|()[{^$*+?<-]",pkgF)
 	pkgF=pkgF[bad<0]                # get rid of weird names

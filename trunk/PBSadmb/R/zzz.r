@@ -19,6 +19,9 @@ A complete user guide 'PBSadmb-UG.pdf' is located at
 Packaged on ", pkg_date, "
 Pacific Biological Station, Nanaimo
 
+All available PBS packages can be found at
+http://code.google.com/p/pbs-software/
+
 Type admb() to start a GUI for operating ADMB.
 -----------------------------------------------------------
 
@@ -27,4 +30,24 @@ Type admb() to start a GUI for operating ADMB.
 .onAttach = function(libname, pkgname){
 	.initOptions()
 }
+
+# No Visible Bindings
+# ===================
+if(getRversion() >= "2.15.1") utils::globalVariables(names=c(
+	"add","admbpath","argvec",
+	"chkadmb","chkgcc",
+	"debugsymbols","digest","dll",
+	"editor",
+	"files",
+	"gccpath",
+	"isdir",
+	"logfile",
+	"nsims","nthin",
+	"optfile",
+	"PBSadmb","pltView","prefix","pthin",
+	"raneff","runType",
+	"safe",
+	"toView",
+	"verbose"
+	), package="PBSadmb")
 
