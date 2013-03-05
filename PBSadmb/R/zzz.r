@@ -11,7 +11,7 @@
 	
 	packageStartupMessage("
 -----------------------------------------------------------
-PBS ADMB ", pkg_info$Version, " -- Copyright (C) 2008-2012 Fisheries and Oceans Canada
+PBS ADMB ", pkg_info$Version, " -- Copyright (C) 2008-2013 Fisheries and Oceans Canada
 
 A complete user guide 'PBSadmb-UG.pdf' is located at 
 ", userguide_path, "

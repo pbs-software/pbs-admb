@@ -1,9 +1,12 @@
 PBSadmb Changes
-===============
+===================================
 Authors:  JTS = Jon T. Schnute
           RH  = Rowan Haigh
           ACB = Alex Couture-Beil
 -----------------------------------
+
+0.65  2013-03-05
+  - Changed namespace to export all package dot functions. (RH 3/5)
 
 0.64  2012-10-31  Authors
   - Fixed "no visible bindings" nonsense; grabbed new manuals from ADMB-project.org and compacted them with "tools::compactPDF'. (RH 10/31)
