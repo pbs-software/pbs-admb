@@ -1,11 +1,11 @@
 Package: PBSadmb
-Version: 0.64
-Date: 2012-10-31
+Version: 0.65
+Date: 2013-03-05
 Title: ADMB for R Using Scripts or GUI
 Author: Jon T. Schnute, Rowan Haigh, Alex Couture-Beil
 Maintainer: Jon T. Schnute <schnutej-dfo@shaw.ca>
 Depends: R (>= 2.15.0), methods, tcltk, PBSmodelling (>= 2.60)
 Description: R Support for ADMB (Automatic Differentiation Model Builder)
 License: GPL (>=2)
-
+URL: http://code.google.com/p/pbs-admb/
 
