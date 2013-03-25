@@ -5,7 +5,10 @@ Authors:  JTS = Jon T. Schnute
           ACB = Alex Couture-Beil
 -----------------------------------
 
-0.65  2013-03-05
+0.65  2013-03-25
+  - Created temporary working directory `.PBSadmbEnv` to house the control object `PBSadmb` and the options object`.PBSadmb`. (RH 3/25)
+Accessor functions that are wrappers to PBSmodelling accessor functions, are called `atget`, atput`, `atcall`, and `atprint`.
+  - Updated User Guide to reflect current installation protocols (JTS 3/23)
   - Changed namespace to export all package dot functions. (RH 3/5)
 
 0.64  2012-10-31  Authors
