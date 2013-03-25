@@ -6,8 +6,8 @@
   that links point to actual files on the hard drive.
 }
 \usage{
-checkADopts(opts=getOptions(.PBSadmb), check=c("admbpath","gccpath","editor"),
-            warn=TRUE, popup=FALSE)
+checkADopts(opts=getOptions(atcall(.PBSadmb)),
+   check=c("admbpath","gccpath","editor"), warn=TRUE, popup=FALSE)
 }
 \arguments{
   \item{opts}{ADMB options values.}
@@ -22,10 +22,10 @@ checkADopts(opts=getOptions(.PBSadmb), check=c("admbpath","gccpath","editor"),
   \code{warn} - named list of test results, and \cr
   \code{message} - named vector of test results.
 }
-\author{ Rowan Haigh, Pacific Biological Station, Nanaimo BC, Canada }
+\author{ Rowan Haigh, Pacific Biological Station, Fisheries and Oceans Canada, Nanaimo BC }
 \note{
   A wrapper function that can be called from a GUI exists as \code{.win.checkADopts}.
 }
-\seealso{ \code{\link{makeADopts}},\code{\link{readADopts}} }
+\seealso{ \code{\link[PBSadmb]{makeADopts}},\code{\link[PBSadmb]{readADopts}} }
 \keyword{ data }
 \keyword{ list }
