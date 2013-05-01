@@ -39,10 +39,10 @@ menu nitems=4 label="Help"
 #----------------------------------- BUTTONS -----------------------------------
 
 Grid 2 3 sticky=E
-	label "Current directory:" sticky=WN
+	label "Current WD:" sticky=W
 	droplist name=currentdir value="'' '<change path>'" add=T width=40 func=.changeWDEnter
 	grid 1 2 sticky=W
-		button text="Set" function=.changeWD
+		button text="Set WD" function=.changeWD
 		button text="Open" func=doAction action="openFile(\".\")"
 
 	label "Prefix:" sticky=W
@@ -50,22 +50,22 @@ Grid 2 3 sticky=E
 	button text="Refresh" sticky=W function=.load.prefix.droplist
 		
 
-notebook tabs="Setup Make Run Output" pady="5 0"
+notebook tabs="Setup Make Run Output" pady="5 0" #selected=3
 
 #setup
-grid 7 1 sticky=W
+grid 7 1 sticky=E
 	grid 1 3 sticky=W
 		label "Path Setup" sticky=W fg=purple3 font="bold 11"
-		null padx=85
+		null padx=120
 		label test name=chkstat sticky=W width=4 bg=lightgoldenrodyellow sticky=E
 	grid 1 2 sticky=E
-		entry name=admbpath value="" label="ADM path:" width=35 mode=character func=setGUIoptions action=admbpath
+		entry name=admbpath value="" label="ADM path:" width=40 mode=character func=setGUIoptions action=admbpath
 		button text=">" func=doAction action="selectDir(usewidget=\"admbpath\")"
 	grid 1 2 sticky=E
-		entry name=gccpath value="" label="GCC path:" width=35 mode=character func=setGUIoptions action=gccpath
+		entry name=gccpath value="" label="GCC path:" width=40 mode=character func=setGUIoptions action=gccpath
 		button text=">" func=doAction action="selectDir(usewidget=\"gccpath\")"
 	grid 1 2 sticky=E
-		entry name=editor value="" label=Editor: width=35 mode=character func=setGUIoptions action=editor
+		entry name=editor value="" label=Editor: width=40 mode=character func=setGUIoptions action=editor
 		button text=">" func=doAction action="selectFile(usewidget=\"editor\")"
 	button name=checkbutton text="Apply" func=.win.makeADopts action=check bg=moccasin sticky=E
 
@@ -128,30 +128,31 @@ grid 4 1 sticky=""
 		check name=verbose text=verbose checked=T sticky=W
 
 #Run
-grid 4 1 sticky=W
-	grid 1 3 sticky=W
+grid 5 1 sticky=W
+	grid 1 2 sticky=W
 		label text=Run font="bold 11" sticky=W fg=forestgreen
-		label text="         " font="Courier 8"
-		matrix nrow=1 ncol=3 names=Rtime rowlabels="'Run times'" collabels=NULL width=7 entrybg=grey94
-	grid 2 5  sticky=W
+		#label text="         " font="Courier 8"
+		matrix nrow=1 ncol=3 names=Rtime rowlabels="'Run times'" collabels=NULL width=8 entrybg=grey94 padx="10 0"
+	grid 2 4  sticky=W
 		label text="Options:" 
 		radio name=runType text=Normal   value=normal mode=character func=.win.showGUIargs selected=T 
 		radio name=runType text=MCMC     value=mcmc   mode=character func=.win.showGUIargs
 		radio name=runType text=Profile  value=lprof  mode=character func=.win.showGUIargs
-		radio name=runType text=Custom   value=custom mode=character func=.win.showGUIargs
+		#radio name=runType text=Custom   value=custom mode=character func=.win.showGUIargs
 		label text="Output:" 
 		check name=logfile text=logfile checked=T sticky=W
 		check name=add text=add checked=T sticky=W
 		check name=verbose text=verbose checked=T sticky=W
-		null
-	grid 1 4 sticky=W pady="15 0"
+		#null
+	grid 1 3 sticky=W pady="15 0"
 		label text="MCMC:" 
-		entry name=nsims label=Sims value=10000 sticky=W width=14
+		entry name=nsims label=Sims value=10000 sticky=W width=15
 		entry name=nthin label=Thin value=100 sticky=W width=10
-		button text=Run func=.win.run bg=green font="bold 9" width=5
-	grid 1 2  sticky=W
-		entry name=argvec value="" label="AD args" width=33 mode=character entrybg=grey94
-		button text="All args" func=.win.showADargs width=6
+	grid 1 3  sticky=W
+		label text="AD args" 
+		entry name=argvec value="" label="" width=40 mode=character entrybg=ghostwhite #grey94
+		button text="All args" func=.win.showADargs width=6 bg=mistyrose padx="5 0" #width=6
+	button text=Run func=.win.run bg=green font="bold 9" width=5 sticky=E
 
 #Output
 grid 3 1 sticky=""
