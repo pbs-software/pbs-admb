@@ -5,7 +5,8 @@ Authors:  JTS = Jon T. Schnute
           ACB = Alex Couture-Beil
 -----------------------------------
 
-0.65  2013-05-01
+0.65  2013-05-06
+  - Fixed Issue 20 where `simplePBS` had not been changed to `simple_pbs`. (RH 5/6)
   - Changed ADMB GUI: e.g., removed `Custom` radio button in notebook tab `Run`. (RH 5/1)
   - Created temporary working directory `.PBSadmbEnv` to house the control object `PBSadmb` and the options object`.PBSadmb`. (RH 3/25)
 Accessor functions that are wrappers to PBSmodelling accessor functions, are called `atget`, atput`, `atcall`, and `atprint`.

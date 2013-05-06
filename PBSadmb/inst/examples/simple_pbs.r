@@ -1,4 +1,4 @@
-# Sample R code for "PBSadmb" with the example "simplePBS.tpl"
+# Sample R code for "PBSadmb" with the example "simple_pbs.tpl"
 
 # Before sourcing this file, have a valid file "ADopts.txt" in the 
 # current working directory.
@@ -6,12 +6,12 @@
 # Load R packages; ignore the GUI for now.
 require(PBSmodelling); require(PBSadmb);
 
-# Make and run "simplePBS.exe"
-makeAD("simplePBS"); runAD("simplePBS");
+# Make and run "simple_pbs.exe"
+makeAD("simple_pbs"); runAD("simple_pbs");
 
 # Read and unpack the report;
-# i.e., create R variables with the same names used in "simplePBS.tpl"
-simplePBS <- readList("simplePBS.rep"); unpackList(simplePBS);
+# i.e., create R variables with the same names used in "simple_pbs.tpl"
+simplePBS <- readList("simple_pbs.rep"); unpackList(simplePBS);
 
 # Plot the data
 plot(x,y); lines(x,ypred,col="red",lwd=2);
