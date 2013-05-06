@@ -1,0 +1,1069 @@
+\documentclass[letterpaper]{book}
+\usepackage[times,inconsolata,hyper]{Rd}
+\usepackage{makeidx}
+\usepackage[utf8,latin1]{inputenc}
+% \usepackage{graphicx} % @USE GRAPHICX@
+\makeindex{}
+\topmargin -0.25in \oddsidemargin 0in \evensidemargin 0in
+\textheight 9in \textwidth 6.5in
+\begin{document}
+\setcounter{page}{17}
+\chapter*{}
+\begin{center}
+{\textbf{\huge Package `PBSadmb'}}
+\par\bigskip{\large \today}
+\end{center}
+\begin{description}
+\raggedright{}
+\item[Version]\AsIs{0.65}
+\item[Date]\AsIs{2013-05-06}
+\item[Title]\AsIs{ADMB for R Using Scripts or GUI}
+\item[Author]\AsIs{Jon T. Schnute, Rowan Haigh, Alex Couture-Beil}
+\item[Maintainer]\AsIs{Jon T. Schnute }\email{schnutej-dfo@shaw.ca}\AsIs{}
+\item[Depends]\AsIs{R   (>= 2.15.0), methods, tcltk, PBSmodelling (>= 2.65)}
+\item[Description]\AsIs{R Support for ADMB (Automatic Differentiation Model Builder)}
+\item[License]\AsIs{GPL (>=2)}
+\item[URL]\AsIs{}\url{http://code.google.com/p/pbs-admb/}\AsIs{}
+\end{description}
+\Rdcontents{\R{} topics documented:}
+\inputencoding{utf8}
+\HeaderA{admb}{ Start the PBS ADMB GUI }{admb}
+\keyword{IO}{admb}
+%
+\begin{Description}\relax
+Start up the PBS GUI for running ADMB.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+admb(prefix="", wdf="admbWin.txt", optfile="ADopts.txt")
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{prefix}] string name prefix of the ADMB project (e.g., \code{"vonb"}).
+\item[\code{wdf}] string name of the \emph{window description file} that creates the GUI.
+\item[\code{optfile}] string name of options file (usually in user's working directory).
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Author}\relax
+ Rowan Haigh, Pacific Biological Station, Nanaimo BC, Canada 
+\end{Author}
+%
+\begin{SeeAlso}\relax
+ \code{\LinkA{makeADopts}{makeADopts}} 
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{appendLog}{ Append Data to Log File }{appendLog}
+\keyword{file}{appendLog}
+%
+\begin{Description}\relax
+Append summary information or output to a previously created log file.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+appendLog(prefix, lines)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{prefix}] string name prefix of the ADMB project (e.g., \code{"vonb"}).
+\item[\code{lines}] data to append to \code{'prefix'.log}).
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+No explicit value reurned. Appends data into a log file 
+\code{'prefix'.log}.
+\end{Value}
+%
+\begin{Note}\relax
+A wrapper function that can be called from a GUI exists as \code{.win.appendLog}.
+\end{Note}
+%
+\begin{Author}\relax
+ Jon T. Schnute, Pacific Biological Station, Nanaimo BC, Canada 
+\end{Author}
+%
+\begin{SeeAlso}\relax
+ \code{\LinkA{startLog}{startLog}}, \code{\LinkA{editADfile}{editADfile}} 
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{atget}{Get/Print Objects From or Put Objects Into Temporary Work Environment}{atget}
+\aliasA{alisp}{atget}{alisp}
+\aliasA{atcall}{atget}{atcall}
+\aliasA{atprint}{atget}{atprint}
+\aliasA{atput}{atget}{atput}
+\keyword{manip}{atget}
+\keyword{environment}{atget}
+%
+\begin{Description}\relax
+These functions are wrappers to the PBSmodelling accessor functions that
+get/print objects from or put objects into a temporary work environment,
+in this case \code{.PBSadmbEnv}. Working objects include \code{PBSadmb},
+which acts as a storage object for some of the functions, and \code{.PBSadmb},
+which controls the options for the user's project.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+atget(...)
+atcall(...)
+atprint(...)
+atput(...)
+alisp(...)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{...}] For \code{atget} through to \code{atput}, the only free argument is: \\{}
+\code{x} -- name (with or without quotes) of an object to retrieve or store 
+in the temporary environment; cannot be represented by a variable. \\{}
+Fixed arguments: \code{penv = parent.frame(), tenv = .PBSadmbEnv} \\{}
+See \code{\LinkA{tget}{tget}} for additional information.
+
+For \code{alisp}, there is only one fixed argument: \\{}
+\code{pos = .PBSadmbEnv} \\{}
+All other arguments are available -- see \code{\LinkA{lisp}{lisp}} 
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+These accessor functions were developed as a response to the CRAN
+repository policy statement: ``Packages should not modify the
+global environment (user's workspace).''
+
+\end{Details}
+%
+\begin{Value}
+Objects are retrieved from or sent to the temporary working 
+environment to/from the place where the function(s) are called.
+Additionally, \code{atcall} invisibly returns the object without 
+transferring, which is useful when the object is a function that the
+user may wish to call, for example, \code{atcall(myfunc)()}, or as 
+arguments in other functions.
+\end{Value}
+%
+\begin{Note}\relax
+Additional wrapper functions to access functions in \code{.PBSadmbEnv}
+are named with the prefix \code{.win} (none at the moment).
+\end{Note}
+%
+\begin{Author}\relax
+Rowan Haigh, Pacific Biological Station, Fisheries and Oceans Canada, Nanaimo BC
+\end{Author}
+%
+\begin{References}\relax
+CRAN Repository Policy: 
+\url{http://cran.r-project.org/web/packages/policies.html}
+\end{References}
+%
+\begin{SeeAlso}\relax
+\code{\LinkA{tget}{tget}} and \code{\LinkA{lisp}{lisp}} in \pkg{PBSmodelling}
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{checkADopts}{ Check ADMB Options for Link Integrity}{checkADopts}
+\keyword{data}{checkADopts}
+\keyword{list}{checkADopts}
+%
+\begin{Description}\relax
+Check that \code{.ADopts} has all required components and
+that links point to actual files on the hard drive.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+checkADopts(opts=getOptions(atcall(.PBSadmb)),
+   check=c("admbpath","gccpath","editor"), warn=TRUE, popup=FALSE)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{opts}] ADMB options values.
+\item[\code{check}] components of \code{.ADopts} to check.
+\item[\code{warn}] logical: if \code{TRUE}, print the results of the check to the R console.
+\item[\code{popup}] logical: if \code{TRUE}, display program location problems in a popup GUI.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+Boolean value where \code{TRUE} indicates all programs were located in the 
+specified directories and \code{FALSE} if at least one program cannot be found.
+The returned Boolean scalar has two attributes: \\{}
+\code{warn} - named list of test results, and \\{}
+\code{message} - named vector of test results.
+\end{Value}
+%
+\begin{Note}\relax
+A wrapper function that can be called from a GUI exists as \code{.win.checkADopts}.
+\end{Note}
+%
+\begin{Author}\relax
+ Rowan Haigh, Pacific Biological Station, Fisheries and Oceans Canada, Nanaimo BC 
+\end{Author}
+%
+\begin{SeeAlso}\relax
+ \code{\LinkA{makeADopts}{makeADopts}},\code{\LinkA{readADopts}{readADopts}} 
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{cleanAD}{ Clean ADMB-Generated Files from the Working Directory }{cleanAD}
+\keyword{manip}{cleanAD}
+%
+\begin{Description}\relax
+Detects files in the working directory with the specified \code{prefix} and
+removes them all save those with the suffix \code{.tpl}, \code{.dat}, and \code{.pin}.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+cleanAD(prefix)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{prefix}] string name prefix of the ADMB project (e.g., \code{"vonb"}).
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+Aside from potential garbage files with the specified \code{prefix}, other 
+files associated with ADMB are detected. Also files \code{*.tmp} and \code{*.bak}
+are displayed. Calling \code{cleanAD} invokes the hidden function \code{.cleanUp},
+which creates a GUI menu of the potential garbage files. The user can select whichever
+files s/he wishes for disposal.
+\end{Details}
+%
+\begin{Value}
+Returns nothing. Invokes a GUI menu of potential garbage files.
+\end{Value}
+%
+\begin{Note}\relax
+A wrapper function that can be called from a GUI exists as \code{.win.cleanAD}.
+\end{Note}
+%
+\begin{Author}\relax
+ Jon T. Schnute, Pacific Biological Station, Nanaimo BC, Canada 
+\end{Author}
+%
+\begin{SeeAlso}\relax
+ \code{\LinkA{makeAD}{makeAD}}, \code{\LinkA{runAD}{runAD}}, \code{\LinkA{readRep}{readRep}} 
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{compAD}{ Compile C Code }{compAD}
+\keyword{programming}{compAD}
+\keyword{interface}{compAD}
+%
+\begin{Description}\relax
+Compile C++ code in \code{'prefix'.cpp} to create a binary object
+file \code{'prefix'.o}.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+compAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{prefix}] string name prefix of the ADMB project (e.g., \code{"vonb"}).
+\item[\code{raneff}] logical: use the random effects model, otherwise use the normal model
+(currently does not influence the compile stage, but the argument is preserved
+here for future development).
+\item[\code{safe}] logical: if \code{TRUE}, use safe mode with bounds checking on all
+array objects, otherwise use optimized mode for fastest execution.
+\item[\code{dll}] create dll (rather than executable)
+\item[\code{debug}] compile with debug symbols
+\item[\code{logfile}] logical: if \code{TRUE}, create a log file of the messages from the shell call.
+\item[\code{add}] logical: if \code{TRUE}, append shell call messages to an exsiting log file.
+\item[\code{verbose}] logical: if \code{TRUE}, report the shell call an its messages to the R console.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This function uses the C++ comiler declared in \code{.ADopts}. If \code{logfile=TRUE},
+any errors will appear in \code{'prefix'.log}. If \code{verbose=TRUE},
+they will appear in the R console.
+\end{Details}
+%
+\begin{Value}
+Invisibly returns the shell call and its messages.
+\end{Value}
+%
+\begin{Note}\relax
+A wrapper function that can be called from a GUI exists as \code{.win.compAD}.
+\end{Note}
+%
+\begin{Author}\relax
+ Jon T. Schnute, Pacific Biological Station, Nanaimo BC, Canada 
+\end{Author}
+%
+\begin{SeeAlso}\relax
+ \code{\LinkA{convAD}{convAD}}, \code{\LinkA{linkAD}{linkAD}}, \code{\LinkA{makeAD}{makeAD}} 
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{convAD}{ Convert TPL Code to CPP Code }{convAD}
+\keyword{programming}{convAD}
+\keyword{interface}{convAD}
+%
+\begin{Description}\relax
+Convert code in \code{'prefix'.tpl} to C++ code in \code{'prefix'.cpp}.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+convAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{prefix}] string name prefix of the ADMB project (e.g., \code{"vonb"}).
+\item[\code{raneff}] logical: if \code{TRUE}, use the random effects model executable
+\code{tpl2rem.exe}, otherwise use the normal model executable \code{tpl2cpp.exe}.
+\item[\code{safe}] logical: if \code{TRUE}, use safe mode with bounds checking on all
+array objects, otherwise use optimized mode for fastest execution.
+\item[\code{dll}] create dll (rather than executable)
+\item[\code{debug}] compile with debug symbols
+\item[\code{logfile}] logical: if \code{TRUE}, create a log file of the messages from the shell call.
+\item[\code{add}] logical: if \code{TRUE}, append shell call messages to an exsiting log file.
+\item[\code{verbose}] logical: if \code{TRUE}, report the shell call an its messages to the R console.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This function invokes the ADMB command \code{tpl2cpp.exe} or \code{tpl2rem.exe},
+if \code{raneff} is \code{FALSE} or \code{TRUE} respectively. If \code{logfile=TRUE},
+any errors will appear in \code{'prefix'.log}. If \code{verbose=TRUE},
+they will appear in R console.
+\end{Details}
+%
+\begin{Value}
+Invisibly returns the shell call and its messages.
+\end{Value}
+%
+\begin{Note}\relax
+A wrapper function that can be called from a GUI exists as \code{.win.convAD}.
+\end{Note}
+%
+\begin{Author}\relax
+ Jon T. Schnute, Pacific Biological Station, Nanaimo BC, Canada 
+\end{Author}
+%
+\begin{SeeAlso}\relax
+ \code{\LinkA{compAD}{compAD}}, \code{\LinkA{linkAD}{linkAD}}, \code{\LinkA{makeAD}{makeAD}} 
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{convOS}{Convert Text Files to Default OS Format}{convOS}
+\keyword{character}{convOS}
+\keyword{file}{convOS}
+%
+\begin{Description}\relax
+Convert text files to the default format of the operating system.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+convOS(inam, onam = inam, path = getwd() )
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{inam}] string vector of names specifying files to be converted to the format of the operating system.
+\item[\code{onam}] string vector of name specifying the output files (the default overwrites the input file).
+\item[\code{path}] string specifying the path where the input files are located (defaults to current working directory).
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+Text file(s) formatted in accordance with standards of the operating system.
+\end{Value}
+%
+\begin{Note}\relax
+This function essentially executes a \code{readLines} command followed by a call to \code{writeLines}.
+\end{Note}
+%
+\begin{Author}\relax
+Rowan Haigh, Pacific Biological Station, Nanaimo BC
+\end{Author}
+%
+\begin{SeeAlso}\relax
+\code{\LinkA{copyFiles}{copyFiles}}, \code{.addQuotes}
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{copyFiles}{ Copy System Files }{copyFiles}
+\keyword{utilities}{copyFiles}
+\keyword{IO}{copyFiles}
+%
+\begin{Description}\relax
+Copy files with specified prefixes and suffixes from one location to another.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+copyFiles(prefix, suffix=NULL, srcdir=getwd(), dstdir=getwd(), ask=TRUE)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{prefix}]  string scalar/vector of potential file prefixes. 
+\item[\code{suffix}]  string scalar/vector of potential file suffixes. 
+\item[\code{srcdir}]  source directory from which to copy files. 
+\item[\code{dstdir}]  destination directory to copy files to. 
+\item[\code{ask}]  logical: if \code{TRUE}, popup boxes will prompt the user
+for every instance that a file will be overwritten. 
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This function uses R's \code{list.files} and \code{file.copy} functions.
+The pattern recognition tends not to work when given the wildcard character
+\code{*}; however, the user may use this character, and the code will interpret it.
+\end{Details}
+%
+\begin{Value}
+Invisibly returns a Boolean vector with names of files that have been copied or not.
+\end{Value}
+%
+\begin{Author}\relax
+ Rowan Haigh, Pacific Biological Station, Nanaimo, BC 
+\end{Author}
+%
+\begin{SeeAlso}\relax
+ \code{\LinkA{editAD}{editAD}} 
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{editAD}{ Edit ADMB Files }{editAD}
+\keyword{file}{editAD}
+%
+\begin{Description}\relax
+Edit files associated with specified prefix and suffixes.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+editAD(prefix, suffix=c(".tpl",".cpp",".log"))
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{prefix}] string name prefix of the ADMB project (e.g., \code{"vonb"}).
+\item[\code{suffix}] string scalar/vector specifying one or more suffixes.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+Invisibly returns Boolean vector with elements \code{TRUE} if files exist, 
+\code{FALSE} if they do not.
+\end{Value}
+%
+\begin{Note}\relax
+A wrapper function that can be called from a GUI exists as \code{.win.editAD}.
+
+This function explicitly uses the editor chosen for PBSadmb. PBSmodelling
+has another function \code{openFile} that uses Windows file associations
+or an application specified with \code{setPBSext}.
+\end{Note}
+%
+\begin{Author}\relax
+ Jon T. Schnute, Pacific Biological Station, Nanaimo BC, Canada 
+\end{Author}
+%
+\begin{SeeAlso}\relax
+\code{\LinkA{editADfile}{editADfile}}, \code{\LinkA{makeADopts}{makeADopts}}
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{editADfile}{ Edit a File }{editADfile}
+\keyword{file}{editADfile}
+%
+\begin{Description}\relax
+Edit a file using the text editor specified in \code{.ADopts}.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+editADfile(fname)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{fname}] string name of file in current working directory
+(or elsewhere if path delimited by \code{/} or \code{\bsl{}}).
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+Returns Boolean: \code{TRUE} if file exists, \code{FALSE} if it does not.
+\end{Value}
+%
+\begin{Note}\relax
+This function explicitly uses the editor chosen for PBSadmb. PBSmodelling
+has another function \code{openFile} that uses Windows file associations
+or an application specified with \code{setPBSext}.
+\end{Note}
+%
+\begin{Author}\relax
+ Jon T. Schnute, Pacific Biological Station, Nanaimo BC, Canada 
+\end{Author}
+%
+\begin{SeeAlso}\relax
+\code{\LinkA{editAD}{editAD}}, \code{\LinkA{makeADopts}{makeADopts}}
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{installADMB}{ Install windows ADMB and MinGW binaries }{installADMB}
+\keyword{file}{installADMB}
+%
+\begin{Description}\relax
+Only applicable for Windows: Downloads and installs the windows ADMB and MinGW binaries.
+
+A user interface is displayed which allows to select to install either ADMB and/or MinGW
+for either 32bit or 64bit versions of Windows. Default installation directories are suggested
+for installation; however, a user may choose to install the binaries elsewhere.
+
+A file "pathconfig.txt" is saved in the PBSadmb library (under R), which keeps track of the
+most recently installed locations.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+installADMB()
+\end{verbatim}
+\end{Usage}
+\inputencoding{utf8}
+\HeaderA{linkAD}{ Link Object Files to Make an Executable }{linkAD}
+\keyword{programming}{linkAD}
+\keyword{interface}{linkAD}
+%
+\begin{Description}\relax
+Links the binary object file \code{'prefix'.o} to the ADMB libraries and 
+produces the executable file \code{'prefix'.exe}.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+linkAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{prefix}] string name prefix of the ADMB project (e.g., \code{"vonb"}).
+\item[\code{raneff}] logical: use the random effects model, otherwise use the normal model.
+\item[\code{safe}] logical: if \code{TRUE}, use safe mode with bounds checking on all
+array objects, otherwise use optimized mode for fastest execution.
+\item[\code{dll}] create dll (rather than executable)
+\item[\code{debug}] compile with debug symbols
+\item[\code{logfile}] logical: if \code{TRUE}, create a log file of the messages from the shell call.
+\item[\code{add}] logical: if \code{TRUE}, append shell call messages to an exsiting log file.
+\item[\code{verbose}] logical: if \code{TRUE}, report the shell call an its messages to the R console.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This function uses the C++ comiler declared in \code{.ADopts}. If \code{logfile=TRUE},
+any errors will appear in \code{'prefix'.log}. If \code{verbose=TRUE},
+they will appear in the R console.
+\end{Details}
+%
+\begin{Value}
+Invisibly returns the shell call and its messages.
+\end{Value}
+%
+\begin{Note}\relax
+A wrapper function that can be called from a GUI exists as \code{.win.linkAD}.
+\end{Note}
+%
+\begin{Author}\relax
+ Jon T. Schnute, Pacific Biological Station, Nanaimo BC, Canada 
+\end{Author}
+%
+\begin{SeeAlso}\relax
+ \code{\LinkA{convAD}{convAD}}, \code{\LinkA{compAD}{compAD}}, \code{\LinkA{makeAD}{makeAD}} 
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{makeAD}{ Make an Executable Binary File from a C File }{makeAD}
+\keyword{programming}{makeAD}
+\keyword{interface}{makeAD}
+%
+\begin{Description}\relax
+Essentially a wrapper function that calls in sequence: \code{convAD},
+\code{compAD}, and \code{linkAD}.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+makeAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{prefix}] string name prefix of the ADMB project (e.g., \code{"vonb"}).
+\item[\code{raneff}] logical: use the random effects model, otherwise use the normal model.
+\item[\code{safe}] logical: if \code{TRUE}, use safe mode with bounds checking on all
+array objects, otherwise use optimized mode for fastest execution.
+\item[\code{dll}] create dll (rather than executable)
+\item[\code{debug}] compile with debug symbols
+\item[\code{logfile}] logical: if \code{TRUE}, create a log file of the messages from the shell call.
+\item[\code{add}] logical: if \code{TRUE}, append shell call messages to an exsiting log file.
+\item[\code{verbose}] logical: if \code{TRUE}, report the shell call an its messages to the R console.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This function uses the C++ comiler declared in \code{.ADopts}. If \code{logfile=TRUE},
+any errors will appear in \code{'prefix'.log}. If \code{verbose=TRUE},
+they will appear in the R console.
+\end{Details}
+%
+\begin{Value}
+Returns nothing. The three functions called by \code{makeAD} each 
+return the shell call and its messages.
+\end{Value}
+%
+\begin{Note}\relax
+A wrapper function that can be called from a GUI exists as \code{.win.makeAD}.
+\end{Note}
+%
+\begin{Author}\relax
+ Jon T. Schnute, Pacific Biological Station, Nanaimo BC, Canada 
+\end{Author}
+%
+\begin{SeeAlso}\relax
+ \code{\LinkA{convAD}{convAD}}, \code{\LinkA{compAD}{compAD}}, \code{\LinkA{linkAD}{linkAD}}, \code{\LinkA{cleanAD}{cleanAD}} 
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{makeADopts}{ Creates the ADMB Options List }{makeADopts}
+\keyword{data}{makeADopts}
+\keyword{list}{makeADopts}
+%
+\begin{Description}\relax
+Creates a global list object detailing the pathways to the ADMB directory, the GCC bin, 
+and the user's preferred text editor.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+makeADopts(admbpath, gccpath, editor)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{admbpath}] explicit path to the user's ADMB directory.
+\item[\code{gccpath}] explicit path to the user's GCC bin (C-compiler) directory.
+\item[\code{editor}] explicit path and program to use for editing text.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+Creates a global, hidden list object called \code{.ADopts}.
+\end{Value}
+%
+\begin{Note}\relax
+A wrapper function that can be called from a GUI exists as \code{.win.makeADopts}.
+\end{Note}
+%
+\begin{Author}\relax
+ Jon T. Schnute, Pacific Biological Station, Nanaimo BC, Canada 
+\end{Author}
+%
+\begin{SeeAlso}\relax
+ \code{\LinkA{makeADopts}{makeADopts}},  \code{\LinkA{writeADopts}{writeADopts}} 
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{plotMC}{ Plot Results of MCMC Simulation }{plotMC}
+\keyword{hplot}{plotMC}
+%
+\begin{Description}\relax
+Plot results of an ADMB MCMC simulation using various plot methods.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+plotMC(prefix, act="pairs", pthin=1, useCols=NULL)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{prefix}] string name prefix of the ADMB project (e.g., \code{"vonb"}).
+\item[\code{act}] string scalar: action describing plot type (current choices:
+\code{"pairs"}, \code{"eggs"}, \code{"acf"}, \code{"trace"}, and
+\code{"dens"}).
+\item[\code{pthin}] numeric scalar indicating interval at which to collect records
+from the \code{.mc.dat} file for plotting.
+\item[\code{useCols}] logical vector indicating which columns of \code{.mc.dat} to plot.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Note}\relax
+A wrapper function that can be called from a GUI exists as \code{.win.plotMC}.
+Use the PBSadmb GUI to explore these plots easily.
+\end{Note}
+%
+\begin{Author}\relax
+ Rowan Haigh, Pacific Biological Station, Nanaimo BC, Canada 
+\end{Author}
+%
+\begin{SeeAlso}\relax
+\code{\LinkA{runMC}{runMC}}, \code{\LinkA{showADargs}{showADargs}}
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{readADopts}{ Reads an ADMB Options List into Memory From a File}{readADopts}
+\keyword{data}{readADopts}
+\keyword{list}{readADopts}
+%
+\begin{Description}\relax
+Reads ADMB options into a global, hidden list object 
+called \code{.ADopts} from an ASCII text file using \\{}
+\code{PBSmodelling::readList}).
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+readADopts(optfile="ADopts.txt")
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{optfile}] string name of an ASCII text file containing ADMB 
+options information.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+No values returned. Reads the ADMB options into the list object \code{.ADopts}.
+\end{Value}
+%
+\begin{Note}\relax
+A wrapper function that can be called from a GUI exists as \code{.win.readADopts}.
+\end{Note}
+%
+\begin{Author}\relax
+ Jon T. Schnute, Pacific Biological Station, Nanaimo BC, Canada 
+\end{Author}
+%
+\begin{SeeAlso}\relax
+ \code{\LinkA{makeADopts}{makeADopts}},\code{\LinkA{writeADopts}{writeADopts}} 
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{readRep}{ Read an ADMB Report into R Memory }{readRep}
+\keyword{file}{readRep}
+\keyword{manip}{readRep}
+%
+\begin{Description}\relax
+Import ADMB-generated report files into R's memory using the names of the 
+report files to name the R-objects.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+readRep(prefix, suffix=c(".cor",".rep",".std",".mc.dat"), global=FALSE)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{prefix}] string name prefix of the ADMB project (e.g., \code{"vonb"}).
+\item[\code{suffix}] string scalar/vector specifying one or more suffixes.
+\item[\code{global}] logical: if \code{TRUE}, save the imported reports as objects to 
+global environment using the same names as the report files.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+If the report object is one of \code{c(".cor", ".std", ".mc.dat")}, the
+report object is a data frame, otherwise it is a string vector. Multiple 
+report objects are returned as a list of objects. A single report object is 
+returned as the object itself.
+
+This function attempts to detect the file format from a number of possibilities.
+For example, if the file has the special format recognized by PBSmodelling,
+then the function returns a list with named components. The example \code{vonb}
+included with this package shows how to write the template to get consistent
+variable names between ADMB and R. See the User's Guide for complete details.
+\end{Details}
+%
+\begin{Value}
+Invisibly returns the list of report objects. If only one report is 
+imported, a single report object is returned.
+\end{Value}
+%
+\begin{Note}\relax
+A wrapper function that can be called from a GUI exists as \code{.win.readRep}.
+\end{Note}
+%
+\begin{Author}\relax
+ Rowan Haigh, Pacific Biological Station, Nanaimo BC, Canada 
+\end{Author}
+%
+\begin{SeeAlso}\relax
+\code{\LinkA{editADfile}{editADfile}}, \code{.win.viewRep}
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{runAD}{ Run an Executable Binary File }{runAD}
+\keyword{programming}{runAD}
+\keyword{interface}{runAD}
+%
+\begin{Description}\relax
+Run the executable binary file \code{'prefix'.exe} that was created by 
+\code{makeAD}.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+runAD(prefix, argvec="", logfile=TRUE, add=TRUE, verbose=TRUE)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{prefix}] string name prefix of the ADMB project (e.g., \code{"vonb"}).
+\item[\code{argvec}] string scalar/vector of arguments appropriate for the executable
+\code{'prefix'.exe}.
+\item[\code{logfile}] logical: if \code{TRUE}, create a log file of the messages from the shell call.
+\item[\code{add}] logical: if \code{TRUE}, append shell call messages to an exsiting log file.
+\item[\code{verbose}] logical: if \code{TRUE}, report the shell call an its messages to the R console.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This function typically reads the two files \code{'prefix'.dat} and \code{'prefix'.pin},
+although in same cases one or both of these files may not be necessary.
+
+If \code{logfile=TRUE}, output (including error messages, if any) will appear in
+\code{'prefix'.log}. If \code{verbose=TRUE}, it will appear in the R console.
+\end{Details}
+%
+\begin{Value}
+Invisibly returns the results of the shell call.
+\end{Value}
+%
+\begin{Note}\relax
+A wrapper function that can be called from a GUI exists as \code{.win.runAD}.
+\end{Note}
+%
+\begin{Author}\relax
+ Jon T. Schnute, Pacific Biological Station, Nanaimo BC, Canada 
+\end{Author}
+%
+\begin{SeeAlso}\relax
+\code{\LinkA{runMC}{runMC}}, \code{\LinkA{makeAD}{makeAD}}, \code{\LinkA{cleanAD}{cleanAD}}
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{runMC}{ Run an Executable Binary File in MCMC Mode }{runMC}
+\keyword{programming}{runMC}
+\keyword{interface}{runMC}
+%
+\begin{Description}\relax
+Run the executable binary file \code{'prefix'.exe}, created by 
+\code{makeAD}, to generate MCMC simulations.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+runMC(prefix, nsims=2000, nthin=20, outsuff=".mc.dat",
+      logfile=FALSE, add=TRUE, verbose=TRUE)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{prefix}] string name prefix of the ADMB project (e.g., \code{"vonb"}).
+\item[\code{nsims}] numeric scalar indicating number of MCMC simulations to perform.
+\item[\code{nthin}] numeric scalar indicating the sampling rate or thinning of the 
+\code{nsims} MCMC simulations to report.
+\item[\code{outsuff}] string name suffix of the MCMC output data file.
+\item[\code{logfile}] logical: if \code{TRUE}, create a log file of the messages from the shell call.
+\item[\code{add}] logical: if \code{TRUE}, append shell call messages to an exsiting log file.
+\item[\code{verbose}] logical: if \code{TRUE}, report the shell call an its messages to the R console.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Details}\relax
+This function runs \code{'prefix'.exe} twice, first with the arguments
+\code{-mcmc 'nsims' -mcsave 'nthin'} and second with the argument \code{-mceval}.
+By default, output goes to the file \code{'prefix'.mc.dat}, although a user can
+specify a different output suffix.
+
+To see this function in action, use the PBSadmb GUI with the example \code{vonb} or
+\code{simpleMC}.
+\end{Details}
+%
+\begin{Value}
+Invisibly returns the results of the shell call.
+\end{Value}
+%
+\begin{Note}\relax
+A wrapper function that can be called from a GUI exists as \code{.win.runMC}.
+\end{Note}
+%
+\begin{Author}\relax
+ Jon T. Schnute, Pacific Biological Station, Nanaimo BC, Canada 
+\end{Author}
+%
+\begin{SeeAlso}\relax
+\code{\LinkA{runAD}{runAD}}, \code{\LinkA{makeAD}{makeAD}}, \code{\LinkA{cleanAD}{cleanAD}}
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{setADMBPath}{ Creates the ADMB Options List }{setADMBPath}
+\keyword{data}{setADMBPath}
+\keyword{list}{setADMBPath}
+%
+\begin{Description}\relax
+Creates a global list object detailing the pathways to the ADMB directory, the GCC bin, 
+and the user's preferred text editor.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+setADMBPath(admbpath, gccpath, editor)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{admbpath}] explicit path to the user's ADMB directory.
+\item[\code{gccpath}] explicit path to the user's GCC bin (C-compiler) directory.
+\item[\code{editor}] explicit path and program to use for editing text.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+Creates a global, hidden list object called \code{.ADopts}.
+\end{Value}
+%
+\begin{Author}\relax
+ Jon T. Schnute, Pacific Biological Station, Nanaimo BC, Canada 
+\end{Author}
+%
+\begin{SeeAlso}\relax
+ \code{\LinkA{makeADopts}{makeADopts}},  \code{\LinkA{writeADopts}{writeADopts}} 
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{showADargs}{ Show All Arguments for an ADMB Executable }{showADargs}
+\keyword{file}{showADargs}
+%
+\begin{Description}\relax
+Show all arguments available for an ADMB executable in the 
+default text editor.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+showADargs(prefix, ed=TRUE)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{prefix}] string name prefix of the ADMB project (e.g., \code{"vonb"}).
+\item[\code{ed}] logical: if \code{TRUE}, write the ADMB arguments to a file and 
+view them with the text editor, else display the arguments on the R console.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+Invisibly returns the argument list.
+\end{Value}
+%
+\begin{Note}\relax
+A wrapper function that can be called from a GUI exists as \code{.win.showADargs}.
+\end{Note}
+%
+\begin{Author}\relax
+ Jon T. Schnute, Pacific Biological Station, Nanaimo BC, Canada 
+\end{Author}
+%
+\begin{SeeAlso}\relax
+\code{\LinkA{editADfile}{editADfile}}, \code{\LinkA{runAD}{runAD}}
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{startLog}{ Start a Log File }{startLog}
+\keyword{file}{startLog}
+%
+\begin{Description}\relax
+Start a log file by removing any previous version and 
+appending header information.
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+startLog(prefix)
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{prefix}] string name prefix of the ADMB project (e.g., \code{"vonb"}).
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+No explicit value reurned. Writes header lines into a log file 
+\code{'prefix'.log}.
+\end{Value}
+%
+\begin{Note}\relax
+A wrapper function that can be called from a GUI exists as \code{.win.startLog}.
+\end{Note}
+%
+\begin{Author}\relax
+ Jon T. Schnute, Pacific Biological Station, Nanaimo BC, Canada 
+\end{Author}
+%
+\begin{SeeAlso}\relax
+ \code{\LinkA{appendLog}{appendLog}}, \code{\LinkA{editADfile}{editADfile}} 
+\end{SeeAlso}
+\inputencoding{utf8}
+\HeaderA{writeADopts}{ Writes the ADMB Options List from Memory to a File}{writeADopts}
+\keyword{data}{writeADopts}
+\keyword{list}{writeADopts}
+%
+\begin{Description}\relax
+Writes the global ADMB options list to a file in 'PBS' format 
+(see \code{PBSmodelling::writeList}).
+\end{Description}
+%
+\begin{Usage}
+\begin{verbatim}
+writeADopts(optfile="ADopts.txt")
+\end{verbatim}
+\end{Usage}
+%
+\begin{Arguments}
+\begin{ldescription}
+\item[\code{optfile}] string name of the intended output file.
+\end{ldescription}
+\end{Arguments}
+%
+\begin{Value}
+Returns \code{opts} invisibly. Writes the options list object to an ASCII file.
+\end{Value}
+%
+\begin{Note}\relax
+A wrapper function that can be called from a GUI exists as \code{.win.writeADopts}.
+\end{Note}
+%
+\begin{Author}\relax
+ Jon T. Schnute, Pacific Biological Station, Nanaimo BC, Canada 
+\end{Author}
+%
+\begin{SeeAlso}\relax
+ \code{\LinkA{makeADopts}{makeADopts}}, \code{\LinkA{readADopts}{readADopts}} 
+\end{SeeAlso}
+\printindex{}
+\end{document}
