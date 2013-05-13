@@ -4,6 +4,10 @@ Authors:  JTS = Jon T. Schnute
           RH  = Rowan Haigh
           ACB = Alex Couture-Beil
 -----------------------------------
+0.66  2013-05-13
+  - Revised documentation, including new GUI "Run" menu
+  - Expanded contents of "Authors"
+  - Removed old Excel table of scripts
 
 0.65  2013-05-06
   - Fixed Issue 20 where `simplePBS` had not been changed to `simple_pbs`. (RH 5/6)
