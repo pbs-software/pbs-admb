@@ -6,7 +6,8 @@
   file \code{'prefix'.o}.
 }
 \usage{
-compAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
+compAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, 
+       logfile=TRUE, add=TRUE, verbose=TRUE)
 }
 \arguments{
   \item{prefix}{string name prefix of the ADMB project (e.g., \code{"vonb"}).}

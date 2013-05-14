@@ -6,7 +6,8 @@
   produces the executable file \code{'prefix'.exe}.
 }
 \usage{
-linkAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
+linkAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, 
+       logfile=TRUE, add=TRUE, verbose=TRUE)
 }
 \arguments{
   \item{prefix}{string name prefix of the ADMB project (e.g., \code{"vonb"}).}

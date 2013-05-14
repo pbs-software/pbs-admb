@@ -6,7 +6,8 @@
   \code{compAD}, and \code{linkAD}.
 }
 \usage{
-makeAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
+makeAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, 
+       logfile=TRUE, add=TRUE, verbose=TRUE)
 }
 \arguments{
   \item{prefix}{string name prefix of the ADMB project (e.g., \code{"vonb"}).}

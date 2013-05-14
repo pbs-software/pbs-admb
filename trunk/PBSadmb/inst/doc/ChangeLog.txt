@@ -4,7 +4,10 @@ Authors:  JTS = Jon T. Schnute
           RH  = Rowan Haigh
           ACB = Alex Couture-Beil
 -----------------------------------
-0.66  2013-05-13
+0.66  2013-05-14
+  - Fixed Rd usage lines to be less than 90 characters long. (RH 5/18)
+	From Kurt Hornik: A new test gives * checking Rd line widths ... NOTE Rd file 
+	\usage lines wider than 90 characters... These lines will be truncated in the PDF manual.
   - Revised documentation, including new GUI "Run" menu
   - Expanded contents of "Authors"
   - Removed old Excel table of scripts
