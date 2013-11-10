@@ -1,0 +1,5 @@
+software filename
+ADMBgcc32 admb101-gcc452-win32.zip
+ADMBgcc64 admb101-gcc452-win64.zip
+gcc32 gcc452-win32.zip
+gcc64 gcc452-win64.zip
