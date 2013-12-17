@@ -7,9 +7,9 @@ admb <- function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 	.initOptions()
 	readADopts()
 	pkg="PBSadmb"
-	if (!require(PBSmodelling))
-		stop("!!!!!Install package PBSmodelling!!!!!")
-	require(tcltk,quietly=TRUE)
+	#if (!require(PBSmodelling))
+	#	stop("!!!!!Install package PBSmodelling!!!!!")
+	#require(tcltk,quietly=TRUE)
 
 	#TODO rename to something else - too similar to .PBSadmb
 	assign("PBSadmb",list(pkg=pkg,call=match.call(),args=args(admb),useCols=NULL),envir=.PBSadmbEnv)
@@ -29,7 +29,7 @@ admb <- function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 	# insert examples into window description file menuitems
 	etpl <- basename(Sys.glob(file.path(edir,"*.tpl"))) # TPL files in examples directory
 	eprf <- stripExt(etpl)                              # strip off extensions
-	enew=character(0)
+	enew <- character(0)
 	edir <- gsub( "\\\\", "/", edir )
 	for (i in eprf) 
 		enew=c(enew,paste("menuitem label=",i," function=doAction action=\"copyFiles(`",
@@ -125,8 +125,8 @@ installADMB <- function()
 	if( .Platform$OS.type != "windows" )
 		stop( "installADMB is only supported for windows. Please refer to User Guide for installation instructions" )
 
-	if (!require(PBSmodelling))
-		stop("!!!!!Install package PBSmodelling!!!!!")
+	#if (!require(PBSmodelling))
+	#	stop("!!!!!Install package PBSmodelling!!!!!")
 
 	#default install location
 	download_to <- system.file(package="PBSadmb")
@@ -204,7 +204,8 @@ installADMB <- function()
 		.get.url <- function( fname )
 		{
 			#ensure the url ends with /
-			base.url <- "http://pbs-admb.googlecode.com/files/"
+			base.url <- "http://pbs-admb.googlecode.com/svn/trunk/Downloads/"
+			#base.url <- "http://pbs-admb.googlecode.com/files/"
 			#base.url <- "C:\\Users\\alex\\Documents\\stuff\\projects\\dfo\\pbsadmb\\admb_binary\\"
 			return( paste( base.url, fname, sep="" ) )
 		}
@@ -502,6 +503,7 @@ readADopts <- function(optfile="ADopts.txt")
 	# Load from current dir, using pkgOptions as default values
 	#eval(parse(text=".PBSadmb <<- new( \"PBSoptions\", filename = optfile, initial.options = getOptions( .PBSadmb.pkgOptions ), gui.prefix=\"\" )"))
 	.PBSadmb <- new( "PBSoptions", filename = optfile, initial.options = getOptions( .PBSadmb.pkgOptions ), gui.prefix="" )
+#browser()
 
 	.guessPath <- function( programs, includefilename = FALSE, failed = NULL )
 	{
@@ -567,6 +569,22 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 		names(istatus)=progs
 		mess[[ipath]]=istatus
 	}
+	if(all(mess[[1]])) { # check ADMB version
+		atget(.PBSadmb)
+		if(file.exists(paste(opts["admbpath"],"/VERSION",sep="")))
+			setOptions(.PBSadmb, ver.admb = readLines(paste(opts["admbpath"],"/VERSION",sep=""))[1] )
+		else if (is.null(getOptions(.PBSadmb,"ver.admb")))
+			setOptions(.PBSadmb, ver.admb = "1")
+		atput(.PBSadmb)
+	}
+	if(all(mess[[2]])) { # check g++ version
+		atget(.PBSadmb)
+		ver.gcc = system(paste(opts["gccpath"],"/bin/g++ --version",sep=""),intern=TRUE)[1]
+		ver.gcc = rev(strsplit(ver.gcc,split=" ")[[1]])[1]
+		setOptions(.PBSadmb, ver.gcc = ver.gcc)
+		atput(.PBSadmb)
+	}
+#browser()
 	ADstatus=all(unlist(mess)==TRUE)
 	attr(ADstatus,"status")=mess
 	vmess=unlist(mess)
@@ -664,6 +682,9 @@ appendLog <- function(prefix, lines)
 	}
 }
 
+#.setPath-------------------------------2013-12-17
+# Set the temporary environment path to run ADMB.
+#-------------------------------------------ACB/RH
 .setPath <- function()
 {
 	path_sep <- .Platform$path.sep
@@ -680,10 +701,10 @@ appendLog <- function(prefix, lines)
 		msys_path <- Sys.getenv( "PATH" )
 	}
 
-	path <- paste( admb_path, gcc_path, msys_path, sep = path_sep )
+	path <- paste(normalizePath(admb_path,dir_sep), normalizePath(msys_path,dir_sep), normalizePath(gcc_path,dir_sep), sep=path_sep)
 	Sys.setenv( PATH = path )
 
-	Sys.setenv( ADMB_HOME = gsub("/*$", "", admb_home ) ) #ensure no trailing slash (`/') exists
+	Sys.setenv( ADMB_HOME = gsub("/*$","",gsub("\\\\*$","",normalizePath(admb_home,dir_sep)) ) ) #ensure no trailing slash (`/') or (`\\') exists
 }
 
 #convAD---------------------------------2009-08-12
@@ -695,15 +716,15 @@ convAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 	ext <- ifelse( .Platform$OS.type == "windows", ".exe", "" )
 	prog <- ifelse( raneff == TRUE, "tpl2rem", "tpl2cpp" )
 
- 	#add cmd flags
- 	flags <- c()
- 	if( dll )
- 		flags[ length( flags ) + 1 ] <- "-dll"
- 	if( safe )
- 		flags[ length( flags ) + 1 ] <- "-bounds"
+	#add cmd flags
+	flags <- c()
+	if( dll )
+		flags[ length( flags ) + 1 ] <- "-dll"
+	if( safe )
+		flags[ length( flags ) + 1 ] <- "-bounds"
 
- 	#build command string
- 	flags <- paste( flags, collapse=" " )
+	#build command string
+	flags <- paste( flags, collapse=" " )
 
 	cmd <- paste( prog, flags, prefix, sep=" " )
 	if (.Platform$OS.type=="windows")
@@ -735,7 +756,6 @@ convAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 	Sys.setenv( PATH = old_path )
 	invisible(tplout2)
 }
-
 .win.convAD=function(winName="PBSadmb")
 {
 	isOK=.win.checkADopts()
@@ -751,89 +771,29 @@ convAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 		cat("\n> ")
 	invisible(Ttime) }
 
-#compAD---------------------------------2009-08-12
+#compAD---------------------------------2013-12-17
 # Apparently "raneff" doesn't influence the compile stage,
 # but the argument is preserved here for future development.
 #-------------------------------------------JTS/RH
 compAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
 {
 	#get path and name of program
-	ext <- ifelse( .Platform$OS.type == "windows", ".bat", "" )
+	admbpath = getOptions(atcall(.PBSadmb),"admbpath")
+	ext <- ifelse( .Platform$OS.type == "windows", ifelse(file.exists(paste(admbpath,"/bin/adcomp.cmd",sep="")),".cmd",".bat"), "" )
+	#ext <- ifelse( .Platform$OS.type == "windows", ".bat", "" )
 	prog <- paste( "adcomp", ext, sep="" )
 
- 	#add cmd flags
- 	flags <- c()
- 	if( dll )
- 		flags[ length( flags ) + 1 ] <- "-d"
- 	if( debug )
- 		flags[ length( flags ) + 1 ] <- "-g"
- 	if( safe )
- 		flags[ length( flags ) + 1 ] <- "-s"
- 	if( raneff )
- 		flags[ length( flags ) + 1 ] <- "-r"
-
-	#build command string
-	flags <- paste( flags, collapse=" " )
-	cmd <- paste( prog, flags, prefix, sep=" " )
-	if (.Platform$OS.type=="windows")
-		cmd=shQuote(cmd)
-		#cmd=.addQuotes(convSlashes(cmd))
-
-	#add ADMB path to path env variable
-	old_path <- Sys.getenv( "PATH" )
-	.setPath()
-
-	#pre cmd run
-	if (logfile & !add)
-		startLog(prefix)
-	if (verbose)
-		cat(cmd,"\n")
-
-	#run cmd
-	out <- .callSys(cmd)
-
-	#post cmd run
-	if (logfile) {
-		out2 <- c(cmd,out)
-		appendLog(prefix, out2)
-	}
-	if (verbose)
-		cat(out, sep="\n")
-
-	Sys.setenv( PATH = old_path )
-	invisible(out2)
-}
-
-.win.compAD=function(winName="PBSadmb")
-{
-	isOK=.win.checkADopts()
- if (!isOK) return()
-	time0=proc.time()[1:3]
-	getWinVal(scope="L",winName=winName)
-	compAD(prefix, raneff, safe, dll, debugsymbols, logfile, add, verbose)
-	Ttime=round(proc.time()[1:3]-time0,2)
-	setWinVal(list("Mtime[2,1]"=Ttime[1],"Mtime[2,2]"=Ttime[2],"Mtime[2,3]"=Ttime[3]),winName=winName) 
-	if( .Platform$OS.type == "unix" ) cat("\n> ")
-	invisible(Ttime)
-}
-
-#linkAD---------------------------------2009-08-12
-# Links binaries into executable
-#-------------------------------------------JTS/RH
-linkAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
-{
-	#get path and name of program
-	ext <- ifelse( .Platform$OS.type == "windows", ".bat", "" )
-	prog <- paste( "adlink", ext, sep="" )
-
 	#add cmd flags
+	ver.admb = .version(getOptions(atcall(.PBSadmb),"ver.admb"))
 	flags <- c()
 	if( dll )
 		flags[ length( flags ) + 1 ] <- "-d"
 	if( debug )
 		flags[ length( flags ) + 1 ] <- "-g"
-	if( safe )
+	if( safe && ver.admb < 11 )
 		flags[ length( flags ) + 1 ] <- "-s"
+	if( !safe && ver.admb >= 11 )
+		flags[ length( flags ) + 1 ] <- "-f"
 	if( raneff )
 		flags[ length( flags ) + 1 ] <- "-r"
 
@@ -868,11 +828,79 @@ linkAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 	Sys.setenv( PATH = old_path )
 	invisible(out2)
 }
-
-.win.linkAD=function(winName="PBSadmb")
+.win.compAD=function(winName="PBSadmb")
 {
 	isOK=.win.checkADopts()
  if (!isOK) return()
+	time0=proc.time()[1:3]
+	getWinVal(scope="L",winName=winName)
+	compAD(prefix, raneff, safe, dll, debugsymbols, logfile, add, verbose)
+	Ttime=round(proc.time()[1:3]-time0,2)
+	setWinVal(list("Mtime[2,1]"=Ttime[1],"Mtime[2,2]"=Ttime[2],"Mtime[2,3]"=Ttime[3]),winName=winName) 
+	if( .Platform$OS.type == "unix" ) cat("\n> ")
+	invisible(Ttime)
+}
+
+#linkAD---------------------------------2013-12-17
+# Links binaries into executable
+#-------------------------------------------JTS/RH
+linkAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
+{
+	#get path and name of program
+	admbpath = getOptions(atcall(.PBSadmb),"admbpath")
+	ext <- ifelse( .Platform$OS.type == "windows", ifelse(file.exists(paste(admbpath,"/bin/adlink.cmd",sep="")),".cmd",".bat"), "" )
+	#ext <- ifelse( .Platform$OS.type == "windows", ".bat", "" )
+	prog <- paste( "adlink", ext, sep="" )
+
+	#add cmd flags
+	ver.admb = .version(getOptions(atcall(.PBSadmb),"ver.admb"))
+	flags <- c()
+	if( dll )
+		flags[ length( flags ) + 1 ] <- "-d"
+	if( debug )
+		flags[ length( flags ) + 1 ] <- "-g"
+	if( safe && ver.admb < 11 )
+		flags[ length( flags ) + 1 ] <- "-s"
+	if( !safe && ver.admb >= 11 )
+		flags[ length( flags ) + 1 ] <- "-f"
+	if( raneff )
+		flags[ length( flags ) + 1 ] <- "-r"
+
+	#build command string
+	flags <- paste( flags, collapse=" " )
+	cmd <- paste( prog, flags, prefix, sep=" " )
+	if (.Platform$OS.type=="windows")
+		cmd=shQuote(cmd)
+		#cmd=.addQuotes(convSlashes(cmd))
+
+	#add ADMB path to path env variable
+	old_path <- Sys.getenv( "PATH" )
+	.setPath()
+
+	#pre cmd run
+	if (logfile & !add)
+		startLog(prefix)
+	if (verbose)
+		cat(cmd,"\n")
+
+	#run cmd
+	out <- .callSys(cmd)
+
+	#post cmd run
+	if (logfile) {
+		out2 <- c(cmd,out)
+		appendLog(prefix, out2)
+	}
+	if (verbose)
+		cat(out, sep="\n")
+
+	Sys.setenv( PATH = old_path )
+	invisible(out2)
+}
+.win.linkAD=function(winName="PBSadmb")
+{
+	isOK=.win.checkADopts()
+	if (!isOK) return()
 	time0=proc.time()[1:3]
 	getWinVal(scope="L",winName=winName)
 	linkAD(prefix, raneff, safe, dll, debugsymbols, logfile, add, verbose)
@@ -882,14 +910,17 @@ linkAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 	invisible(Ttime)
 }
 
+#makeAD---------------------------------2009-08-12
+# Convert TPL file to CPP code.
+# Compile CPP to object files.
+# Links binaries into executable.
+#-------------------------------------------JTS/RH
 makeAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
 {
 	convAD(prefix, raneff, safe, dll, debug, logfile, add, verbose)
 	compAD(prefix, raneff, safe, dll, debug, logfile, add, verbose)
 	linkAD(prefix, raneff, safe, dll, debug, logfile, add, verbose)
 }
-
-
 .win.makeAD=function(winName="PBSadmb") {
 	isOK=.win.checkADopts()
 	if (!isOK) return()
@@ -897,6 +928,7 @@ makeAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 	.win.compAD( winName )
 	.win.linkAD( winName )
 }
+
 
 runAD <- function(prefix, argvec="", logfile=TRUE, add=TRUE, verbose=TRUE)
 {
@@ -1126,7 +1158,7 @@ readRep=function(prefix, suffix=c(".cor",".rep",".std",".mc.dat"), global=FALSE)
 		contents=dat=readLines(i)
 		ncont=length(contents)
 		ff=findFormat(contents)
-		if (ff=="P") dat=PBSmodelling:::.readList.P(i)
+		if (ff=="P") dat=PBSmodelling::.readList.P(i)
 		else if (ff=="D" || ff=="R") dat=eval(parse(i))
 		else if (any(ii==c("cor","std","mc.dat"))) { # treat these as a data frames
 			tcont=gsub("std dev","std",contents)
@@ -1255,7 +1287,7 @@ plotMC=function(prefix,act="pairs",pthin=1,useCols=NULL){
 		mtext("Sequential chain values",side=1,outer=TRUE,line=2,cex=1) 
 	}
 	if (act=="dens") {
-		rc=PBSmodelling:::.findSquare(nc)
+		rc=PBSmodelling::.findSquare(nc)
 		#sqn=sqrt(nc); m=ceiling(sqn); n=ceiling(nc/m)
 		expandGraph(mfrow=c(rc[1],rc[2]),mar=c(2,2,0,0),oma=c(1,1.75,.5,.5),mgp=c(1.5,.2,0))
 		for (i in 1:nc) {
@@ -1440,14 +1472,14 @@ cleanAD <- function(prefix=NULL) {
 		"button text=\">\" function=.win.findClean",
 		"button text=refresh function=.cleanUpAgain",
 		"label text=\"\n\nSuffixes to Clean\" font=\"bold 9\"", 
-		PBSmodelling:::.makeCleanVec("suff", suffix, rowLen), 
+		PBSmodelling::.makeCleanVec("suff", suffix, rowLen), 
 		"label text=\"\n\nFiles to Clean\" font=\"bold 9\"", 
-		PBSmodelling:::.makeCleanVec("file", files, rowLen), 
+		PBSmodelling::.makeCleanVec("file", files, rowLen), 
 		"grid 1 3 relief=groove padx=4 pady=4", 
 		"button function=.selectCleanBoxes action=1 text=\"Select All\" padx=4 pady=4", 
 		"button function=.selectCleanBoxes action=0 text=\"Deselect All\" padx=4 pady=4", 
 		"button function=.doClean text=Clean bg=aliceblue padx=4 pady=4")
-	createWin(winDesc, astext = TRUE, env=PBSmodelling:::.getHiddenEnv() ) 
+	createWin(winDesc, astext = TRUE, env=PBSmodelling::.getHiddenEnv() ) 
 	invisible(TRUE) }
 
 .cleanUpAgain=function(winName="cleanWindow"){
@@ -1470,12 +1502,12 @@ cleanAD <- function(prefix=NULL) {
 	}
 	winDesc = c("window name=cleanWD title=Clean",
 		"label text=\"\n\nFiles to Clean\" font=\"bold 9\"",
-		PBSmodelling:::.makeCleanVec("file", files, rowLen),
+		PBSmodelling::.makeCleanVec("file", files, rowLen),
 		"grid 1 3 relief=groove padx=4 pady=4", 
 		"button function=.selectCleanBoxes action=1 text=\"Select All\" padx=4 pady=4", 
 		"button function=.selectCleanBoxes action=0 text=\"Deselect All\" padx=4 pady=4", 
 		"button function=doAction text=Clean bg=aliceblue padx=4 pady=4 action=\".doCleanADMB(); closeWin(`cleanWD`)\"")
-	createWin(winDesc, astext = TRUE, env=PBSmodelling:::.getHiddenEnv() )
+	createWin(winDesc, astext = TRUE, env=PBSmodelling::.getHiddenEnv() )
 	invisible(TRUE) }
 
 #.doCleanADMB---------------------------2013-03-25
@@ -1575,6 +1607,16 @@ atcall  = function(...) {tcall (..., penv=parent.frame(), tenv=.PBSadmbEnv)}
 atprint = function(...) {tprint(..., penv=parent.frame(), tenv=.PBSadmbEnv)}
 atput   = function(...) {tput  (..., penv=parent.frame(), tenv=.PBSadmbEnv)}
 alisp   = function(...) {lisp  (..., pos =.PBSadmbEnv)}
+
+.version = function(x) {
+	if (is.numeric(x)) return(x)
+	xpc = strsplit(x,split="\\.")[[1]]
+	npc = length(xpc)
+	xnu = as.numeric(paste(xpc[1:min(2,npc)],collapse="."))
+	return(xnu)
+}
+
+
 
 # functions called from window description files
 #.win.onClose  = function(){ atcall(.onClose)() }
