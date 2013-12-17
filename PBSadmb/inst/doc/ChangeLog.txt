@@ -4,6 +4,10 @@ Authors:  JTS = Jon T. Schnute
           RH  = Rowan Haigh
           ACB = Alex Couture-Beil
 -----------------------------------
+0.67  2013-12-17
+  - Revised code to run ADMB 11 which uses `adcomp.cmd` and `adlink.cmd` for ADMB v.11 and `.bat` files for previous versions. (RH 12/17)
+  - .PBSadmb (stored in .PBSadmbEnv) now tracks `ver.admb` and `ver.gcc` (versions). (RH 12/17)
+
 0.66  2013-05-14
   - Fixed Rd usage lines to be less than 90 characters long. (RH 5/18)
 	From Kurt Hornik: A new test gives * checking Rd line widths ... NOTE Rd file 
