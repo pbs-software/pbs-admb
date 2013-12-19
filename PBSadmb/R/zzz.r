@@ -40,12 +40,12 @@ Type admb() to start a GUI for operating ADMB.
 # ===================
 if(getRversion() >= "2.15.1") utils::globalVariables(names=c(
 	".PBSadmb",".PBSadmb.pkgOptions",".PBSmod",
-	"add","admbpath","argvec",
+	"add","admbpath","admbver","argvec",
 	"chkadmb","chkgcc",
 	"debugsymbols","digest","dll",
 	"editor",
 	"files",
-	"gccpath",
+	"gccpath","gccver",
 	"isdir",
 	"logfile",
 	"nsims","nthin",
