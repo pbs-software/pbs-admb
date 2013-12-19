@@ -50,7 +50,7 @@ Grid 2 3 sticky=E
 	button text="Refresh" sticky=W function=.load.prefix.droplist
 		
 
-notebook tabs="Setup Make Run Output" pady="5 0" #selected=3
+notebook tabs="Setup Make Run Output" pady="2 0" #selected=3
 
 #setup
 grid 7 1 sticky=E
@@ -59,20 +59,24 @@ grid 7 1 sticky=E
 		null padx=120
 		label test name=chkstat sticky=W width=4 bg=lightgoldenrodyellow sticky=E
 	grid 1 2 sticky=E
-		entry name=admbpath value="" label="ADM path:" width=40 mode=character func=setGUIoptions action=admbpath
+		entry name=admbpath value="" label="ADMB path:" width=50 mode=character func=setGUIoptions action=admbpath
 		button text=">" func=doAction action="selectDir(usewidget=\"admbpath\")"
 	grid 1 2 sticky=E
-		entry name=gccpath value="" label="GCC path:" width=40 mode=character func=setGUIoptions action=gccpath
+		entry name=gccpath value="" label="GCC path:" width=50 mode=character func=setGUIoptions action=gccpath
 		button text=">" func=doAction action="selectDir(usewidget=\"gccpath\")"
 	grid 1 2 sticky=E
-		entry name=editor value="" label=Editor: width=40 mode=character func=setGUIoptions action=editor
+		entry name=editor value="" label=Editor: width=50 mode=character func=setGUIoptions action=editor
 		button text=">" func=doAction action="selectFile(usewidget=\"editor\")"
-	button name=checkbutton text="Apply" func=.win.makeADopts action=check bg=moccasin sticky=E
+	grid 1 3 sticky=E
+		entry name=admbver value="" label="ADMB version" width=10 mode=character func=setGUIoptions action=admbver
+		entry name=gccver value="" label="GCC version" width=10 mode=character func=setGUIoptions action=gccver padx="2 0"
+		button name=checkbutton text="Apply" func=.win.makeADopts action=check bg=moccasin padx="10 0"
 
 	label "Save/Load Options to/from Disk" sticky=W fg=purple3 font="bold 11"
-	grid 1 4 sticky=E
+	grid 1 5 sticky=E
 		label text="Options: "
-		entry name=optfile value="" label="" width=15 mode=character action=optfile
+		entry name=optfile value="" label="" width=30 mode=character action=optfile
+		button text=">" func=doAction action="optfile=selectFile(filetype=list(c(`.txt`)),usewidget=NULL); setWinVal(list(optfile=basename(optfile)))"
 		button text="Load" func=.win.readADopts bg=palegoldenrod
 		button text="Save"  func=.win.writeADopts bg=lightgoldenrod1
 

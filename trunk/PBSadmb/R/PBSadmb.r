@@ -204,7 +204,7 @@ installADMB <- function()
 		.get.url <- function( fname )
 		{
 			#ensure the url ends with /
-			base.url <- "http://pbs-admb.googlecode.com/svn/trunk/Downloads/"
+			base.url <- "http://pbs-admb.googlecode.com/svn/files/Downloads/"
 			#base.url <- "http://pbs-admb.googlecode.com/files/"
 			#base.url <- "C:\\Users\\alex\\Documents\\stuff\\projects\\dfo\\pbsadmb\\admb_binary\\"
 			return( paste( base.url, fname, sep="" ) )
@@ -436,12 +436,26 @@ installADMB <- function()
 }
 
 
+#makeADopts-----------------------------2009-08-12
+# Sets the ADMB path directories (deprecated).
+#----------------------------------------------ACB
 makeADopts <- function( admbpath, gccpath, editor )
 {
 	cat( "THIS FUNCTION IS DEPRECATED - use setADMBPath\n" )
 	setADMBPath( admbpath = admbpath, gccpath = gccpath, editor = editor )
 }
+.win.makeADopts=function(winName="PBSadmb")
+{
+	getWinVal(scope="L",winName=winName)
+	setADMBPath(admbpath,gccpath,editor) 
+	.win.setADMBVer() 
+	.win.checkADopts()
+	invisible()
+}
 
+#setADMBPath----------------------------2009-08-12
+# Sets the ADMB path directories.
+#----------------------------------------------ACB
 setADMBPath <- function( admbpath, gccpath, editor )
 {
 	.initOptions()
@@ -454,12 +468,53 @@ setADMBPath <- function( admbpath, gccpath, editor )
 		setOptions( .PBSadmb, editor = editor )
 	atput(.PBSadmb)
 }
-	
-.win.makeADopts=function(winName="PBSadmb")
+.win.setADMBPath=function(winName="PBSadmb")
 {
 	getWinVal(scope="L",winName=winName)
 	setADMBPath(admbpath,gccpath,editor) 
 	.win.checkADopts()
+	invisible()
+}
+
+#setADMBVer-----------------------------2013-12-18
+# Sets the ADMB versions.
+#-----------------------------------------------RH
+setADMBVer <- function( admbver, gccver )
+{
+	.initOptions()
+	sayWhat = attributes(checkADopts())$status
+	atget(.PBSadmb)
+	opts = getOptions(.PBSadmb)
+#browser()
+	if( !missing( admbver ) && !is.element(admbver,c("")) ) 
+		setOptions( .PBSadmb, admbver = admbver )
+	else {
+		if(all(sayWhat[[1]])) { # check ADMB version
+			if(file.exists(paste(opts["admbpath"],"/VERSION",sep="")))
+				setOptions(.PBSadmb, admbver = readLines(paste(opts["admbpath"],"/VERSION",sep=""))[1] )
+			else if (is.null(getOptions(.PBSadmb,"admbver")))
+				setOptions(.PBSadmb, admbver = "10")
+	}	}
+	if( !missing( gccver ) && !is.element(gccver,c("")) )
+		setOptions( .PBSadmb, gccver = gccver )
+	else {
+		if(all(sayWhat[[2]])) { # check g++ version
+			gccver = system(paste(opts["gccpath"],"/bin/g++ --version",sep=""),intern=TRUE)[1]
+			gccver = rev(strsplit(gccver,split=" ")[[1]])[1]
+			setOptions(.PBSadmb, gccver = gccver)
+	}	}
+	atput(.PBSadmb)
+}
+.win.setADMBVer=function(winName="PBSadmb")
+{
+	getWinVal(scope="L",winName=winName)
+	setADMBVer(admbver,gccver) 
+	for (i in c("admbver","gccver")) {
+		ival = getOptions(atcall(.PBSadmb),i)
+		if (is.null(ival)) next
+		eval(parse(text=paste("setWinVal(list(",i,"=getOptions(atcall(.PBSadmb),\"",i,"\")),winName=winName)",sep="")))
+	}
+	#.win.checkADopts()
 	invisible()
 }
 
@@ -569,22 +624,22 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 		names(istatus)=progs
 		mess[[ipath]]=istatus
 	}
-	if(all(mess[[1]])) { # check ADMB version
-		atget(.PBSadmb)
-		if(file.exists(paste(opts["admbpath"],"/VERSION",sep="")))
-			setOptions(.PBSadmb, ver.admb = readLines(paste(opts["admbpath"],"/VERSION",sep=""))[1] )
-		else if (is.null(getOptions(.PBSadmb,"ver.admb")))
-			setOptions(.PBSadmb, ver.admb = "1")
-		atput(.PBSadmb)
-	}
-	if(all(mess[[2]])) { # check g++ version
-		atget(.PBSadmb)
-		ver.gcc = system(paste(opts["gccpath"],"/bin/g++ --version",sep=""),intern=TRUE)[1]
-		ver.gcc = rev(strsplit(ver.gcc,split=" ")[[1]])[1]
-		setOptions(.PBSadmb, ver.gcc = ver.gcc)
-		atput(.PBSadmb)
-	}
 #browser()
+#	if(all(mess[[1]])) { # check ADMB version
+#		atget(.PBSadmb)
+#		if(file.exists(paste(opts["admbpath"],"/VERSION",sep="")))
+#			setOptions(.PBSadmb, admbver = readLines(paste(opts["admbpath"],"/VERSION",sep=""))[1] )
+#		else if (is.null(getOptions(.PBSadmb,"admbver")))
+#			setOptions(.PBSadmb, admbver = "10")
+#		atput(.PBSadmb)
+#	}
+#	if(all(mess[[2]])) { # check g++ version
+#		atget(.PBSadmb)
+#		gccver = system(paste(opts["gccpath"],"/bin/g++ --version",sep=""),intern=TRUE)[1]
+#		gccver = rev(strsplit(gccver,split=" ")[[1]])[1]
+#		setOptions(.PBSadmb, gccver = gccver)
+#		atput(.PBSadmb)
+#	}
 	ADstatus=all(unlist(mess)==TRUE)
 	attr(ADstatus,"status")=mess
 	vmess=unlist(mess)
@@ -616,7 +671,6 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 	setWinVal(list(chkstat=ifelse(chkstat," OK"," Fix")),winName=winName)
 	setWidgetColor( "chkstat", winName=winName, bg=ifelse(chkstat,"lightgreen","red") )
 	setWidgetColor( "checkbutton", winName=winName, bg=ifelse(chkstat,"moccasin","red") )
-
 	invisible(chkstat)
 }
 
@@ -784,15 +838,15 @@ compAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 	prog <- paste( "adcomp", ext, sep="" )
 
 	#add cmd flags
-	ver.admb = .version(getOptions(atcall(.PBSadmb),"ver.admb"))
+	admbvernum = .version(getOptions(atcall(.PBSadmb),"admbver"))
 	flags <- c()
 	if( dll )
 		flags[ length( flags ) + 1 ] <- "-d"
 	if( debug )
 		flags[ length( flags ) + 1 ] <- "-g"
-	if( safe && ver.admb < 11 )
+	if( safe && admbvernum < 11 )
 		flags[ length( flags ) + 1 ] <- "-s"
-	if( !safe && ver.admb >= 11 )
+	if( !safe && admbvernum >= 11 )
 		flags[ length( flags ) + 1 ] <- "-f"
 	if( raneff )
 		flags[ length( flags ) + 1 ] <- "-r"
@@ -853,15 +907,15 @@ linkAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 	prog <- paste( "adlink", ext, sep="" )
 
 	#add cmd flags
-	ver.admb = .version(getOptions(atcall(.PBSadmb),"ver.admb"))
+	admbvernum = .version(getOptions(atcall(.PBSadmb),"admbver"))
 	flags <- c()
 	if( dll )
 		flags[ length( flags ) + 1 ] <- "-d"
 	if( debug )
 		flags[ length( flags ) + 1 ] <- "-g"
-	if( safe && ver.admb < 11 )
+	if( safe && admbvernum < 11 )
 		flags[ length( flags ) + 1 ] <- "-s"
-	if( !safe && ver.admb >= 11 )
+	if( !safe && admbvernum >= 11 )
 		flags[ length( flags ) + 1 ] <- "-f"
 	if( raneff )
 		flags[ length( flags ) + 1 ] <- "-r"
