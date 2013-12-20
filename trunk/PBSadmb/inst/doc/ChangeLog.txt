@@ -4,7 +4,9 @@ Authors:  JTS = Jon T. Schnute
           RH  = Rowan Haigh
           ACB = Alex Couture-Beil
 -----------------------------------
-0.67  2013-12-18
+0.67  2013-12-19
+  - Changed function `checkADopts` to check for presence of `sed(.exe)` and to provide a warning if not found. (RH 12/19)
+  - Changed code to require that `msys` directory falls directly below `mingw` directory. (RH 12/19)
   - Created new function called `setADMBVer`; version R objects are now called `admbver` and `gccver`. (RH 12/18)
   - Revised code to run ADMB 11 which uses `adcomp.cmd` and `adlink.cmd` for ADMB v.11 and `.bat` files for previous versions. (RH 12/17)
   - .PBSadmb (stored in .PBSadmbEnv) now tracks `ver.admb` and `ver.gcc` (versions). (RH 12/17)
