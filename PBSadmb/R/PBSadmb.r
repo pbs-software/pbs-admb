@@ -595,56 +595,38 @@ readADopts <- function(optfile="ADopts.txt")
 checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
    check=c("admbpath","gccpath","editor"), warn=TRUE, popup=FALSE)
 {
+	isWin = .Platform$OS.type=="windows"
+	slash = ifelse(isWin, "\\", "/" )
 	# Check that .ADopts has all required components and that links point to actual files on the hard drive.
 	#if (!exists(".ADopts",envir=.GlobalEnv)) initAD()
 	sAF=options()$stringsAsFactors; options(stringsAsFactors=FALSE)
+
+### check for sed.exe ###
 	mess=list()
 	for (i in names(opts)) {
 		if (!any(i==check))
 			next
 		ii=ipath=opts[[i]]
 		if (i=="admbpath") {
-			ipath=paste(ii,"/bin",sep="")
-			if( .Platform$OS.type == "windows" )
-				progs=c("tpl2cpp.exe","tpl2rem.exe")
-			else
-				progs=c("tpl2cpp","tpl2rem") #TODO verify these names
+			ipath=paste(ii,slash,"bin",sep="")
+			progs=paste(c("tpl2cpp","tpl2rem"),ifelse(isWin,".exe",""),sep="")
 		}
 		else if (i=="gccpath")
-			if( .Platform$OS.type == "windows" )
-				progs="bin\\g++.exe" 
-			else
-				progs="bin/g++" 
+			progs=paste("bin",slash,"g++",ifelse(isWin,".exe",""),sep="")
 		else if (i=="editor") {
 			ipath=dirname(ii)
 			progs=basename(ii)
 		}
-		target=paste(ipath,progs,sep="/")
+		target=paste(ipath,progs,sep=slash)
 		istatus=file.exists(target)
 		names(istatus)=progs
 		mess[[ipath]]=istatus
 	}
-#browser()
-#	if(all(mess[[1]])) { # check ADMB version
-#		atget(.PBSadmb)
-#		if(file.exists(paste(opts["admbpath"],"/VERSION",sep="")))
-#			setOptions(.PBSadmb, admbver = readLines(paste(opts["admbpath"],"/VERSION",sep=""))[1] )
-#		else if (is.null(getOptions(.PBSadmb,"admbver")))
-#			setOptions(.PBSadmb, admbver = "10")
-#		atput(.PBSadmb)
-#	}
-#	if(all(mess[[2]])) { # check g++ version
-#		atget(.PBSadmb)
-#		gccver = system(paste(opts["gccpath"],"/bin/g++ --version",sep=""),intern=TRUE)[1]
-#		gccver = rev(strsplit(gccver,split=" ")[[1]])[1]
-#		setOptions(.PBSadmb, gccver = gccver)
-#		atput(.PBSadmb)
-#	}
 	ADstatus=all(unlist(mess)==TRUE)
 	attr(ADstatus,"status")=mess
 	vmess=unlist(mess)
 	names(vmess)=paste(rep(names(mess),sapply(mess,length,simplify=FALSE)),
-		unlist(sapply(mess,names,simplify=FALSE)),sep="/")
+		unlist(sapply(mess,names,simplify=FALSE)),sep=slash)
 	attr(ADstatus,"message")=vmess
 	if (warn|popup) {
 		if (all(vmess==TRUE)) {
@@ -654,11 +636,44 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 			badmess=paste("Programs not found:\n",paste(names(vmess)[!vmess],collapse="\n"),
 				"\n\nEither alter '.ADopts' or remove it and alter 'ADopts.txt'.\n\n",
 				"If using the ADMB GUI, alter the appropriate entry.\n\n",sep="")
-			if (.Platform$OS.type=="windows" && popup) {
+			if (isWin && popup) {
 				badmess <- paste( badmess, "You may also install ADMB directly by using the install dropdown menu.", sep="" )
 			}
 			if (warn) cat(badmess)
-			if (popup) showAlert(badmess,"User action required","warning") } }
+			if (popup) showAlert(badmess,"User action required","warning") 
+		}
+	}
+	### check for sed.exe ###
+	opts.sed = c(list(msyspath=paste(opts[["gccpath"]],slash,"msys",slash,"bin",sep="")),opts[c("admbpath","gccpath")])
+	sedmess=list()
+	for (i in names(opts.sed)) {
+		if (!any(i==c(check,"msyspath")))
+			next
+		ii=ipath=opts.sed[[i]]
+		if (i=="msyspath")
+			progs = paste("sed",ifelse(isWin,".exe",""),sep="")
+		else if (i=="admbpath")
+			progs=paste("bin",slash,"sed",ifelse(isWin,".exe",""),sep="")
+		else if (i=="gccpath")
+			progs=paste("bin",slash,"sed",ifelse(isWin,".exe",""),sep="")
+		target=paste(ipath,progs,sep="/")
+		istatus=file.exists(target)
+		names(istatus)=progs
+		sedmess[[ipath]]=istatus
+	}
+	smess=unlist(sedmess)
+	names(smess)=paste(rep(names(sedmess),sapply(sedmess,length,simplify=FALSE)),
+		unlist(sapply(sedmess,names,simplify=FALSE)),sep=slash)
+	if (warn|popup) {
+		if (!any(smess)) {
+			badsedmess=paste("Exception: the program `sed",ifelse(isWin,".exe",""),"` was not found on any of these paths:\n",
+				paste(gsub(paste("sed",ifelse(isWin,".exe",""),sep=""),"",names(smess))[!smess],collapse="\n"),
+				"\n\nPlace a copy of `sed",ifelse(isWin,".exe",""),"` on any one of the paths indicated above.\n\n",sep="")
+			if (warn) cat(badsedmess)
+			if (popup) showAlert(badsedmess,"User action required","warning") 
+		}
+	}
+#browser();return()
 	options(stringsAsFactors=sAF)
 	invisible(ADstatus)
 }
@@ -749,7 +764,8 @@ appendLog <- function(prefix, lines)
 	gcc_path <- paste( getOptions( atcall(.PBSadmb), "gccpath"), "bin", sep = dir_sep )
 
 	if( .Platform$OS.type == "windows" ) {
-		msys_path <- paste( getOptions( atcall(.PBSadmb), "gccpath"), "msys", "1.0", "bin", sep = dir_sep )
+		#msys_path <- paste( getOptions( atcall(.PBSadmb), "gccpath"), "msys", "1.0", "bin", sep = dir_sep )
+		msys_path <- paste( getOptions( atcall(.PBSadmb), "gccpath"), "msys", "bin", sep = dir_sep )
 	} else {
 		#linux must include original path so programs like cat, sed are found
 		msys_path <- Sys.getenv( "PATH" )
