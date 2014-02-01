@@ -1,15 +1,25 @@
+#==============================================================
+##### DEPRECATED - BUT ALTERED FOR THE RECORD USING 7-ZIP #####
+#==============================================================
 window name=PBSadmbInst title="Install ADMB"
 
-label "ADMB and MinGW installer" sticky=W font=bold
+label "ADMB and MinGW installer for Windows" sticky=W font=bold
 
-grid 1 3 sticky=W pady=10
-  label "architecture:" sticky=W font=underline
-  radio name=arch value=32 text="32 bit" mode=character function=changeArch
-  radio name=arch value=64 text="64 bit" mode=character function=changeArch
+grid 1 2 sticky=W pady=10
+  grid 2 1
+    label "System" font=underline
+    grid 1 2
+      radio name=arch value=32 text="32 bit" mode=character function=changeArch
+      radio name=arch value=64 text="64 bit" mode=character function=changeArch
+  grid 2 1
+    label "7-Zip location (required)" sticky=EW font=underline padx="10 0"
+    grid 1 2
+      entry name=zipdir width=60 mode=character padx="10 0"
+      button "..." name=zipdirbutton function=changeDir action="zipdir"
 
 grid 3 3
-  label software font=underline
-  label "install location" font=underline
+  label Software font=underline
+  label "Install to location" font=underline
   null
 
   check name=chkadmb text="ADMB" function=checkSoft sticky=W checked=T

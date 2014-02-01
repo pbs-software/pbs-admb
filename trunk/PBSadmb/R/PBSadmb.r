@@ -1,7 +1,6 @@
-# Authors: Jon T. Schnute, Rowan Haigh, Alex Couture-Beil
-
-#admb-----------------------------------2013-03-25
+#admb-----------------------------------2014-01-31
 # Starts the primary GUI interface
+# Authors: Jon T. Schnute, Rowan Haigh, Alex Couture-Beil
 #-----------------------------------------------RH
 admb <- function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 	.initOptions()
@@ -37,14 +36,18 @@ admb <- function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 	temp <- gsub("@nitems",length(eprf),temp)
 	temp <- gsub("@menuitems",paste(enew,collapse="\n\t"),temp)
 
-	#install menu (windows only)
+	#install menu (different for windows and unix)
 	if( .Platform$OS.type == "windows" ) {
 		install.menu <- "menu nitems=1 label=Install"
-		install.menu <- c( install.menu, "menuitem label=\"ADMB and MinGW for Windows\" function=doAction action=installADMB()" )
-		temp <- gsub( "@install", paste( install.menu, collapse="\n" ), temp )
+		install.menu <- c( install.menu, "menuitem label=\"ADMB Tools for Windows\" function=doAction action=\"browseURL(`http://www.admb-project.org/tools/admb-tools-for-windows`)\"" )
+		#temp <- gsub( "@install", paste( install.menu, collapse="\n" ), temp )
 	} else {
-		temp <- gsub( "@install", "", temp )
+		install.menu <- "menu nitems=2 label=Install"
+		install.menu <- c( install.menu, "menuitem label=\"Linux install and build\" function=doAction action=\"browseURL(`http://www.admb-project.org/documentation/install/admb-installation-linux`)\"" )
+		install.menu <- c( install.menu, "menuitem label=\"MacOS package installer\" function=doAction action=\"browseURL(`http://www.admb-project.org/documentation/install/admb-installation-macos-package-installer`)\"" )
+		#temp <- gsub( "@install", "", temp )
 	}
+	temp <- gsub( "@install", paste( install.menu, collapse="\n" ), temp )
 	temp = gsub("@wdf",twdf,temp)
 	
 	#create the window (from temp string)
@@ -82,25 +85,6 @@ admb <- function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 	readADopts()
 }
 
-
-#given any number of directories, return the first one that actually exists; null if nothing else is found
-#ex: .findDownloadedSoftware( "c:/fake/dir", "c:/windows", "c:/") returns "c:/windows"
-.findDownloadedSoftware <- function( ... )
-{
-	.findDownloadedSoftwareHelper <- function( name )
-	{
-		if( file.exists( name ) )
-			return( name )
-		return( NULL )
-	}
-	for( i in c( ... ) ) {
-		path <- .findDownloadedSoftwareHelper( i )
-		if( is.null( path ) == FALSE )
-			return( path )
-	}
-	return( NULL )
-}
-
 # Repopulates droplist with all prefixes in current directory
 # TODO we might want a "refresh" button on the GUI to call this
 # ideally we could have the droplist call a function *BEFORE* 
@@ -118,321 +102,6 @@ admb <- function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 {
 	dirname <- gsub("\\\\", "/", path )
 	return( unlist( lapply( strsplit( dirname, "/" ), function(x) x[length(x)] ) ) )
-}
-
-installADMB <- function()
-{
-	if( .Platform$OS.type != "windows" )
-		stop( "installADMB is only supported for windows. Please refer to User Guide for installation instructions" )
-
-	#if (!require(PBSmodelling))
-	#	stop("!!!!!Install package PBSmodelling!!!!!")
-
-	#default install location
-	download_to <- system.file(package="PBSadmb")
-	download_to <- paste( download_to, "/software", sep="" )
-
-	#default directory names to install to
-	admbdir <- c( "32" = paste( download_to, "/admb", sep="" ), "64" = paste( download_to, "/admb64", sep="" ) )
-	gccdir <- c( "32" = paste( download_to, "/mingw", sep="" ), "64" = paste( download_to, "/mingw64", sep="" ) )
-
-
-	#given: arch: "32" or "64"
-	#       val: string of path in GUI, e.g. "c:/foo/bar"
-	#       defaults: vector of default path locations, with names matching arch
-	#                 e.g. c( "32" = "c:/foo/bar", "64" = "c:/foo/bar64" )
-	# returns: corrected value for GUI (e.g. updates the path from c:/otherfoo/bar to c:/otherfoo/bar64 when moving to arch=64)
-	.fixLastDirName <- function( arch, val, defaults )
-	{
-		#get last dir name of all paths
-		default.d <- .getDirName( defaults )
-		d <- .getDirName( val )
-
-		if( any( d == default.d ) ) {
-			val <- gsub("\\\\", "/", val )
-			val <- unlist( strsplit( val, "/" ) )
-			val[ length( val ) ] <- default.d[ arch ]
-			val <- paste( val, collapse = "/" )
-		}
-		return( val )
-	}
-
-	#called when software to install is toggled
-	checkSoft <- function()
-	{
-		getWinVal(scope="L")
-		
-		state <- ifelse( c(admb=chkadmb, gcc=chkgcc), "normal", "disabled" )
-		setWidgetState( "admbdir", state["admb"] )
-		setWidgetState( "admbdirbutton", state["admb"] )
-		setWidgetState( "gccdir", state["gcc"] )
-		setWidgetState( "gccdirbutton", state["gcc"] )
-
-		#disable install button if nothing is selected
-		setWidgetState( "installbutton", ifelse( all( state == "disabled" ), "disabled", "normal" ) )
-	}
-
-	#called when arch is changed
-	changeArch <- function()
-	{
-		vals <- getWinVal()
-		arch <- vals[["arch"]]
-
-		setWinVal( list( 
-			admbdir = .fixLastDirName( arch, vals[["admbdir"]], admbdir ),
-			gccdir = .fixLastDirName( arch, vals[["gccdir"]], gccdir )
-		) )
-		
-	}
-	changeDir <- function()
-	{
-		vals <- getWinVal()
-		arch <- vals[["arch"]]
-		act <- getWinAct()[1]
-		old <- vals[[ act ]]
-
-		d <- choose.dir( old )
-		
-		if( !is.na( d ) ) {
-			tmp <- list()
-			tmp[[ act ]] <- d
-			setWinVal( tmp )
-		}
-	}
-	install <- function()
-	{
-		.get.url <- function( fname )
-		{
-			#ensure the url ends with /
-			base.url <- "http://pbs-admb.googlecode.com/svn/files/Downloads/"
-			#base.url <- "http://pbs-admb.googlecode.com/files/"
-			#base.url <- "C:\\Users\\alex\\Documents\\stuff\\projects\\dfo\\pbsadmb\\admb_binary\\"
-			return( paste( base.url, fname, sep="" ) )
-		}
-	
-		#load list of software from google code
-		software <- read.table( .get.url( "versions.txt" ), header=TRUE, stringsAsFactors=FALSE )
-		software$url <- .get.url( software$filename )
-
-		#software should be a data.frame with columns: software, filename, hash, and url (added after reading)
-		#example:
-		#   software                           filename                                     hash  |  url (added after reading)
-		#1 ADMBgcc32 admb-10.0-mingw-gcc4.5.0-32bit.zip bb4b13634aba91625e627e5950870d482568110f  |  http://.../admb-10.0-mingw-gcc4.5.0-32bit.zip
-		#2 ADMBgcc64 admb-10.0-mingw-gcc4.5.2-64bit.zip db334b21f393fb397f81a17eecba02c5345fe223  |  http://.../admb-10.0-mingw-gcc4.5.2-64bit.zip
-		#3     gcc32                         gcc450.zip 8a210c2136a5075389a368b558ada0eebe164642  |  http://.../gcc450.zip
-		#4     gcc64                   gcc452-64bit.zip 231e56d8f82ef54bfd5b2d7257e42fd429977d5b  |  http://.../gcc452-64bit.zip
-
-		#When a new version of ADMB is to be added:
-		#1) make sure there is a version.txt file included in the installation zip which indicates the version of ADMB (or gcc) on a single line
-		#2) upload it to google
-		#3) modify the versions.txt file on google, updating the filename and hash field of the updated software (note: the sha1 hash can be obtained on google's download info page)
-		#4) test that it works
-
-		#give: software: table defined above
-		#	name: software name: "gcc", or "ADMBgcc"
-		#	arch: "32" or "64"
-		#returns: a row of the software table, or NULL if not found
-		.getSoftwareRow <- function( software, name, arch )
-		{
-			name <- paste( name, arch, sep="" )
-			x <- software[ software$software == name, ]
-			if( nrow( x ) == 0 )
-				return( NULL )
-			return( x )
-		}
-
-		getWinVal( scope="L" )
-
-		#keep track of installation files in this file
-		fname = paste( system.file(package="PBSadmb"), "/ADopts.txt", sep="" )
-		pkgOptions <- new( "PBSoptions", filename = fname, initial.options = list(admbpath="", gccpath=""), gui.prefix="" )
-
-		previous.settings.ok <- checkADopts(check=c("admbpath","gccpath"), warn=FALSE)
-
-		#each row is a software component the user can install, with GUI options
-		#eval(parse(text= "software.to.install <<- data.frame(
-		software.to.install <- data.frame(
-			selected = c( chkadmb, chkgcc ),
-			dir = c( admbdir, gccdir ),
-			name = c( "ADMBgcc", "gcc" ),
-			option.name = c( "admbpath", "gccpath" ),
-			ok = c( FALSE, FALSE ),
-			stringsAsFactors=FALSE
-			)
-		atput(software.to.install)
-		
-		#only select the selected software components
-		software.to.install <- software.to.install[ software.to.install$selected, ]
-		
-		install.ok <- TRUE
-
-		#iterate each row of software.to.install data.frame
-		if( nrow( software.to.install ) ) {
-			for( i in 1:nrow( software.to.install ) ) {
-				to.install <- software.to.install[ i, ]
-
-				#install ok flag
-				ok <- FALSE
-
-				version.fname = paste( to.install$dir, "/version.txt", sep="" )
-				if( file.exists( version.fname ) ) {
-					#should be two lines: line 1) version number, 2) name of zip file used to install this
-					version.info <- readLines( version.fname, warn=FALSE )[1]
-					if( getYes( paste( "You already have version", version.info, "installed in", to.install$dir, "\nDo you want to overwrite?" ) ) ) {
-						#remove installed files
-						zip.fname <- paste( to.install$dir, "/", .getDirName( to.install$dir ), ".zip", sep="" )
-						cat( paste( "Deleting old ", to.install$name, " files in ", to.install$dir, ".\n", sep="" ) )
-						ok <- .deleteExtractedZipFiles( zip.fname )
-						cat( paste( "cleanup done.\n", sep="" ) )
-						if( ok == FALSE )
-							showAlert( paste( "Unable to uninstall previous version of ", to.install$name, ".\n\nThe zip file \"", zip.fname, "\" is missing and is required for building the list of previously installed files to delete.\n\nTry manually deleting the contents of the directory: \"", to.install$dir, "\"", sep="" ) )
-					}
-				}
-				if( !file.exists( version.fname ) ) {
-					x <- .getSoftwareRow( software, to.install$name, arch )
-					if( !is.null( x ) ) {
-						#install gcc to gccdir
-						ok <- .installADMB.windows( x$url, to.install$dir, x$hash )
-						software.to.install[i,"ok"] <- ok
-					}
-					if( ok == TRUE ) {
-						#save the option: key: option.name, val: dir. e.g. gccpath = gccdir, or admbpath = admbdir
-						tmp <- list( atcall(.PBSadmb) )
-						tmp[[ to.install$option.name ]] <- to.install$dir
-						do.call( setOptions, tmp )
-					} else {
-						showAlert( paste( "Failed to install", to.install$name, "- see R console for details" ) )
-					}
-					install.ok <- install.ok && ok
-				} else {
-					#user hit no
-					chkgcc <- FALSE
-				}
-			}
-		}
-
-		if( install.ok == FALSE ) {
-			cat( "\n\n-------------------------------------------\n" )
-			cat( "Installation Failed" )
-			cat( "\n-------------------------------------------\n\n" )
-			return( FALSE )
-		}
-
-		
-		#save locations where files were installed (and previous settings were incorrect)
-		new.settings.ok <- checkADopts(check=c("admbpath","gccpath"), warn=FALSE)
-		if( previous.settings.ok == FALSE && new.settings.ok == TRUE ) {
-			writeADopts()
-		}
-		cat( "\n\n-------------------------------------------\n" )
-		cat( "Installation complete" )
-		cat( "\n-------------------------------------------\n\n" )
-
-		closeWin("PBSadmbInst")
-
-		#update GUI with new values
-		if( chkadmb ) setWinVal(list(admbpath=admbdir),winName="PBSadmb")
-		if(  chkgcc ) setWinVal(list(gccpath=gccdir), winName="PBSadmb")
-		.win.makeADopts()
-	}
-	create <- function()
-	{
-		win <- system.file("win/installWin.txt", package="PBSadmb")
-		createWin( win, env = parent.env( environment() ) )
-	}
-	
-	#create the window
-	create()
-
-	#set default values
-	arch <- ifelse( .Platform$r_arch == "x64", "64", "32" ) 
-	setWinVal( list( 
-		arch = arch,
-		admbdir = admbdir[ arch ],
-		gccdir = gccdir[ arch ] ) )
-}
-
-
-#usage: .installADMB.windows( gcc = "http://some.url/to.download.zip" )
-# will be downloaded to gcc.zip, and extract to a directory under PBSadmb\gcc\...
-# any number of programs can be downloaded and unzipped this way
-#hash: sha1 hash of file to download (can be viewed on google-code), if missing, no checks are performed
-.installADMB.windows <- function( url, install.path, hash = NULL )
-{
-	#use.digest <- require( digest, quietly = TRUE )
-	use.digest = FALSE
-	if( use.digest == FALSE ) hash <- NULL
-	
-	cat( "\n\n-------------------------------------------\n" )
-	oldwd <- getwd()
-	if( file.exists( install.path ) == FALSE ) {
-		dir.create( install.path, recursive = TRUE )
-		cat( paste( "creating directory:", install.path, "\n" ) )
-	}
-	setwd( install.path )
-
-	name <- .getDirName( install.path )
-	save_to <- paste( name, ".zip", sep="" )
-	cat( paste( "preparing to download:\n" ) )
-	cat( paste( "  URL:", url, "\n" ) )
-	cat( paste( "  Saving to:", install.path, "/", save_to, "\n", sep="" ) )
-	if( file.exists( url ) )
-		file.copy( url, save_to, overwrite = TRUE )
-	else
-		download.file( url, save_to )
-
-	#check hash
-	if( !is.null( hash ) ) {
-		file.hash <- digest( save_to, "sha1", file = TRUE )
-		if( file.hash != hash ) {
-			cat( "!!!!!!!!!!!! File hashes do not match !!!!!!!!!!!!!!\n" )
-			cat( paste( "expected:  ", hash, "\n" ) )
-			cat( paste( "calculated:", file.hash, "\n" ) )
-			return( FALSE )
-		}	
-		cat( paste( "calculated file hash matches:", file.hash, "\n" ) )
-	}
-
-	cat( "Download complete.\nAttempting to unzip files\n" )
-	unzip( save_to, exdir="." )
-	cat( "Unzip complete.\n\n" )
-	cat( paste( name, " has been installed to: ", install.path, "\n", sep="" ) )
-	cat( "-------------------------------------------\n\n" )
-
-	setwd( oldwd )
-	return( TRUE )
-}
-
-.deleteExtractedZipFiles <- function( zip.fname )
-{
-	if( !file.exists( zip.fname ) ) {
-		return( FALSE )
-	}
-	#eval(parse(text="files <<- as.character( unzip( zip.fname, list=TRUE )$Name )"))
-	#directories have a trailing /, which causes file.info to report NA for isdir
-	#eval(parse(text="files <<- gsub( \"/$\", \"\", files )"))
-	#eval(parse(text="files <<- paste( dirname( zip.fname ), files, sep=\"/\" )"))
-	#eval(parse(text="isdir <<- file.info( files )[,\"isdir\"]"))
-
-	files <- as.character( unzip( zip.fname, list=TRUE )$Name )
-	#directories have a trailing /, which causes file.info to report NA for isdir
-	files <- gsub( "/$", "", files )
-	files <- paste( dirname( zip.fname ), files, sep="/" )
-	atput(files)
-	isdir <- file.info( files )[,"isdir"]
-	atput(isdir)
-
-	#delete all files
-	lapply( files[ !isdir ], unlink )
-
-	#delete all directories, sorted from most nested dir, to least nested dir (to delete a child before the parent)
-	#To be safe, don't delete a dir unless it is empty (unlink fails to delete a dir with recursive=FALSE)
-	lapply( rev( sort( files[ isdir ] ) ), 
-		function(f) {
-			if( length( dir(f) ) == 0 ) { unlink(f,recursive = TRUE) }
-		}
-	)
-	return( TRUE )
 }
 
 

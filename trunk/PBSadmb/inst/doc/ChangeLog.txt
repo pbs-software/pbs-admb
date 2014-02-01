@@ -4,6 +4,10 @@ Authors:  JTS = Jon T. Schnute
           RH  = Rowan Haigh
           ACB = Alex Couture-Beil
 -----------------------------------
+0.68  2013-01-31
+  - Replaced Install build with pointers to ADMB.org's web pages for Windows, Linux and MacOS. (RH 1/31)
+  - Updated manuals with those from ADMB. (RH 1/31)
+
 0.67  2013-12-19
   - Changed function `checkADopts` to check for presence of `sed(.exe)` and to provide a warning if not found. (RH 12/19)
   - Changed code to require that `msys` directory falls directly below `mingw` directory. (RH 12/19)
