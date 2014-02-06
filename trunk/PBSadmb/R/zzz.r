@@ -12,10 +12,11 @@
 		pkg_date  <- date()
 	
 	userguide_path <- system.file( "doc/PBSadmb-UG.pdf", package = "PBSadmb" )
+	year <- substring(date(),nchar(date())-3,nchar(date()))
 	
 	packageStartupMessage("
 -----------------------------------------------------------
-PBS ADMB ", pkg_info$Version, " -- Copyright (C) 2008-2013 Fisheries and Oceans Canada
+PBS ADMB ", pkg_info$Version, " -- Copyright (C) 2008-",year," Fisheries and Oceans Canada
 
 A complete user guide 'PBSadmb-UG.pdf' is located at 
 ", userguide_path, "

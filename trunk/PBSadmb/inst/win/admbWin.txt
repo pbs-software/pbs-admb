@@ -1,7 +1,12 @@
 window name=PBSadmb title="PBS ADMB" #onclose=
 
 #------------------------------------ MENU -------------------------------------
-@install  # install menu is tailor-made by function `admb` depending on OS.
+# @install  # install menu is tailor-made by function `admb` depending on OS. # Instead: all OS users see all OS intall instruction
+menu nitems=3 label=Install
+	menuitem label="ADMB Tools for Windows" function=doAction action="browseURL(`http://www.admb-project.org/tools/admb-tools-for-windows`)"
+	menuitem label="ADMB Installation Linux" function=doAction action="browseURL(`http://www.admb-project.org/documentation/install/admb-installation-linux`)"
+	menuitem label="ADMB Installation Mac XCode" function=doAction action="browseURL(`http://www.admb-project.org/documentation/install/admb-installation-macos-package-installer`)"
+
 menu nitems=4 label="Edit"
 	menuitem label=TPL function=doAction action="editADfile(paste(getWinVal()$prefix,`.tpl`,sep=``))"
 	menuitem label=DAT function=doAction action="editADfile(paste(getWinVal()$prefix,`.dat`,sep=``))"

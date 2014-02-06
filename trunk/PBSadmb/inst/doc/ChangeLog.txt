@@ -4,7 +4,8 @@ Authors:  JTS = Jon T. Schnute
           RH  = Rowan Haigh
           ACB = Alex Couture-Beil
 -----------------------------------
-0.68  2013-01-31
+0.68  2014-02-06
+  - Menu Install on GUI now shows all OS users links to three OS installation instructions (Windows, Linux, MacOS). (RH 2/6)
   - Replaced Install build with pointers to ADMB.org's web pages for Windows, Linux and MacOS. (RH 1/31)
   - Updated manuals with those from ADMB. (RH 1/31)
 
