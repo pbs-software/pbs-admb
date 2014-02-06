@@ -1,4 +1,4 @@
-#admb-----------------------------------2014-01-31
+#admb-----------------------------------2014-02-06
 # Starts the primary GUI interface
 # Authors: Jon T. Schnute, Rowan Haigh, Alex Couture-Beil
 #-----------------------------------------------RH
@@ -37,17 +37,17 @@ admb <- function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 	temp <- gsub("@menuitems",paste(enew,collapse="\n\t"),temp)
 
 	#install menu (different for windows and unix)
-	if( .Platform$OS.type == "windows" ) {
-		install.menu <- "menu nitems=1 label=Install"
-		install.menu <- c( install.menu, "menuitem label=\"ADMB Tools for Windows\" function=doAction action=\"browseURL(`http://www.admb-project.org/tools/admb-tools-for-windows`)\"" )
-		#temp <- gsub( "@install", paste( install.menu, collapse="\n" ), temp )
-	} else {
-		install.menu <- "menu nitems=2 label=Install"
-		install.menu <- c( install.menu, "menuitem label=\"Linux install and build\" function=doAction action=\"browseURL(`http://www.admb-project.org/documentation/install/admb-installation-linux`)\"" )
-		install.menu <- c( install.menu, "menuitem label=\"MacOS package installer\" function=doAction action=\"browseURL(`http://www.admb-project.org/documentation/install/admb-installation-macos-package-installer`)\"" )
-		#temp <- gsub( "@install", "", temp )
-	}
-	temp <- gsub( "@install", paste( install.menu, collapse="\n" ), temp )
+	#if( .Platform$OS.type == "windows" ) {
+	#	install.menu <- "menu nitems=1 label=Install"
+	#	install.menu <- c( install.menu, "menuitem label=\"ADMB Tools for Windows\" function=doAction action=\"browseURL(`http://www.admb-project.org/tools/admb-tools-for-windows`)\"" )
+	#	#temp <- gsub( "@install", paste( install.menu, collapse="\n" ), temp )
+	#} else {
+	#	install.menu <- "menu nitems=2 label=Install"
+	#	install.menu <- c( install.menu, "menuitem label=\"Linux install and build\" function=doAction action=\"browseURL(`http://www.admb-project.org/documentation/install/admb-installation-linux`)\"" )
+	#	install.menu <- c( install.menu, "menuitem label=\"MacOS package installer\" function=doAction action=\"browseURL(`http://www.admb-project.org/documentation/install/admb-installation-macos-package-installer`)\"" )
+	#	#temp <- gsub( "@install", "", temp )
+	#}
+	#temp <- gsub( "@install", paste( install.menu, collapse="\n" ), temp )
 	temp = gsub("@wdf",twdf,temp)
 	
 	#create the window (from temp string)
@@ -270,7 +270,7 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 	#if (!exists(".ADopts",envir=.GlobalEnv)) initAD()
 	sAF=options()$stringsAsFactors; options(stringsAsFactors=FALSE)
 
-### check for sed.exe ###
+	### check for admb, mingw, and editor programs ###
 	mess=list()
 	for (i in names(opts)) {
 		if (!any(i==check))
@@ -306,43 +306,47 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 				"\n\nEither alter '.ADopts' or remove it and alter 'ADopts.txt'.\n\n",
 				"If using the ADMB GUI, alter the appropriate entry.\n\n",sep="")
 			if (isWin && popup) {
-				badmess <- paste( badmess, "You may also install ADMB directly by using the install dropdown menu.", sep="" )
+				badmess <- paste( badmess, "You may need to install ADMB; see instructions using the install dropdown menu.\n\n", sep="" )
 			}
 			if (warn) cat(badmess)
 			if (popup) showAlert(badmess,"User action required","warning") 
 		}
 	}
-	### check for sed.exe ###
-	opts.sed = c(list(msyspath=paste(opts[["gccpath"]],slash,"msys",slash,"bin",sep="")),opts[c("admbpath","gccpath")])
-	sedmess=list()
-	for (i in names(opts.sed)) {
-		if (!any(i==c(check,"msyspath")))
-			next
-		ii=ipath=opts.sed[[i]]
-		if (i=="msyspath")
-			progs = paste("sed",ifelse(isWin,".exe",""),sep="")
-		else if (i=="admbpath")
-			progs=paste("bin",slash,"sed",ifelse(isWin,".exe",""),sep="")
-		else if (i=="gccpath")
-			progs=paste("bin",slash,"sed",ifelse(isWin,".exe",""),sep="")
-		target=paste(ipath,progs,sep="/")
-		istatus=file.exists(target)
-		names(istatus)=progs
-		sedmess[[ipath]]=istatus
-	}
-	smess=unlist(sedmess)
-	names(smess)=paste(rep(names(sedmess),sapply(sedmess,length,simplify=FALSE)),
-		unlist(sapply(sedmess,names,simplify=FALSE)),sep=slash)
-	if (warn|popup) {
-		if (!any(smess)) {
-			badsedmess=paste("Exception: the program `sed",ifelse(isWin,".exe",""),"` was not found on any of these paths:\n",
-				paste(gsub(paste("sed",ifelse(isWin,".exe",""),sep=""),"",names(smess))[!smess],collapse="\n"),
-				"\n\nPlace a copy of `sed",ifelse(isWin,".exe",""),"` on any one of the paths indicated above.\n\n",sep="")
-			if (warn) cat(badsedmess)
-			if (popup) showAlert(badsedmess,"User action required","warning") 
+	### check for sed.exe when all programs above are found ###
+	if (all(vmess)) {
+		opts.sed = c(list(msyspath=paste(opts[["gccpath"]],slash,"msys",slash,"bin",sep="")),opts[c("admbpath","gccpath")])
+		sedmess=list()
+		for (i in names(opts.sed)) {
+			if (!any(i==c(check,"msyspath")))
+				next
+			ii=ipath=opts.sed[[i]]
+			if (i=="msyspath")
+				progs = paste("sed",ifelse(isWin,".exe",""),sep="")
+			else if (i=="admbpath")
+				progs=paste("bin",slash,"sed",ifelse(isWin,".exe",""),sep="")
+			else if (i=="gccpath")
+				progs=paste("bin",slash,"sed",ifelse(isWin,".exe",""),sep="")
+			target=paste(ipath,progs,sep="/")
+			istatus=file.exists(target)
+			names(istatus)=progs
+			sedmess[[ipath]]=istatus
+		}
+		smess=unlist(sedmess)
+		names(smess)=paste(rep(names(sedmess),sapply(sedmess,length,simplify=FALSE)),
+			unlist(sapply(sedmess,names,simplify=FALSE)),sep=slash)
+		if (warn|popup) {
+			if (any(smess)) {
+				if(warn) cat(paste("'sed",ifelse(isWin,".exe'",",")," program found\n\n",sep="")) }
+			else {
+			#if (!any(smess)) {
+				badsedmess=paste("Exception: the program `sed",ifelse(isWin,".exe",""),"` was not found on any of these paths:\n",
+					paste(gsub(paste("sed",ifelse(isWin,".exe",""),sep=""),"",names(smess))[!smess],collapse="\n"),
+					"\n\nPlace a copy of `sed",ifelse(isWin,".exe",""),"` on any one of the paths indicated above.\n\n",sep="")
+				if (warn) cat(badsedmess)
+				if (popup) showAlert(badsedmess,"User action required","warning") 
+			}
 		}
 	}
-#browser();return()
 	options(stringsAsFactors=sAF)
 	invisible(ADstatus)
 }
@@ -446,7 +450,7 @@ appendLog <- function(prefix, lines)
 	Sys.setenv( ADMB_HOME = gsub("/*$","",gsub("\\\\*$","",normalizePath(admb_home,dir_sep)) ) ) #ensure no trailing slash (`/') or (`\\') exists
 }
 
-#convAD---------------------------------2009-08-12
+#convAD---------------------------------2014-02-03
 # Conver TPL file to CPP code.
 #-------------------------------------------JTS/RH
 convAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
@@ -454,6 +458,7 @@ convAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 	#get path and name of program
 	ext <- ifelse( .Platform$OS.type == "windows", ".exe", "" )
 	prog <- ifelse( raneff == TRUE, "tpl2rem", "tpl2cpp" )
+	prog <- paste(prog,ext,sep="")
 
 	#add cmd flags
 	flags <- c()
@@ -482,10 +487,11 @@ convAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 
 	#run cmd
 	tplout <- .callSys(cmd)
+	tplout2 <- c(cmd,tplout)
 
 	#post cmd run
 	if (logfile) {
-		tplout2 <- c(cmd,tplout)
+		#tplout2 <- c(cmd,tplout)
 		appendLog(prefix, tplout2)
 	}
 	if (verbose)
@@ -510,7 +516,7 @@ convAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 		cat("\n> ")
 	invisible(Ttime) }
 
-#compAD---------------------------------2013-12-17
+#compAD---------------------------------2014-02-03
 # Apparently "raneff" doesn't influence the compile stage,
 # but the argument is preserved here for future development.
 #-------------------------------------------JTS/RH
@@ -555,10 +561,11 @@ compAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 
 	#run cmd
 	out <- .callSys(cmd)
+	out2 <- c(cmd,out)
 
 	#post cmd run
 	if (logfile) {
-		out2 <- c(cmd,out)
+		#out2 <- c(cmd,out)
 		appendLog(prefix, out2)
 	}
 	if (verbose)
@@ -580,7 +587,7 @@ compAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 	invisible(Ttime)
 }
 
-#linkAD---------------------------------2013-12-17
+#linkAD---------------------------------2014-02-03
 # Links binaries into executable
 #-------------------------------------------JTS/RH
 linkAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
@@ -624,10 +631,11 @@ linkAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 
 	#run cmd
 	out <- .callSys(cmd)
+	out2 <- c(cmd,out)
 
 	#post cmd run
 	if (logfile) {
-		out2 <- c(cmd,out)
+		#out2 <- c(cmd,out)
 		appendLog(prefix, out2)
 	}
 	if (verbose)
