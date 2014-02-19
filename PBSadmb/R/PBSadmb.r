@@ -1231,15 +1231,6 @@ cleanAD <- function(prefix=NULL) {
 #              UTILITY FUNCTIONS                  
 #=================================================
 
-.addQuotes=function(str){
-	return(paste("\"",str,"\"",sep=""))
-}
-
-.asIs=function(x) {
-	if (is.numeric(x)) x=format(x,scientific=FALSE)
-	return(x)
-}
-
 #atget----------------------------------2013-03-25
 # Provide PBSadmb wrappers for PBSmodelling 
 #  functions tget/tcall/tprint/tput/lisp
@@ -1250,6 +1241,99 @@ atprint = function(...) {tprint(..., penv=parent.frame(), tenv=.PBSadmbEnv)}
 atput   = function(...) {tput  (..., penv=parent.frame(), tenv=.PBSadmbEnv)}
 alisp   = function(...) {lisp  (..., pos =.PBSadmbEnv)}
 
+
+#suggestPath----------------------------2014-02-19
+# Suggesta path for a specified proram from PATH
+#-----------------------------------------------RH
+suggestPath <- function(progs, ipath=NULL, file_ext=NULL)  # initial path if user knows
+{
+	isWin = .Platform$OS.type=="windows" #; isWin=FALSE
+	path_sep = .Platform$path.sep
+	file_sep = ifelse(isWin, "\\", "/" )
+	if (is.null(file_ext))
+		file_ext = ifelse(isWin, ".exe", "" )
+	sys_path=Sys.getenv( "PATH" )
+	paths = strsplit(sys_path,path_sep)[[1]]
+
+	status = logical()
+	pathos = list()
+	for (aprog in progs) {
+		aprog = paste(aprog,file_ext,sep="")
+		inprog = sapply(c(ipath,paths),function(x){file.exists(paste(x,aprog,sep=file_sep))})
+		pathos[[aprog]] = inprog
+		if (!any(inprog)) {
+			target  = "" 
+			astatus = FALSE
+		} else {
+			target = names(inprog)[inprog][1]
+			astatus = TRUE
+		}
+		names(astatus) = target
+		status = c(status,astatus)
+	}
+	attr(status,"pathos") = pathos
+	return(status)
+}
+.win.suggestPath=function(winName="PBSadmb")
+{
+	getWinVal(scope="L",winName=winName)
+	isWin = .Platform$OS.type=="windows" #; isWin=FALSE
+	file_sep = ifelse(isWin, "\\", "/" )
+	file_ext = ifelse(isWin, ".exe", "" )
+	suggestions = list()
+	nPath =function(x){
+		if (is.null(admbpath) || admbpath=="") return("")
+		else gsub("(\\\\|/)$", "", normalizePath(x)) 
+	}
+
+	admb_sugg = suggestPath("tpl2cpp",paste(nPath(admbpath),"bin",sep=file_sep))
+	if (admb_sugg)
+		suggestions[["admbpath"]] = gsub(paste(file_sep,"bin",sep=ifelse(isWin,file_sep,"")),"",names(admb_sugg))
+	else
+		suggestions[["admbver"]] = ""
+
+	gcc_sugg = suggestPath("g++",paste(nPath(gccpath),"bin",sep=file_sep))
+	if (gcc_sugg)
+		suggestions[["gccpath"]] = gsub(paste(file_sep,"bin",sep=ifelse(isWin,file_sep,"")),"",names(gcc_sugg))
+	else
+		suggestions[["gccver"]] = ""
+
+	if (isWin) editors = c("Uedit32","notepad++","cedt","runemacs","notepad")
+	else       editors = c("gedit","Vim","vi")
+	edit_sugg = FALSE
+	### what if user specifies an editor with some weird extension (e.g., non.sense.old, fake_emacs)
+	if (!is.null(editor) && editor!="") {
+		path_editor = dirname(editor)
+		user_editor = basename(editor)
+		edpcs = strsplit(user_editor,"\\.")[[1]]
+		if (length(edpcs)==1) user_ext = ""
+		else {
+			user_ext = paste(".",rev(edpcs)[1],sep="")
+			user_editor = paste(rev(rev(edpcs)[-1]),collapse=".")
+		}
+		edit_sugg = suggestPath(user_editor,nPath(path_editor),file_ext=user_ext)
+	}
+	if (edit_sugg)
+		suggestions[["editor"]] = paste(names(edit_sugg)[edit_sugg][1],file_sep,user_editor,user_ext,sep="")
+	else {
+		edit_sugg = suggestPath(editors,nPath(editor))
+		if (any(edit_sugg))
+			suggestions[["editor"]] = paste(names(edit_sugg)[edit_sugg][1],file_sep,editors[edit_sugg][1],file_ext,sep="")
+	}
+#browser();return()
+	if (length(suggestions)>0)
+		setWinVal(suggestions,winName=winName)
+}
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~suggestPath
+
+.addQuotes=function(str){
+	return(paste("\"",str,"\"",sep=""))
+}
+
+.asIs=function(x) {
+	if (is.numeric(x)) x=format(x,scientific=FALSE)
+	return(x)
+}
 
 .callSys <- function(..., wait=TRUE) { # note dots is not interpreted as expected, uses only first in list
 	dots=list(...)

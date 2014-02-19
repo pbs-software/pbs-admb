@@ -5,6 +5,8 @@ Authors:  JTS = Jon T. Schnute
           ACB = Alex Couture-Beil
 -----------------------------------
 0.68  2014-02-19
+  - Added function `suggestPath` to provide suggestions for `admbpath`, `gccpath`, and `editor` from the system's PATH environment. (RH 2/19)
+  - Added new button `suggest` to the GUI's first notebook tab. (RH 2/19)
   - Re-arranged order of functions in `PBSadmb.r` source file. (RH 2/19)
   - Altered code so that Unix systems don't ckeck for msys (unix) tools; some GUI labels altered. (RH 2/18)
   - Menu Install on GUI now shows all OS users links to three OS installation instructions (Windows, Linux, MacOS). (RH 2/6)
