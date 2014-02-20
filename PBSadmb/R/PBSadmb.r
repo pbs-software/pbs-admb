@@ -782,7 +782,8 @@ copyFiles=function(prefix,suffix=NULL,srcdir=getwd(),dstdir=getwd(),ask=TRUE){
 #-------------------------------------------JTS/RH
 editADfile <- function(fname)
 {
-	if (!checkADopts(warn=FALSE)) {cat("Invalid options for PBSadmb\n"); stop()}
+	if (!attributes(checkADopts(warn=FALSE))$status[[3]]) {cat("Valid editor not verified in Setup tab\n"); stop()}
+	#if (!checkADopts(warn=FALSE)) {cat("Invalid options for PBSadmb\n"); stop()}
 	#f.edit <- paste("start \"\"",.addQuotes(convSlashes(.ADopts$editor)),.addQuotes(convSlashes(fname)),sep=" ");
 	if (.Platform$OS.type=="windows") {
 		f.edit <- paste(shQuote(getOptions(atcall(.PBSadmb),"editor")),shQuote(fname),sep=" ")
@@ -1243,9 +1244,14 @@ alisp   = function(...) {lisp  (..., pos =.PBSadmbEnv)}
 
 
 #suggestPath----------------------------2014-02-19
-# Suggesta path for a specified proram from PATH
+# Suggesta path for a specified program from PATH
+# Arguments:
+#  progs = vector of program names (without extension)
+#  ipath = initial path by user to try before PATh directories
+#  file_ext = alternative program extension if other
+#    than `.exe` (primarily for Windows users)
 #-----------------------------------------------RH
-suggestPath <- function(progs, ipath=NULL, file_ext=NULL)  # initial path if user knows
+suggestPath <- function(progs, ipath=NULL, file_ext=NULL)
 {
 	isWin = .Platform$OS.type=="windows" #; isWin=FALSE
 	path_sep = .Platform$path.sep
@@ -1274,6 +1280,9 @@ suggestPath <- function(progs, ipath=NULL, file_ext=NULL)  # initial path if use
 	attr(status,"pathos") = pathos
 	return(status)
 }
+#.win.suggestPath-----------------------2014-02-20
+# Function called by GUI to suggest paths for setup.
+#-----------------------------------------------RH
 .win.suggestPath=function(winName="PBSadmb")
 {
 	getWinVal(scope="L",winName=winName)
@@ -1282,17 +1291,25 @@ suggestPath <- function(progs, ipath=NULL, file_ext=NULL)  # initial path if use
 	file_ext = ifelse(isWin, ".exe", "" )
 	suggestions = list()
 	nPath =function(x){
-		if (is.null(admbpath) || admbpath=="") return("")
-		else gsub("(\\\\|/)$", "", normalizePath(x)) 
+		if (is.null(x) || x=="") return(NULL)
+		else gsub("(\\\\|/)$", "", normalizePath(x,mustWork=FALSE)) 
+	}
+	if (isWin) {
+		admbpath.default = "C:\\admb"
+		gccpath.default  = "C:\\mingw"
+	} else {
+		admbpath.default = "/usr/local/admb"
+		gccpath.default  = "/usr"
 	}
 
-	admb_sugg = suggestPath("tpl2cpp",paste(nPath(admbpath),"bin",sep=file_sep))
+	admb_sugg = suggestPath("tpl2cpp",paste(c(nPath(admbpath),admbpath.default),"bin",sep=file_sep))
 	if (admb_sugg)
 		suggestions[["admbpath"]] = gsub(paste(file_sep,"bin",sep=ifelse(isWin,file_sep,"")),"",names(admb_sugg))
 	else
 		suggestions[["admbver"]] = ""
+#browser();return()
 
-	gcc_sugg = suggestPath("g++",paste(nPath(gccpath),"bin",sep=file_sep))
+	gcc_sugg = suggestPath("g++",paste(c(nPath(gccpath),gccpath.default),"bin",sep=file_sep))
 	if (gcc_sugg)
 		suggestions[["gccpath"]] = gsub(paste(file_sep,"bin",sep=ifelse(isWin,file_sep,"")),"",names(gcc_sugg))
 	else

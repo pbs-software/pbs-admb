@@ -4,7 +4,8 @@ Authors:  JTS = Jon T. Schnute
           RH  = Rowan Haigh
           ACB = Alex Couture-Beil
 -----------------------------------
-0.68  2014-02-19
+0.68  2014-02-20
+  - Modified function `.win.suggestPath` to try default directories for `admbpath` and `gccpath` (after user-specified directories and before PATH directories). (RH 2/20)
   - Added function `suggestPath` to provide suggestions for `admbpath`, `gccpath`, and `editor` from the system's PATH environment. (RH 2/19)
   - Added new button `suggest` to the GUI's first notebook tab. (RH 2/19)
   - Re-arranged order of functions in `PBSadmb.r` source file. (RH 2/19)
