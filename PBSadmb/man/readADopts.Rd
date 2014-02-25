@@ -20,6 +20,6 @@ readADopts(optfile="ADopts.txt")
 \note{
   A wrapper function that can be called from a GUI exists as \code{.win.readADopts}.
 }
-\seealso{ \code{\link{makeADopts}},\code{\link{writeADopts}} }
+\seealso{ \code{\link{makeADopts}},\code{\link{writeADopts}}, \code{\link[PBSadmb]{readADpaths}} }
 \keyword{ data }
 \keyword{ list }

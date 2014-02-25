@@ -7,7 +7,7 @@
 }
 \usage{
 makeAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, 
-       logfile=TRUE, add=TRUE, verbose=TRUE)
+   logfile=TRUE, add=TRUE, verbose=TRUE, pathfile=NULL)
 }
 \arguments{
   \item{prefix}{string name prefix of the ADMB project (e.g., \code{"vonb"}).}
@@ -19,6 +19,7 @@ makeAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE,
   \item{logfile}{logical: if \code{TRUE}, create a log file of the messages from the shell call.}
   \item{add}{logical: if \code{TRUE}, append shell call messages to an exsiting log file.}
   \item{verbose}{logical: if \code{TRUE}, report the shell call an its messages to the R console.}
+  \item{pathfile}{string name of simple 2-column text file that details the relevant paths -- admbpath, gccpath, editor.}
 }
 \details{
   This function uses the C++ comiler declared in \code{.ADopts}. If \code{logfile=TRUE},
@@ -29,10 +30,19 @@ makeAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE,
   Returns nothing. The three functions called by \code{makeAD} each 
   return the shell call and its messages.
 }
-\author{ Jon T. Schnute, Pacific Biological Station, Nanaimo BC, Canada }
+\author{ Jon T. Schnute, Pacific Biological Station, Fisheries and Oceans Canada, Nanaimo BC. }
 \note{
   A wrapper function that can be called from a GUI exists as \code{.win.makeAD}.
+
+  The optional \code{pathfile} is offered for use in command (non-GUI) functions. 
+  Users can easily create this file in a text editor.
+  Note that on UNIX systems, only the \code{admbpath} (actually the path to ADMB's home directory)
+  and text editor are used because the MinGW compiler (\code{gccpath}) and UNIX tools are already recognised.
 }
-\seealso{ \code{\link{convAD}}, \code{\link{compAD}}, \code{\link{linkAD}}, \code{\link{cleanAD}} }
+\seealso{
+  \code{\link[PBSadmb]{convAD}}, \code{\link[PBSadmb]{compAD}},
+  \code{\link[PBSadmb]{linkAD}}, \code{\link[PBSadmb]{runAD}},
+  \code{\link[PBSadmb]{readADpaths}}
+}
 \keyword{programming}
 \keyword{interface}
