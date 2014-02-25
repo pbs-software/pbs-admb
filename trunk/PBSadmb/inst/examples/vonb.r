@@ -1,10 +1,12 @@
 # Sample R code for "PBSadmb" with the example "vonb.tpl"
 
 # Before sourcing this file, have a valid file "ADopts.txt" in the 
-# current working directory.
+# current working directory or a 2-column text file of paths
+# (e.g. "ADpaths.txt", but user can specify any name).
 
 # Load R packages; ignore the GUI for now.
-require(PBSmodelling); require(PBSadmb); readADopts("Adopts.txt")
+require(PBSmodelling); require(PBSadmb)
+readADopts("Adopts.txt"); readADpaths("ADpaths.txt")
 
 # Make and run "vonb.exe"
 makeAD("vonb"); runAD("vonb");

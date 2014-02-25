@@ -69,10 +69,10 @@ admb <- function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 #              ADMB FUNCTIONS                     
 #=================================================
 
-#convAD---------------------------------2014-02-03
+#convAD---------------------------------2014-02-25
 # Conver TPL file to CPP code.
 #-------------------------------------------JTS/RH
-convAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
+convAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE, pathfile=NULL)
 {
 	#get path and name of program
 	ext <- ifelse( .Platform$OS.type == "windows", ".exe", "" )
@@ -96,7 +96,7 @@ convAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 
 	#add ADMB path to path env variable
 	old_path <- Sys.getenv( "PATH" )
-	.setPath()
+	.setPath(pathfile)
 
 	#pre cmd run
 	if (logfile & !add)
@@ -136,11 +136,11 @@ convAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 	invisible(Ttime)
 }
 
-#compAD---------------------------------2014-02-03
+#compAD---------------------------------2014-02-25
 # Apparently "raneff" doesn't influence the compile stage,
 # but the argument is preserved here for future development.
 #-------------------------------------------JTS/RH
-compAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
+compAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE, pathfile=NULL)
 {
 	#get path and name of program
 	admbpath = getOptions(atcall(.PBSadmb),"admbpath")
@@ -149,6 +149,8 @@ compAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 	prog <- paste( "adcomp", ext, sep="" )
 
 	#add cmd flags
+	if (is.null(getOptions(atcall(.PBSadmb),"admbver")))
+		setADMBVer(gccver = NULL) # only get ADMB version
 	admbvernum = .version(getOptions(atcall(.PBSadmb),"admbver"))
 	flags <- c()
 	if( dll )
@@ -171,7 +173,7 @@ compAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 
 	#add ADMB path to path env variable
 	old_path <- Sys.getenv( "PATH" )
-	.setPath()
+	.setPath(pathfile)
 
 	#pre cmd run
 	if (logfile & !add)
@@ -207,10 +209,10 @@ compAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 	invisible(Ttime)
 }
 
-#linkAD---------------------------------2014-02-03
+#linkAD---------------------------------2014-02-25
 # Links binaries into executable
 #-------------------------------------------JTS/RH
-linkAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
+linkAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE, pathfile=NULL)
 {
 	#get path and name of program
 	admbpath = getOptions(atcall(.PBSadmb),"admbpath")
@@ -219,6 +221,8 @@ linkAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 	prog <- paste( "adlink", ext, sep="" )
 
 	#add cmd flags
+	if (is.null(getOptions(atcall(.PBSadmb),"admbver")))
+		setADMBVer(gccver = NULL) # only get ADMB version
 	admbvernum = .version(getOptions(atcall(.PBSadmb),"admbver"))
 	flags <- c()
 	if( dll )
@@ -241,7 +245,7 @@ linkAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 
 	#add ADMB path to path env variable
 	old_path <- Sys.getenv( "PATH" )
-	.setPath()
+	.setPath(pathfile)
 
 	#pre cmd run
 	if (logfile & !add)
@@ -277,14 +281,14 @@ linkAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 	invisible(Ttime)
 }
 
-#makeAD---------------------------------2009-08-12
+#makeAD---------------------------------2014-02-25
 # Convert TPL file to CPP code.
 # Compile CPP to object files.
 # Links binaries into executable.
 #-------------------------------------------JTS/RH
-makeAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE)
+makeAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logfile=TRUE, add=TRUE, verbose=TRUE, pathfile=NULL)
 {
-	convAD(prefix, raneff, safe, dll, debug, logfile, add, verbose)
+	convAD(prefix, raneff, safe, dll, debug, logfile, add, verbose, pathfile) # first call using pathfile is sufficient
 	compAD(prefix, raneff, safe, dll, debug, logfile, add, verbose)
 	linkAD(prefix, raneff, safe, dll, debug, logfile, add, verbose)
 }
@@ -567,6 +571,24 @@ readADopts <- function(optfile="ADopts.txt")
 	invisible()
 }
 
+#readADpaths----------------------------2014-02-25
+# Read ADMB paths from a simple 2-column file.
+# Allows user to pass in a file easily made by hand.
+# Assumes .PBSadmb options object exists.
+#-----------------------------------------------RH
+readADpaths = function(pathfile) {
+	sAF = options()$stringsAsFactors
+	on.exit(options(stringsAsFactors=sAF))
+	if (!missing(pathfile) && !is.null(pathfile) && file.exists(pathfile)) {
+		options(stringsAsFactors=FALSE)
+		ufile = read.table(file=pathfile,header=FALSE,col.names=c("target","path"))
+		uopts = split(ufile$path,ufile$target)
+		atget(.PBSadmb)
+		setOptions(.PBSadmb,uopts)
+		atput(.PBSadmb)
+	}
+}
+
 #writeADopts----------------------------2009-08-12
 # Writes ADMB options to a file.
 #-----------------------------------------------RH
@@ -620,16 +642,21 @@ setADMBPath <- function( admbpath, gccpath, editor )
 	invisible()
 }
 
-#.setPath-------------------------------2014-02-18
+
+#.setPath-------------------------------2014-02-25
 # Set the temporary environment path to run ADMB.
 #-------------------------------------------ACB/RH
-.setPath <- function()
+.setPath <- function(pathfile)
 {
 	path_sep <- .Platform$path.sep
 	dir_sep <- ifelse( .Platform$OS.type == "windows", "\\", "/" )
+	
+	# User can specify a 2-column pathfile (no headers)
+	if (!missing(pathfile) && !is.null(pathfile) && file.exists(pathfile))
+		readADpaths(pathfile)
 
 	admb_home <- getOptions( atcall(.PBSadmb), "admbpath" )
-	admb_path <- paste( getOptions( atcall(.PBSadmb), "admbpath" ), "bin", sep = dir_sep )
+	admb_path <- paste( admb_home, "bin", sep = dir_sep )
 
 	if( .Platform$OS.type == "windows" ) {
 		gcc_path <- paste( getOptions( atcall(.PBSadmb), "gccpath"), "bin", sep = dir_sep )
@@ -666,8 +693,10 @@ setADMBVer <- function( admbver, gccver )
 	sayWhat = attributes(checkADopts())$status
 	atget(.PBSadmb)
 	opts = getOptions(.PBSadmb)
-#browser()
-	if( !missing( admbver ) && !is.element(admbver,c("")) ) 
+#browser();return()
+	if( !missing( admbver ) && is.null( admbver ) ) 
+		junk = "do nothing"
+	else if( !missing( admbver ) && !is.element(admbver,c("")) ) 
 		setOptions( .PBSadmb, admbver = admbver )
 	else {
 		if(all(sayWhat[[1]])) { # check ADMB version
@@ -676,7 +705,9 @@ setADMBVer <- function( admbver, gccver )
 			else if (is.null(getOptions(.PBSadmb,"admbver")))
 				setOptions(.PBSadmb, admbver = "10")
 	}	}
-	if( !missing( gccver ) && !is.element(gccver,c("")) )
+	if( !missing( gccver ) && is.null( gccver ) ) 
+		junk = "do nothing"
+	else if( !missing( gccver ) && !is.element(gccver,c("")) )
 		setOptions( .PBSadmb, gccver = gccver )
 	else {
 		if(all(sayWhat[[2]])) { # check g++ version
@@ -1469,7 +1500,7 @@ suggestPath <- function(progs, ipath=NULL, file_ext=NULL)
 }
 
 .version = function(x) {
-	if (is.numeric(x)) return(x)
+	if (is.null(x) || is.numeric(x)) return(x)
 	xpc = strsplit(x,split="\\.")[[1]]
 	npc = length(xpc)
 	xnu = as.numeric(paste(xpc[1:min(2,npc)],collapse="."))

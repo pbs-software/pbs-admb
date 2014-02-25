@@ -1,10 +1,12 @@
 # Sample R code for "PBSadmb" with the example "simple_pbs.tpl"
 
 # Before sourcing this file, have a valid file "ADopts.txt" in the 
-# current working directory.
+# current working directory or a 2-column text file of paths
+# (e.g. "ADpaths.txt", but user can specify any name).
 
 # Load R packages; ignore the GUI for now.
-require(PBSmodelling); require(PBSadmb);
+require(PBSmodelling); require(PBSadmb)
+readADopts("Adopts.txt"); readADpaths("ADpaths.txt")
 
 # Make and run "simple_pbs.exe"
 makeAD("simple_pbs"); runAD("simple_pbs");
