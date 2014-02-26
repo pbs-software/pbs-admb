@@ -1,3 +1,3 @@
-admbpath "C:/Apps/ADMB"
-gccpath  "C:/Apps/mingw"
-editor   "C:/Apps/UltraEdit/Uedit32.exe"
+admbpath "C:/admb"
+gccpath  "C:/mingw"
+editor   "C:/Windows/System32/notepad.exe"
