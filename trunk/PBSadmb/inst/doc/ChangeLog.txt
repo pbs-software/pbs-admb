@@ -4,7 +4,9 @@ Authors:  JTS = Jon T. Schnute
           RH  = Rowan Haigh
           ACB = Alex Couture-Beil
 -----------------------------------
-0.68  2014-02-25
+0.68  2014-02-26
+  - Added new function `setupAD` to initialize and validate the paths to admbpath, gccpath, and editor for command line functions. (JTS/RH 2/26)
+  - Modified GUI to take the new pathfile; created function `.win.readADpaths`. (RH 2/26)
   - Added new function called `readADpaths` that allows user to supply a simple, 2-column text file of paths for PBSadmb. (RH 2/25)
   - Modified function `.win.suggestPath` to try default directories for `admbpath` and `gccpath` (after user-specified directories and before PATH directories). (RH 2/20)
   - Added function `suggestPath` to provide suggestions for `admbpath`, `gccpath`, and `editor` from the system's PATH environment. (RH 2/19)

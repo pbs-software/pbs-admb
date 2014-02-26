@@ -2,13 +2,13 @@
 # Starts the primary GUI interface
 # Authors: Jon T. Schnute, Rowan Haigh, Alex Couture-Beil
 #-----------------------------------------------RH
-admb <- function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
+admb <- function(prefix="", wdf="admbWin.txt", optfile="ADopts.txt", pathfile){
 	.initOptions()
 	readADopts()
+	if (!missing(pathfile) && !is.null(pathfile) && file.exists(pathfile))
+		readADpaths(pathfile)
+	else pathfile="ADpaths.txt"
 	pkg="PBSadmb"
-	#if (!require(PBSmodelling))
-	#	stop("!!!!!Install package PBSmodelling!!!!!")
-	#require(tcltk,quietly=TRUE)
 
 	#TODO rename to something else - too similar to .PBSadmb
 	assign("PBSadmb",list(pkg=pkg,call=match.call(),args=args(admb),useCols=NULL),envir=.PBSadmbEnv)
@@ -37,6 +37,7 @@ admb <- function(prefix="",wdf="admbWin.txt",optfile="ADopts.txt"){
 	temp <- gsub("@menuitems",paste(enew,collapse="\n\t"),temp)
 
 	temp = gsub("@wdf",twdf,temp)
+	temp = gsub("@pathfile",pathfile,temp)
 	
 	#create the window (from temp string)
 	temp <- unlist( strsplit(temp, "\n" ) )
@@ -387,7 +388,7 @@ runMC <- function(prefix, nsims=2000, nthin=20, outsuff=".mc.dat",
 .initOptions <- function()
 {
 	#don't re-init
-	if( exists( ".PBSadmb", envir=.PBSadmbEnv ) ) 
+	if(exists(".PBSadmb", envir=.PBSadmbEnv) && is(atcall(.PBSadmb),"PBSoptions"))
 		return()
 	readADopts()
 }
@@ -398,15 +399,16 @@ runMC <- function(prefix, nsims=2000, nthin=20, outsuff=".mc.dat",
 checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
    check=c("admbpath","gccpath","editor"), warn=TRUE, popup=FALSE)
 {
+	sAF = options()$stringsAsFactors
+	on.exit(options(stringsAsFactors=sAF))
+	options(stringsAsFactors=FALSE)
 	isWin = .Platform$OS.type=="windows" #; isWin=FALSE
 	slash = ifelse(isWin, "\\", "/" )
-	# assume g++ is always available on Unix machines, so don't check it.
+	
+	### assume g++ is always available on Unix machines, so don't check it.
 	#if (!isWin) opts = opts[setdiff(names(opts),"gccpath")]
 
-	# Check that .ADopts has all required components and that links point to actual files on the hard drive.
-	#if (!exists(".ADopts",envir=.GlobalEnv)) initAD()
-	sAF=options()$stringsAsFactors; options(stringsAsFactors=FALSE)
-
+	### Check that .ADopts has all required components and that links point to actual files on the hard drive.
 	### check for admb, mingw, and editor programs ###
 	mess=list()
 	for (i in names(opts)) {
@@ -441,7 +443,6 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 	names(vmess)=paste(rep(names(mess),sapply(mess,length,simplify=FALSE)),
 		unlist(sapply(mess,names,simplify=FALSE)),sep=slash)
 	attr(ADstatus,"message")=vmess
-#browser();return()
 	if (warn|popup) {
 		if (all(vmess==TRUE)) {
 			if(warn) cat("All programs found\n\n") }
@@ -457,7 +458,6 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 			if (popup) showAlert(badmess,"User action required","warning") 
 		}
 	}
-#browser();return()
 	### check for sed.exe when all programs above are found ###
 	if (isWin && all(vmess)) {
 		opts.sed = c(list(msyspath=paste(opts[["gccpath"]],slash,"msys",slash,"bin",sep="")),opts[c("admbpath","gccpath")])
@@ -494,7 +494,6 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 			}
 		}
 	}
-	options(stringsAsFactors=sAF)
 	invisible(ADstatus)
 }
 .win.checkADopts=function(winName="PBSadmb")
@@ -579,14 +578,36 @@ readADopts <- function(optfile="ADopts.txt")
 readADpaths = function(pathfile) {
 	sAF = options()$stringsAsFactors
 	on.exit(options(stringsAsFactors=sAF))
+	options(stringsAsFactors=FALSE)
 	if (!missing(pathfile) && !is.null(pathfile) && file.exists(pathfile)) {
-		options(stringsAsFactors=FALSE)
 		ufile = read.table(file=pathfile,header=FALSE,col.names=c("target","path"))
 		uopts = split(ufile$path,ufile$target)
 		atget(.PBSadmb)
 		setOptions(.PBSadmb,uopts)
 		atput(.PBSadmb)
 	}
+}
+.win.readADpaths = function(winName="PBSadmb"){
+	pathfile = getWinAct()[1]
+	readADpaths(pathfile)
+	loadOptionsGUI( atcall(.PBSadmb) )
+}
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~readADpaths
+
+
+#setupAD--------------------------------2014-02-26
+# Command line initialization to read in path
+# information and check for the presence of executables:
+# admbpath -- tpl2cpp, tpl2rem
+# gccpath  -- g++
+# editor   -- e.g. notepad, but can be any valid editor.
+#-----------------------------------------------RH
+setupAD = function(pathfile){
+	if (missing(pathfile) || is.null(pathfile) || !file.exists(pathfile))
+	pathfile = "ADpaths.txt"
+	.initOptions()
+	readADpaths(pathfile)
+	checkADopts()
 }
 
 #writeADopts----------------------------2009-08-12
@@ -661,14 +682,14 @@ setADMBPath <- function( admbpath, gccpath, editor )
 	if( .Platform$OS.type == "windows" ) {
 		gcc_path <- paste( getOptions( atcall(.PBSadmb), "gccpath"), "bin", sep = dir_sep )
 		msys_path <- paste( getOptions( atcall(.PBSadmb), "gccpath"), "msys", "bin", sep = dir_sep )
-		path <- paste(normalizePath(admb_path,dir_sep), normalizePath(msys_path,dir_sep), normalizePath(gcc_path,dir_sep), sep=path_sep)
+		path <- paste(.normPath(admb_path,dir_sep), .normPath(msys_path,dir_sep), .normPath(gcc_path,dir_sep), sep=path_sep)
 	} else {
 		#linux must include original path so programs like cat, sed are found
 		sys_path <- Sys.getenv( "PATH" )
-		path <- paste(normalizePath(admb_path,dir_sep), normalizePath(sys_path,dir_sep), sep=path_sep)
+		path <- paste(.normPath(admb_path,dir_sep), .normPath(sys_path,dir_sep), sep=path_sep)
 	}
 	Sys.setenv( PATH = path )
-	Sys.setenv( ADMB_HOME = gsub("/*$","",gsub("\\\\*$","",normalizePath(admb_home,dir_sep)) ) ) #ensure no trailing slash (`/') or (`\\') exists
+	Sys.setenv( ADMB_HOME = gsub("/*$","",gsub("\\\\*$","",.normPath(admb_home,dir_sep)) ) ) #ensure no trailing slash (`/') or (`\\') exists
 }
 
 #add a dir to path variable (only if it hasn't already been set)
@@ -906,7 +927,8 @@ readRep=function(prefix, suffix=c(".cor",".rep",".std",".mc.dat"), global=FALSE)
 				break
 		}	}
 	return(fileformat) }
-	sAF=options()$stringsAsFactors
+	sAF = options()$stringsAsFactors
+	on.exit(options(stringsAsFactors=sAF))
 	options(stringsAsFactors=FALSE)
 	if (missing(prefix) || any(is.null(c(prefix,suffix))) || any(c(prefix,suffix)=="")) return()
 	flist=list()
@@ -977,7 +999,6 @@ readRep=function(prefix, suffix=c(".cor",".rep",".std",".mc.dat"), global=FALSE)
 		eval(parse(text=expr))
 	}
 	if (length(flist)==1) flist=flist[[1]] # return a single object, not a list of objects
-	options(stringsAsFactors=sAF)
 	invisible(flist)
 }
 #------------------------------------------readRep
@@ -1323,7 +1344,7 @@ suggestPath <- function(progs, ipath=NULL, file_ext=NULL)
 	suggestions = list()
 	nPath =function(x){
 		if (is.null(x) || x=="") return(NULL)
-		else gsub("(\\\\|/)$", "", normalizePath(x,mustWork=FALSE)) 
+		else gsub("(\\\\|/)$", "", .normPath(x) )
 	}
 	if (isWin) {
 		admbpath.default = "C:\\admb"
@@ -1497,6 +1518,10 @@ suggestPath <- function(progs, ipath=NULL, file_ext=NULL)
 	setWinVal( list( prefix.values = choices ) )
 	if (any(choices=="vonb")) ch1 = grep("vonb",choices) else ch1 = 1
 	setWinVal( list( prefix = choices[ ch1 ] ) )
+}
+
+.normPath = function(path, winslash="\\", mustWork=FALSE) {
+	normalizePath( path, winslash, mustWork )
 }
 
 .version = function(x) {
