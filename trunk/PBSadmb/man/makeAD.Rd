@@ -19,7 +19,8 @@ makeAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE,
   \item{logfile}{logical: if \code{TRUE}, create a log file of the messages from the shell call.}
   \item{add}{logical: if \code{TRUE}, append shell call messages to an exsiting log file.}
   \item{verbose}{logical: if \code{TRUE}, report the shell call an its messages to the R console.}
-  \item{pathfile}{string name of simple 2-column text file that details the relevant paths -- admbpath, gccpath, editor.}
+  \item{pathfile}{string name of 2-column text file that details the 
+    relevant paths for the R variables \code{admbpath}, \code{gccpath}, and \code{editor}.}
 }
 \details{
   This function uses the C++ comiler declared in \code{.ADopts}. If \code{logfile=TRUE},

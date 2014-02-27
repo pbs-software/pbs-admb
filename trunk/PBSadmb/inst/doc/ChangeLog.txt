@@ -4,7 +4,9 @@ Authors:  JTS = Jon T. Schnute
           RH  = Rowan Haigh
           ACB = Alex Couture-Beil
 -----------------------------------
-0.68  2014-02-26
+0.68  2014-02-27
+  - Added new function `saveADpaths` to save paths to a 2-column text file. (RH 2/27)
+  - Changed GUI to only recognise the `pathfile` and not the `optfile`. (RH 2/27)
   - Added new function `setupAD` to initialize and validate the paths to admbpath, gccpath, and editor for command line functions. (JTS/RH 2/26)
   - Modified GUI to take the new pathfile; created function `.win.readADpaths`. (RH 2/26)
   - Added new function called `readADpaths` that allows user to supply a simple, 2-column text file of paths for PBSadmb. (RH 2/25)

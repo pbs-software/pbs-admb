@@ -2,13 +2,14 @@
 # Starts the primary GUI interface
 # Authors: Jon T. Schnute, Rowan Haigh, Alex Couture-Beil
 #-----------------------------------------------RH
-admb <- function(prefix="", wdf="admbWin.txt", optfile="ADopts.txt", pathfile){
+admb <- function(prefix="", wdf="admbWin.txt", optfile="ADopts.txt", pathfile="ADpaths.txt"){
 	.initOptions()
-	readADopts()
-	if (!missing(pathfile) && !is.null(pathfile) && file.exists(pathfile))
+	#readADopts()
+	if (!is.null(pathfile) && file.exists(pathfile))
 		readADpaths(pathfile)
 	else pathfile="ADpaths.txt"
 	pkg="PBSadmb"
+#browser();return()
 
 	#TODO rename to something else - too similar to .PBSadmb
 	assign("PBSadmb",list(pkg=pkg,call=match.call(),args=args(admb),useCols=NULL),envir=.PBSadmbEnv)
@@ -43,7 +44,6 @@ admb <- function(prefix="", wdf="admbWin.txt", optfile="ADopts.txt", pathfile){
 	temp <- unlist( strsplit(temp, "\n" ) )
 	#createWin(twdf, TRUE)
 	writeLines(temp,con=twdf)
-#browser();return()
 	createWin(twdf)
 
 	#set some values
@@ -61,7 +61,8 @@ admb <- function(prefix="", wdf="admbWin.txt", optfile="ADopts.txt", pathfile){
 	#TODO need centralized window variable init (is it done anywhere?)
 	setWinVal( list( currentdir.values = getwd() ) )
 	setWinVal( list( currentdir = getwd() ) )
-	setWinVal( list( optfile = optfile ) )
+	#setWinVal( list( optfile = optfile ) )
+	setWinVal( list( optfile = pathfile ) )
 
 	invisible() }
 #---------------------------------------------admb
@@ -408,7 +409,7 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 	### assume g++ is always available on Unix machines, so don't check it.
 	#if (!isWin) opts = opts[setdiff(names(opts),"gccpath")]
 
-	### Check that .ADopts has all required components and that links point to actual files on the hard drive.
+	### Check that .PSadmb has all required paths and that links point to actual files on the hard drive.
 	### check for admb, mingw, and editor programs ###
 	mess=list()
 	for (i in names(opts)) {
@@ -448,11 +449,12 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 			if(warn) cat("All programs found\n\n") }
 			#if(popup) showAlert("All programs found","Continue","info") }
 		else {
-			badmess=paste("Programs not found:\n",paste(names(vmess)[!vmess],collapse="\n"),
-				"\n\nEither alter '.ADopts' or remove it and alter 'ADopts.txt'.\n\n",
-				"If using the ADMB GUI, alter the appropriate entry.\n\n",sep="")
+			badmess=paste("Programs not found:\n----------------------\n",paste(names(vmess)[!vmess],collapse="\n"),
+				"\n\nAlter the path file (default 'ADpaths.txt') in the working directory.\n",
+				"     ~~~OR~~~\n",
+				"If using the PBSadmb GUI, alter the path entries in the Setup tab.\n\n",sep="")
 			if (isWin && popup) {
-				badmess <- paste( badmess, "You may need to install ADMB; see instructions using the install dropdown menu.\n\n", sep="" )
+				badmess <- paste( badmess, "If you need to install ADMB, follow links from Install dropdown menu.\n\n", sep="" )
 			}
 			if (warn) cat(badmess)
 			if (popup) showAlert(badmess,"User action required","warning") 
@@ -588,12 +590,35 @@ readADpaths = function(pathfile) {
 	}
 }
 .win.readADpaths = function(winName="PBSadmb"){
-	pathfile = getWinAct()[1]
+	pathfile = getWinVal()$optfile
 	readADpaths(pathfile)
 	loadOptionsGUI( atcall(.PBSadmb) )
 }
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~readADpaths
 
+#saveADpaths----------------------------2014-02-27
+# Save ADMB paths to a simple 2-column file.
+# Assumes .PBSadmb options object exists.
+#-----------------------------------------------RH
+saveADpaths = function(pathfile) {
+	sAF = options()$stringsAsFactors
+	on.exit(options(stringsAsFactors=sAF))
+	options(stringsAsFactors=FALSE)
+	if (missing(pathfile) || is.null(pathfile)) pathfile="ADpaths.txt"
+	isWin = .Platform$OS=="windows"
+	Uopts = getOptions(atcall(.PBSadmb))
+	upath = if (isWin) c("admbpath","gccpath","editor") else c("admbpath","editor")
+	uopts = Uopts[upath]
+	ufile = t(sapply(upath,function(x,u){
+		c(x,paste(rep(" ",10 - nchar(x)),collapse=""),convSlashes(u[[x]],addQuotes=TRUE))
+		},u=uopts,USE.NAMES=FALSE))
+	write.table(ufile,file=pathfile,row.names=FALSE,col.names=FALSE,quote=FALSE,sep="")
+}
+.win.saveADpaths = function(winName="PBSadmb"){
+	pathfile = getWinVal()$optfile
+	saveADpaths(pathfile)
+}
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~saveADpaths
 
 #setupAD--------------------------------2014-02-26
 # Command line initialization to read in path
@@ -711,10 +736,9 @@ setADMBVer <- function( admbver, gccver )
 {
 	.initOptions()
 	isWin = .Platform$OS.type=="windows" #; isWin=FALSE
-	sayWhat = attributes(checkADopts())$status
+	sayWhat = attributes(checkADopts(warn=FALSE))$status
 	atget(.PBSadmb)
 	opts = getOptions(.PBSadmb)
-#browser();return()
 	if( !missing( admbver ) && is.null( admbver ) ) 
 		junk = "do nothing"
 	else if( !missing( admbver ) && !is.element(admbver,c("")) ) 
