@@ -12,7 +12,8 @@
 setupAD(pathfile)
 }
 \arguments{
-  \item{pathfile}{string name of simple 2-column text file that details the relevant paths -- admbpath, gccpath, editor.}
+  \item{pathfile}{string name of 2-column text file that details the 
+    relevant paths for the R variables \code{admbpath}, \code{gccpath}, and \code{editor}.}
 }
 \details{
   This program is useful primarily for console-based function calls. 
@@ -31,8 +32,9 @@ setupAD(pathfile)
 
   \code{atprint(.PBSadmb)}
 
-  Note that on UNIX systems, only the \code{admbpath} (actually the path to ADMB's home directory)
-  and text editor are used because the MinGW compiler (\code{gccpath}) and UNIX tools are already recognised.
+  On UNIX systems the MinGW compiler and UNIX tools are readily available; 
+  therefore, only the \code{admbpath} (path to ADMB's home directory)
+  and the path to a text editor are needed.
 }
 \seealso{ 
   \code{\link[PBSadmb]{readADpaths}}, \code{\link[PBSadmb]{checkADopts}},
