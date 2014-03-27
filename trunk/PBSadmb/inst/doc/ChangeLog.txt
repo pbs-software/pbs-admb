@@ -4,7 +4,12 @@ Authors:  JTS = Jon T. Schnute
           RH  = Rowan Haigh
           ACB = Alex Couture-Beil
 -----------------------------------
-0.68  2014-03-03
+0.68  2014-03-27
+  - Jon requested that Rowan becomes the package Maintainer. (RH 3/27)
+  - For PBSadmb we have to IMPORT and DEPEND on PBSmodelling (see DESCRIPTION and NAMESPACE files). (RH 3/20)
+	IMPORT alone cannot find `ComboBox` when `admb()` is called.
+	DEPEND alone causes a NOTE in Rcheck.
+  - Removed direct reliance on `tcltk` by replacing `tclvalue(tkchooseDirectory())` with `selectDir()` in function `.changeWD`. (RH 3/20)
   - Revised UG for Jon's perusal. (RH 3/3)
   - Added new function `saveADpaths` to save paths to a 2-column text file. (RH 2/27)
   - Changed GUI to only recognise the `pathfile` and not the `optfile`. (RH 2/27)

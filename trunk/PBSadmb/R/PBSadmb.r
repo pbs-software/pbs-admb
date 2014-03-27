@@ -1448,7 +1448,7 @@ suggestPath <- function(progs, ipath=NULL, file_ext=NULL)
 .changeWD <- function( wd )
 {
 	if( missing( wd ) )
-		wd <- tclvalue(tkchooseDirectory())
+		wd <- selectDir() #tclvalue(tkchooseDirectory())
 	if( wd != "" ) {
 		currentdir.values <- sort( unique( c( wd, getWinVal()$currentdir.values ) ) )
 		setWinVal( list( currentdir.values = currentdir.values ) )
