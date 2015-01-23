@@ -1,15 +1,19 @@
-#admb-----------------------------------2014-02-18
+#admb-----------------------------------2015-01-23
 # Starts the primary GUI interface
 # Authors: Jon T. Schnute, Rowan Haigh, Alex Couture-Beil
+#-------------------------------------------------
+# Note that the primary control file is now the pathfile.
+# `ADopts.txt' has been demoted to a back-up file that
+# will be saved only when the user pushes the Save button.
+# If `ADopts.txt' exists and the options file `.PBSadmb' is
+# not available, then `ADopts.txt' will be used on start up.
 #-----------------------------------------------RH
-admb <- function(prefix="", wdf="admbWin.txt", optfile="ADopts.txt", pathfile="ADpaths.txt"){
+admb <- function(prefix="", wdf="admbWin.txt", pathfile="ADpaths.txt"){
 	.initOptions()
-	#readADopts()
 	if (!is.null(pathfile) && file.exists(pathfile))
 		readADpaths(pathfile)
 	else pathfile="ADpaths.txt"
 	pkg="PBSadmb"
-#browser();return()
 
 	#TODO rename to something else - too similar to .PBSadmb
 	assign("PBSadmb",list(pkg=pkg,call=match.call(),args=args(admb),useCols=NULL),envir=.PBSadmbEnv)
@@ -388,7 +392,7 @@ runMC <- function(prefix, nsims=2000, nthin=20, outsuff=".mc.dat",
 
 .initOptions <- function()
 {
-	#don't re-init
+	# do not re-iniitialize if `.PBSadmb' exists in the package environment
 	if(exists(".PBSadmb", envir=.PBSadmbEnv) && is(atcall(.PBSadmb),"PBSoptions"))
 		return()
 	readADopts()
@@ -502,32 +506,17 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 {
 	getWinVal(scope="L",winName=winName)
 	chkstat=checkADopts(opts=list(admbpath=admbpath,gccpath=gccpath,editor=editor),popup=TRUE)
-	#set label to OK/FIX with coloured background
+	# set label to OK/FIX with coloured background
 	setWinVal(list(chkstat=ifelse(chkstat," OK"," Fix")),winName=winName)
 	setWidgetColor( "chkstat", winName=winName, bg=ifelse(chkstat,"lightgreen","pink") )
 	setWidgetColor( "checkbutton", winName=winName, bg=ifelse(chkstat,"moccasin","pink") )
 	invisible(chkstat)
 }
 
-#makeADopts-----------------------------2009-08-12
-# Sets the ADMB path directories (deprecated).
-#----------------------------------------------ACB
-makeADopts <- function( admbpath, gccpath, editor )
-{
-	cat( "THIS FUNCTION IS DEPRECATED - use setADMBPath\n" )
-	setADMBPath( admbpath = admbpath, gccpath = gccpath, editor = editor )
-}
-.win.makeADopts=function(winName="PBSadmb")
-{
-	getWinVal(scope="L",winName=winName)
-	setADMBPath(admbpath,gccpath,editor) 
-	.win.setADMBVer() 
-	.win.checkADopts()
-	invisible()
-}
 
 #readADopts-----------------------------2009-08-12
 # Read ADMB options from a file.
+# Only called by `.initOptions()'
 #-----------------------------------------------RH
 readADopts <- function(optfile="ADopts.txt")
 {
@@ -559,7 +548,7 @@ readADopts <- function(optfile="ADopts.txt")
 	atput(.PBSadmb)
 	invisible()
 }
-.win.readADopts=function(winName="PBSadmb")
+.win.readADopts=function(winName="PBSadmb")  ### not currently used 
 {
 	getWinVal(scope="L",winName=winName)
 	if (file.exists(optfile)) {
@@ -596,7 +585,7 @@ readADpaths = function(pathfile) {
 }
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~readADpaths
 
-#saveADpaths----------------------------2014-02-27
+#saveADpaths----------------------------2015-01-23
 # Save ADMB paths to a simple 2-column file.
 # Assumes .PBSadmb options object exists.
 #-----------------------------------------------RH
@@ -617,6 +606,7 @@ saveADpaths = function(pathfile) {
 .win.saveADpaths = function(winName="PBSadmb"){
 	pathfile = getWinVal()$optfile
 	saveADpaths(pathfile)
+	writeADopts() ### automatic backup to `ADopts.txt' (only if user pushes the Save button)
 }
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~saveADpaths
 
@@ -635,8 +625,10 @@ setupAD = function(pathfile){
 	checkADopts()
 }
 
-#writeADopts----------------------------2009-08-12
+#writeADopts----------------------------2015-01-23
 # Writes ADMB options to a file.
+# Demote this to an automatic back-up file if user 
+# saves the ADpaths file.
 #-----------------------------------------------RH
 writeADopts <- function(optfile="ADopts.txt")
 {
@@ -650,18 +642,15 @@ writeADopts <- function(optfile="ADopts.txt")
 	setOptions(.PBSadmb.pkgOptions,opts)
 	atput(.PBSadmb.pkgOptions)
 	#hack no longer needed: http://code.google.com/p/pbs-modelling/issues/detail?id=81 solved
-	#tmp <- list( atcall(.PBSadmb.pkgOptions) )
-	#tmp[ names( opts ) ] <- opts
-	#do.call( setOptions, tmp )
 	saveOptions( .PBSadmb.pkgOptions )
 	return(invisible(NULL))
 }
-.win.writeADopts=function(winName="PBSadmb")
+.win.writeADopts=function(winName="PBSadmb") ### not currently used
 {
 	isOK=.win.checkADopts()
 	if (!isOK) return()
 	getWinVal(scope="L",winName=winName)
-	writeADopts(optfile=optfile) 
+	writeADopts(optfile="ADopts.txt") #optfile) 
 	invisible()
 }
 
@@ -729,8 +718,9 @@ setADMBPath <- function( admbpath, gccpath, editor )
 	}
 }
 
-#setADMBVer-----------------------------2014-02-18
+#setADMBVer-----------------------------2015-01-23
 # Sets the ADMB versions.
+# Now simplified to always read in versions if admb/g++ exist.
 #-----------------------------------------------RH
 setADMBVer <- function( admbver, gccver )
 {
@@ -739,32 +729,25 @@ setADMBVer <- function( admbver, gccver )
 	sayWhat = attributes(checkADopts(warn=FALSE))$status
 	atget(.PBSadmb)
 	opts = getOptions(.PBSadmb)
-	if( !missing( admbver ) && is.null( admbver ) ) 
-		junk = "do nothing"
-	else if( !missing( admbver ) && !is.element(admbver,c("")) ) 
-		setOptions( .PBSadmb, admbver = admbver )
-	else {
-		if(all(sayWhat[[1]])) { # check ADMB version
-			if(file.exists(paste(opts["admbpath"],"/VERSION",sep="")))
-				setOptions(.PBSadmb, admbver = readLines(paste(opts["admbpath"],"/VERSION",sep=""))[1] )
-			else if (is.null(getOptions(.PBSadmb,"admbver")))
-				setOptions(.PBSadmb, admbver = "10")
-	}	}
-	if( !missing( gccver ) && is.null( gccver ) ) 
-		junk = "do nothing"
-	else if( !missing( gccver ) && !is.element(gccver,c("")) )
-		setOptions( .PBSadmb, gccver = gccver )
-	else {
-		if(all(sayWhat[[2]])) { # check g++ version
+
+	if(all(sayWhat[[1]])) { # check ADMB version
+		if(file.exists(paste(opts["admbpath"],"/VERSION",sep="")))
+			setOptions(.PBSadmb, admbver = readLines(paste(opts["admbpath"],"/VERSION",sep=""))[1] )
+	} else {
+		setOptions(.PBSadmb, admbver = "")
+	}
+	if(all(sayWhat[[2]])) { # check g++ version
 			cmd = "g++ --version"
 			if (isWin) cmd = shQuote(paste(opts["gccpath"],"/bin/",cmd,sep=""))
 			gccVer = .callSys(cmd)[1]
-			gccpcs = strsplit(gccVer," ")[[1]]
-			gccver = gccpcs[grep("\\.",gccpcs)][1]
-#browser()
-			#gccver =  paste(setdiff(strsplit(gsub("[[:alpha:]+()]","",gccver)," ")[[1]],""),collapse=".")
+			gccver = PBSmodelling::.trimWhiteSpace(gsub("g\\+\\+","",gccVer)) # return the whole string minus `g++ '
+			#gccpcs = strsplit(gccVer," ")[[1]]
+			#gccver = gccpcs[grep("\\.",gccpcs)][1]
+			#gccver = paste(setdiff(strsplit(gsub("[[:alpha:]+()]","",gccver)," ")[[1]],""),collapse=".")
 			setOptions(.PBSadmb, gccver = gccver)
-	}	}
+	} else {
+		setOptions(.PBSadmb, gccver = "")
+	}
 	atput(.PBSadmb)
 }
 .win.setADMBVer=function(winName="PBSadmb")
