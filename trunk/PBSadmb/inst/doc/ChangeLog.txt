@@ -4,6 +4,13 @@ Authors:  JTS = Jon T. Schnute
           RH  = Rowan Haigh
           ACB = Alex Couture-Beil
 -----------------------------------
+
+0.69  2015-01-23
+  - Demoted the use of `ADopts.txt' to act as a back-up file; the pathfile (default = `ADpaths.txt') has been the primary control file for a while. (RH 1/23)
+  - Changed the function `setADMBVer' to always check versions of ADMB and g++, if they exist. (RH 1/23)
+  - Removed the deprecated function `makeADopts'. (RH 1/23)
+  - Bumped up the version for a new year and the inevitable posting to CRAN. (RH 1/23)
+
 0.68  2014-04-08
   - Added a vignette (Kurt indicates that this is sufficient) to satisfy yet another Rcheck that we don't see. (RH 4/8)
 	* checking for code which exercises the package ... WARNING ... No examples, no tests, no vignettes

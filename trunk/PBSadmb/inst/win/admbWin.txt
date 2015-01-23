@@ -73,9 +73,10 @@ grid 7 1 sticky=E
 	grid 1 2 sticky=E
 		entry name=editor value="" label=Editor: width=45 mode=character func=setGUIoptions action=editor
 		button text=">" func=doAction action="selectFile(usewidget=\"editor\")"
-	grid 1 3 sticky=E
-		entry name=admbver value="" label="admb version" width=10 mode=character func=setGUIoptions action=admbver
-		entry name=gccver value="" label="g++ version" width=10 mode=character func=setGUIoptions action=gccver padx="2 0"
+	grid 1 4 sticky=E
+		label text="Versions:"
+		entry name=admbver value="" label="admb" width=12 mode=character func=setGUIoptions action=admbver
+		entry name=gccver value="" label="g++" width=15 mode=character func=setGUIoptions action=gccver padx="2 0"
 		button name=checkbutton text="Verify" func=.win.makeADopts action=check bg=moccasin padx="10 0"
 
 	label "Load/Save Paths from/to File" sticky=W fg=purple3 font="bold 11" pady="5 0"
