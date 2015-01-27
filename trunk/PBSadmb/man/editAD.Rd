@@ -15,7 +15,7 @@ editAD(prefix, suffix=c(".tpl",".cpp",".log"))
   Invisibly returns Boolean vector with elements \code{TRUE} if files exist, 
   \code{FALSE} if they do not.
 }
-\author{ Jon T. Schnute, Pacific Biological Station, Nanaimo BC, Canada }
+\author{Jon T. Schnute, Pacific Biological Station, Fisheries and Oceans Canada, Nanaimo BC}
 \note{
   A wrapper function that can be called from a GUI exists as \code{.win.editAD}.
   
@@ -24,7 +24,7 @@ editAD(prefix, suffix=c(".tpl",".cpp",".log"))
   or an application specified with \code{setPBSext}.
 }
 \seealso{
-  \code{\link{editADfile}}, \code{\link{makeADopts}}
+  \code{\link{editADfile}}, \code{\link{setADMBpath}}
 }
 \keyword{file}
 

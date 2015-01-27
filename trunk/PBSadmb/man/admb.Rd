@@ -40,7 +40,7 @@ admb(prefix="", wdf="admbWin.txt", pathfile="ADpaths.txt")
   Rowan Haigh, Pacific Biological Station, Fisheries and Oceans Canada, Nanaimo BC 
 }
 \seealso{ 
-  \code{\link[PBSadmb]{setADMBPath}}, \code{\link[PBSadmb]{readADopts}}, 
+  \code{\link[PBSadmb]{setADMBpath}}, \code{\link[PBSadmb]{readADopts}}, 
   \code{\link[PBSadmb]{readADpaths}}, \code{\link[PBSadmb]{makeAD}}
 }
 \keyword{IO}
