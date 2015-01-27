@@ -23,14 +23,16 @@ linkAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE,
     relevant paths for the R variables \code{admbpath}, \code{gccpath}, and \code{editor}.}
 }
 \details{
-  This function uses the C++ comiler declared in \code{.ADopts}. If \code{logfile=TRUE},
+  This function uses the C++ comiler declared in \code{.PBSadmb}. If \code{logfile=TRUE},
   any errors will appear in \code{'prefix'.log}. If \code{verbose=TRUE},
   they will appear in the R console.
 }
 \value{
   Invisibly returns the shell call and its messages.
 }
-\author{ Jon T. Schnute, Pacific Biological Station, Fisheries and Oceans Canada, Nanaimo BC. }
+\author{
+  Jon T. Schnute, Pacific Biological Station, Fisheries and Oceans Canada, Nanaimo BC
+}
 \note{
   A wrapper function that can be called from a GUI exists as \code{.win.linkAD}.
 

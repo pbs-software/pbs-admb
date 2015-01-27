@@ -5,44 +5,46 @@ Authors:  JTS = Jon T. Schnute
           ACB = Alex Couture-Beil
 -----------------------------------
 
-0.69  2015-01-23
-  - Demoted the use of `ADopts.txt' to act as a back-up file; the pathfile (default = `ADpaths.txt') has been the primary control file for a while. (RH 1/23)
-  - Changed the function `setADMBVer' to always check versions of ADMB and g++, if they exist. (RH 1/23)
-  - Removed the deprecated function `makeADopts'. (RH 1/23)
-  - Bumped up the version for a new year and the inevitable posting to CRAN. (RH 1/23)
+0.69  2015-01-27
+  - Changed function names: `setADMBPath' to `setADMBpath' and `setADMBVer' to `setADMBver'. (RH 150127)
+  - Updated a number of document (.Rd) files. (RH 150127)
+  - Demoted the use of `ADopts.txt' to act as a back-up file; the pathfile (default = `ADpaths.txt') has been the primary control file for a while. (RH 150123)
+  - Changed the function `setADMBVer' to always check versions of ADMB and g++, if they exist. (RH 150123)
+  - Removed the deprecated function `makeADopts'. (RH 150123)
+  - Bumped up the version for a new year and the inevitable posting to CRAN. (RH 150123)
 
 0.68  2014-04-08
-  - Added a vignette (Kurt indicates that this is sufficient) to satisfy yet another Rcheck that we don't see. (RH 4/8)
+  - Added a vignette (Kurt indicates that this is sufficient) to satisfy yet another Rcheck that we don't see. (RH 140408)
 	* checking for code which exercises the package ... WARNING ... No examples, no tests, no vignettes
-  - Jon requested that Rowan becomes the package Maintainer. (RH 3/27)
-  - For PBSadmb we have to IMPORT and DEPEND on PBSmodelling (see DESCRIPTION and NAMESPACE files). (RH 3/20)
+  - Jon requested that Rowan becomes the package Maintainer. (RH 140327)
+  - For PBSadmb we have to IMPORT and DEPEND on PBSmodelling (see DESCRIPTION and NAMESPACE files). (RH 140320)
 	IMPORT alone cannot find `ComboBox` when `admb()` is called.
 	DEPEND alone causes a NOTE in Rcheck.
-  - Removed direct reliance on `tcltk` by replacing `tclvalue(tkchooseDirectory())` with `selectDir()` in function `.changeWD`. (RH 3/20)
-  - Revised UG for Jon's perusal. (RH 3/3)
-  - Added new function `saveADpaths` to save paths to a 2-column text file. (RH 2/27)
-  - Changed GUI to only recognise the `pathfile` and not the `optfile`. (RH 2/27)
-  - Added new function `setupAD` to initialize and validate the paths to admbpath, gccpath, and editor for command line functions. (JTS/RH 2/26)
-  - Modified GUI to take the new pathfile; created function `.win.readADpaths`. (RH 2/26)
-  - Added new function called `readADpaths` that allows user to supply a simple, 2-column text file of paths for PBSadmb. (RH 2/25)
-  - Modified function `.win.suggestPath` to try default directories for `admbpath` and `gccpath` (after user-specified directories and before PATH directories). (RH 2/20)
-  - Added function `suggestPath` to provide suggestions for `admbpath`, `gccpath`, and `editor` from the system's PATH environment. (RH 2/19)
-  - Added new button `suggest` to the GUI's first notebook tab. (RH 2/19)
-  - Re-arranged order of functions in `PBSadmb.r` source file. (RH 2/19)
-  - Altered code so that Unix systems don't ckeck for msys (unix) tools; some GUI labels altered. (RH 2/18)
-  - Menu Install on GUI now shows all OS users links to three OS installation instructions (Windows, Linux, MacOS). (RH 2/6)
-  - Replaced Install build with pointers to ADMB.org's web pages for Windows, Linux and MacOS. (RH 1/31)
-  - Updated manuals with those from ADMB. (RH 1/31)
+  - Removed direct reliance on `tcltk` by replacing `tclvalue(tkchooseDirectory())` with `selectDir()` in function `.changeWD`. (RH 140320)
+  - Revised UG for Jon's perusal. (RH 140303)
+  - Added new function `saveADpaths` to save paths to a 2-column text file. (RH 140227)
+  - Changed GUI to only recognise the `pathfile` and not the `optfile`. (RH 140227)
+  - Added new function `setupAD` to initialize and validate the paths to admbpath, gccpath, and editor for command line functions. (JTS/RH 140226)
+  - Modified GUI to take the new pathfile; created function `.win.readADpaths`. (RH 140226)
+  - Added new function called `readADpaths` that allows user to supply a simple, 2-column text file of paths for PBSadmb. (RH 140225)
+  - Modified function `.win.suggestPath` to try default directories for `admbpath` and `gccpath` (after user-specified directories and before PATH directories). (RH 140220)
+  - Added function `suggestPath` to provide suggestions for `admbpath`, `gccpath`, and `editor` from the system's PATH environment. (RH 140219)
+  - Added new button `suggest` to the GUI's first notebook tab. (RH 140219)
+  - Re-arranged order of functions in `PBSadmb.r` source file. (RH 140219)
+  - Altered code so that Unix systems don't ckeck for msys (unix) tools; some GUI labels altered. (RH 140218)
+  - Menu Install on GUI now shows all OS users links to three OS installation instructions (Windows, Linux, MacOS). (RH 140206)
+  - Replaced Install build with pointers to ADMB.org's web pages for Windows, Linux and MacOS. (RH 140131)
+  - Updated manuals with those from ADMB. (RH 140131)
 
 0.67  2013-12-19
-  - Changed function `checkADopts` to check for presence of `sed(.exe)` and to provide a warning if not found. (RH 12/19)
-  - Changed code to require that `msys` directory falls directly below `mingw` directory. (RH 12/19)
-  - Created new function called `setADMBVer`; version R objects are now called `admbver` and `gccver`. (RH 12/18)
-  - Revised code to run ADMB 11 which uses `adcomp.cmd` and `adlink.cmd` for ADMB v.11 and `.bat` files for previous versions. (RH 12/17)
-  - .PBSadmb (stored in .PBSadmbEnv) now tracks `ver.admb` and `ver.gcc` (versions). (RH 12/17)
+  - Changed function `checkADopts` to check for presence of `sed(.exe)` and to provide a warning if not found. (RH 131219)
+  - Changed code to require that `msys` directory falls directly below `mingw` directory. (RH 131219)
+  - Created new function called `setADMBVer`; version R objects are now called `admbver` and `gccver`. (RH 131218)
+  - Revised code to run ADMB 11 which uses `adcomp.cmd` and `adlink.cmd` for ADMB v.11 and `.bat` files for previous versions. (RH 131217)
+  - .PBSadmb (stored in .PBSadmbEnv) now tracks `ver.admb` and `ver.gcc` (versions). (RH 131217)
 
 0.66  2013-05-14
-  - Fixed Rd usage lines to be less than 90 characters long. (RH 5/18)
+  - Fixed Rd usage lines to be less than 90 characters long. (RH 130518)
 	From Kurt Hornik: A new test gives * checking Rd line widths ... NOTE Rd file 
 	\usage lines wider than 90 characters... These lines will be truncated in the PDF manual.
   - Revised documentation, including new GUI "Run" menu
@@ -50,35 +52,35 @@ Authors:  JTS = Jon T. Schnute
   - Removed old Excel table of scripts
 
 0.65  2013-05-06
-  - Fixed Issue 20 where `simplePBS` had not been changed to `simple_pbs`. (RH 5/6)
-  - Changed ADMB GUI: e.g., removed `Custom` radio button in notebook tab `Run`. (RH 5/1)
-  - Created temporary working directory `.PBSadmbEnv` to house the control object `PBSadmb` and the options object`.PBSadmb`. (RH 3/25)
-Accessor functions that are wrappers to PBSmodelling accessor functions, are called `atget`, atput`, `atcall`, and `atprint`.
-  - Updated User Guide to reflect current installation protocols (JTS 3/23)
-  - Changed namespace to export all package dot functions. (RH 3/5)
+  - Fixed Issue 20 where `simplePBS` had not been changed to `simple_pbs`. (RH 130506)
+  - Changed ADMB GUI: e.g., removed `Custom` radio button in notebook tab `Run`. (RH 130501)
+  - Created temporary working directory `.PBSadmbEnv` to house the control object `PBSadmb` and the options object`.PBSadmb`. (RH 130325)
+	Accessor functions that are wrappers to PBSmodelling accessor functions, are called `atget`, atput`, `atcall`, and `atprint`.
+  - Updated User Guide to reflect current installation protocols (JTS 130323)
+  - Changed namespace to export all package dot functions. (RH 130305)
 
 0.64  2012-10-31  Authors
-  - Fixed "no visible bindings" nonsense; grabbed new manuals from ADMB-project.org and compacted them with "tools::compactPDF'. (RH 10/31)
-  - Jon changed email address to schnutej-dfo@shaw.ca (RH 10/30)
-  - Exported the '.clean' functions from the namespace. (RH 6/5)
-  - Modified GUI so that user can view the window description file and the project's R code. (RH 6/5)
-  - Modified function 'runAD' to remove trailing whitespace if the executable has no arguments. (RH 6/5)
+  - Fixed "no visible bindings" nonsense; grabbed new manuals from ADMB-project.org and compacted them with "tools::compactPDF'. (RH 121031)
+  - Jon changed email address to schnutej-dfo@shaw.ca (RH 121030)
+  - Exported the '.clean' functions from the namespace. (RH 120605)
+  - Modified GUI so that user can view the window description file and the project's R code. (RH 120605)
+  - Modified function 'runAD' to remove trailing whitespace if the executable has no arguments. (RH 120605)
   - Advance to version 0.64 for next CRAN release.
 
 0.63  2011-11-24  Authors
-  - Moved '.initOptions' from '.onLoad' to '.onAttach'. (RH 11/24)
-  - Revised UG to reflect new GUI and for eventual upgrading to discuss new install methodology. (RH 11/22)
-  - Altered GUI so that output controls appear on Make and Run tabs. (JTS 11/22)
-  - R-2.14.0 requires namespace and loading via '.onLoad'. (RH 11/10)
+  - Moved '.initOptions' from '.onLoad' to '.onAttach'. (RH 111124)
+  - Revised UG to reflect new GUI and for eventual upgrading to discuss new install methodology. (RH 111122)
+  - Altered GUI so that output controls appear on Make and Run tabs. (JTS 111122)
+  - R-2.14.0 requires namespace and loading via '.onLoad'. (RH 111110)
 
 0.62  2011-03-15  Authors
-  - Modified function '.load.prefix.droplist' to choose 'vonb' first if it exists. (RH 3/15)
-  - Modified function '.changeWD' to refresh the available 'prefix.values' after changing to a new directory. (RH 3/15)
-  - Modified function '.installADMB' to write any installed directory paths to the 'PBSadmb" GUI. (RH 3/15)
+  - Modified function '.load.prefix.droplist' to choose 'vonb' first if it exists. (RH 110315)
+  - Modified function '.changeWD' to refresh the available 'prefix.values' after changing to a new directory. (RH 110315)
+  - Modified function '.installADMB' to write any installed directory paths to the 'PBSadmb" GUI. (RH 110315)
 	Also renamed the Boolean variables 'admb' and 'gcc' to 'chkadmb' and 'chkgcc', respectively.
-  - Added ADM scripts in 'ADMtools' under 'inst' directory (RH 2/22)
-  - Started integrating batch wrappers for PBSadmb (ACB 2/21)
-  - Modified functions 'runMC' and '.win.runMC' so that script version doesn't require GUI. (RH 10/8)
+  - Added ADM scripts in 'ADMtools' under 'inst' directory (RH 110222)
+  - Started integrating batch wrappers for PBSadmb (ACB 110221)
+  - Modified functions 'runMC' and '.win.runMC' so that script version doesn't require GUI. (RH 101008)
 
 0.61.rxx 2009-12-07 Jon
   - Fixed Linux bug in "All args" button in the GUI (use "prefix", not xxxfs"prefix.exe")

@@ -1,7 +1,6 @@
 # Taking cue from Roger Bivand's maptools:
 .PBSadmbEnv <- new.env(FALSE, parent=globalenv())  # be sure to exportPattern("^\\.PBS") in NAMESPACE
 
-#.onLoad <- function(libname, pkgname)
 .onAttach <- function(libname, pkgname)
 {
 	.initOptions()

@@ -156,7 +156,7 @@ compAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 
 	#add cmd flags
 	if (is.null(getOptions(atcall(.PBSadmb),"admbver")))
-		setADMBVer(gccver = NULL) # only get ADMB version
+		setADMBver(gccver = NULL) # only get ADMB version
 	admbvernum = .version(getOptions(atcall(.PBSadmb),"admbver"))
 	flags <- c()
 	if( dll )
@@ -228,7 +228,7 @@ linkAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE, logf
 
 	#add cmd flags
 	if (is.null(getOptions(atcall(.PBSadmb),"admbver")))
-		setADMBVer(gccver = NULL) # only get ADMB version
+		setADMBver(gccver = NULL) # only get ADMB version
 	admbvernum = .version(getOptions(atcall(.PBSadmb),"admbver"))
 	flags <- c()
 	if( dll )
@@ -520,17 +520,16 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 #-----------------------------------------------RH
 readADopts <- function(optfile="ADopts.txt")
 {
-	# Create instance of option manager - use this to get/set/save/load options
-	# First attempt to load options from the package, then attempt to load options from the current dir (which will override pkg options)
+	### Create instance of option manager - use this to get/set/save/load options
+	### First attempt to load options from the package, then attempt to load options from the current dir (which will override pkg options)
 	pkg_fname = paste( system.file(package="PBSadmb"), "/ADopts.txt", sep="" )
-	#eval(parse(text=".PBSadmb.pkgOptions <<- new( \"PBSoptions\", filename = pkg_fname, initial.options = list(admbpath=\"\", gccpath=\"\",editor=\"\"), gui.prefix=\"\" )"))
 	.PBSadmb.pkgOptions <- new( "PBSoptions", filename = pkg_fname, initial.options = list(admbpath="", gccpath="",editor=""), gui.prefix="" )
 	atput(.PBSadmb.pkgOptions)
 
-	# Load from current dir, using pkgOptions as default values
-	#eval(parse(text=".PBSadmb <<- new( \"PBSoptions\", filename = optfile, initial.options = getOptions( .PBSadmb.pkgOptions ), gui.prefix=\"\" )"))
+	### Load from current dir, using pkgOptions as default values
 	.PBSadmb <- new( "PBSoptions", filename = optfile, initial.options = getOptions( .PBSadmb.pkgOptions ), gui.prefix="" )
 
+	### `.guessPath' not currently used
 	.guessPath <- function( programs, includefilename = FALSE, failed = NULL ) {
 		for( p in programs ) {
 			found <- Sys.which( p )[ 1 ]
@@ -542,7 +541,6 @@ readADopts <- function(optfile="ADopts.txt")
 		}
 		return( failed )
 	}
-
 	#if( getOptions( .PBSadmb, "editor" ) == "" )
 	#	setOptions( .PBSadmb, editor = .guessPath( c( "kate", "notepad" ), TRUE ) )
 	atput(.PBSadmb)
@@ -654,10 +652,10 @@ writeADopts <- function(optfile="ADopts.txt")
 	invisible()
 }
 
-#setADMBPath----------------------------2009-08-12
+#setADMBpath----------------------------2015-01-27
 # Sets the ADMB path directories.
 #----------------------------------------------ACB
-setADMBPath <- function( admbpath, gccpath, editor )
+setADMBpath <- function( admbpath, gccpath, editor )
 {
 	.initOptions()
 	atget(.PBSadmb)
@@ -669,11 +667,12 @@ setADMBPath <- function( admbpath, gccpath, editor )
 		setOptions( .PBSadmb, editor = editor )
 	atput(.PBSadmb)
 }
-.win.setADMBPath=function(winName="PBSadmb")
+.win.setADMBpath=function(winName="PBSadmb")
 {
 	getWinVal(scope="L",winName=winName)
-	setADMBPath(admbpath,gccpath,editor) 
+	setADMBpath(admbpath,gccpath,editor) 
 	.win.checkADopts()
+	.win.setADMBver()
 	invisible()
 }
 
@@ -718,11 +717,11 @@ setADMBPath <- function( admbpath, gccpath, editor )
 	}
 }
 
-#setADMBVer-----------------------------2015-01-23
+#setADMBver-----------------------------2015-01-27
 # Sets the ADMB versions.
 # Now simplified to always read in versions if admb/g++ exist.
 #-----------------------------------------------RH
-setADMBVer <- function( admbver, gccver )
+setADMBver <- function( admbver, gccver )
 {
 	.initOptions()
 	isWin = .Platform$OS.type=="windows" #; isWin=FALSE
@@ -750,10 +749,10 @@ setADMBVer <- function( admbver, gccver )
 	}
 	atput(.PBSadmb)
 }
-.win.setADMBVer=function(winName="PBSadmb")
+.win.setADMBver=function(winName="PBSadmb")
 {
 	getWinVal(scope="L",winName=winName)
-	setADMBVer(admbver,gccver) 
+	setADMBver(admbver,gccver) 
 	for (i in c("admbver","gccver")) {
 		ival = getOptions(atcall(.PBSadmb),i)
 		if (is.null(ival)) next

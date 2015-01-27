@@ -77,7 +77,7 @@ grid 7 1 sticky=E
 		label text="Versions:"
 		entry name=admbver value="" label="admb" width=12 mode=character func=setGUIoptions action=admbver
 		entry name=gccver value="" label="g++" width=15 mode=character func=setGUIoptions action=gccver padx="2 0"
-		button name=checkbutton text="Verify" func=.win.makeADopts action=check bg=moccasin padx="10 0"
+		button name=checkbutton text="Verify" func=.win.setADMBpath action=check bg=moccasin padx="10 0"
 
 	label "Load/Save Paths from/to File" sticky=W fg=purple3 font="bold 11" pady="5 0"
 	grid 1 5 sticky=E

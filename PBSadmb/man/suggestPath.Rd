@@ -35,7 +35,7 @@ suggestPath(progs, ipath = NULL, file_ext = NULL)
   Rowan Haigh, Pacific Biological Station, Fisheries and Oceans Canada, Nanaimo BC
 }
 \seealso{
-\code{\link[PBSadmb]{setADMBPath}}
+\code{\link[PBSadmb]{setADMBpath}}
 }
 \keyword{ utilites }
 \keyword{ sysdata }
