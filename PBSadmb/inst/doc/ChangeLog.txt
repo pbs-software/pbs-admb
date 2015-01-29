@@ -5,7 +5,8 @@ Authors:  JTS = Jon T. Schnute
           ACB = Alex Couture-Beil
 -----------------------------------
 
-0.69  2015-01-27
+0.69  2015-01-28
+  - Debugged a few things in the GUI and R code; updated User's Guide. (RH 150128)
   - Changed function names: `setADMBPath' to `setADMBpath' and `setADMBVer' to `setADMBver'. (RH 150127)
   - Updated a number of document (.Rd) files. (RH 150127)
   - Demoted the use of `ADopts.txt' to act as a back-up file; the pathfile (default = `ADpaths.txt') has been the primary control file for a while. (RH 150123)

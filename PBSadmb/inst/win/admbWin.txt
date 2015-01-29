@@ -1,4 +1,4 @@
-# PBSadmb GUI (last modified: 2014-02-26)
+# PBSadmb GUI (last modified: 2015-01-27)
 window name=PBSadmb title="PBSadmb for ADMB" #onclose=
 
 #------------------------------------ MENU -------------------------------------
