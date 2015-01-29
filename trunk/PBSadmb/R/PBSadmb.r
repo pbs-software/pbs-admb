@@ -419,7 +419,7 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 	for (i in names(opts)) {
 		if (!any(i==check))
 			next
-		ii=ipath=opts[[i]]
+		ii = ipath = convSlashes(opts[[i]])
 		if (i=="admbpath") {
 			ipath=paste(ii,slash,"bin",sep="")
 			progs=paste(c("tpl2cpp","tpl2rem"),ifelse(isWin,".exe",""),sep="")
@@ -427,7 +427,7 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 		else if (i=="gccpath") 
 			progs=paste("bin",slash,"g++",ifelse(isWin,".exe",""),sep="")
 		else if (i=="editor") {
-			ipath=dirname(ii)
+			ipath=convSlashes(dirname(ii))
 			progs=basename(ii)
 		}
 		target=paste(ipath,progs,sep=slash)
@@ -478,7 +478,8 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 				progs=paste("bin",slash,"sed",ifelse(isWin,".exe",""),sep="")
 			else if (i=="gccpath")
 				progs=paste("bin",slash,"sed",ifelse(isWin,".exe",""),sep="")
-			target=paste(ipath,progs,sep="/")
+			target=paste(ipath,progs,sep=slash)
+#{browser();return()}
 			istatus=file.exists(target)
 			names(istatus)=progs
 			sedmess[[ipath]]=istatus
@@ -486,12 +487,13 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 		smess=unlist(sedmess)
 		names(smess)=paste(rep(names(sedmess),sapply(sedmess,length,simplify=FALSE)),
 			unlist(sapply(sedmess,names,simplify=FALSE)),sep=slash)
+#{browser();return()}
 		if (warn|popup) {
 			if (any(smess)) {
-				# if(warn) cat(paste("'sed",ifelse(isWin,".exe'",",")," program found\n\n",sep="")) 
+				# if(warn) cat(paste("'sed",ifelse(isWin,".exe'",",")," program found\n\n",sep="")) ### do not warn
 			}
 			else {
-			#if (!any(smess)) {
+			#if (!any(smess)) { ### always warn
 				badsedmess=paste("Exception: the program `sed",ifelse(isWin,".exe",""),"` was not found on any of these paths:\n",
 					paste(gsub(paste("sed",ifelse(isWin,".exe",""),sep=""),"",names(smess))[!smess],collapse="\n"),
 					"\n\nPlace a copy of `sed",ifelse(isWin,".exe",""),"` on any one of the paths indicated above.\n\n",sep="")
@@ -505,7 +507,7 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 .win.checkADopts=function(winName="PBSadmb")
 {
 	getWinVal(scope="L",winName=winName)
-	chkstat=checkADopts(opts=list(admbpath=admbpath,gccpath=gccpath,editor=editor),popup=TRUE)
+	chkstat = checkADopts(opts=list(admbpath=admbpath,gccpath=gccpath,editor=editor),popup=TRUE)
 	# set label to OK/FIX with coloured background
 	setWinVal(list(chkstat=ifelse(chkstat," OK"," Fix")),winName=winName)
 	setWidgetColor( "chkstat", winName=winName, bg=ifelse(chkstat,"lightgreen","pink") )
@@ -543,6 +545,11 @@ readADopts <- function(optfile="ADopts.txt")
 	}
 	#if( getOptions( .PBSadmb, "editor" ) == "" )
 	#	setOptions( .PBSadmb, editor = .guessPath( c( "kate", "notepad" ), TRUE ) )
+
+	### Standardise paths with OS path separators
+	allpaths = getOptions(.PBSadmb)[c("admbpath","gccpath","editor")]
+	ospaths  = sapply(allpaths,convSlashes,simplify=FALSE)
+	setOptions(.PBSadmb,ospaths)
 	atput(.PBSadmb)
 	invisible()
 }
