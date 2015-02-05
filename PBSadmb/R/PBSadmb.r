@@ -810,7 +810,7 @@ showADargs <- function(prefix,ed=TRUE) {
 #              FILE FUNCTIONS                     
 #=================================================
 
-#copyFiles------------------------------2013-03-25
+#copyFiles------------------------------2015-01-05
 # Copy files with specified prefixes and suffixes 
 # from one location to another.
 #-----------------------------------------------RH
@@ -837,10 +837,10 @@ copyFiles=function(prefix,suffix=NULL,srcdir=getwd(),dstdir=getwd(),ask=TRUE){
 		if (ask) ovr=getYes(paste("Overwrite",fname[i],"?"))
 		copy.out[i]=file.copy(fnam0,dstdir,overwrite=ovr) 
 	}
-	if (exists(".PBSmod",envir=.PBSmodEnv) && tcall(.PBSmod)$.activeWin=="PBSadmb") 
+	if (exists(".PBSmod",envir=.PBSmodEnv) && ".activeWin" %in% names(tcall(.PBSmod)) && tcall(.PBSmod)$.activeWin=="PBSadmb") 
 		setWinVal(list(prefix=substring(prefix,1,nchar(prefix)-2)),winName="PBSadmb")
 	invisible(copy.out) }
-#----------------------------------------copyFiles
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~copyFiles
 
 #editADfile-----------------------------2013-03-25
 # Use the specified editor to edit a file.
