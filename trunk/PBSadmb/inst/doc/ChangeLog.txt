@@ -5,7 +5,9 @@ Authors:  JTS = Jon T. Schnute
           ACB = Alex Couture-Beil
 -----------------------------------
 
-0.69  2015-01-29
+0.69  2015-02-05
+  - Reorganised the User's Guide to somewhat demote the GUI and promote the scripting aspect. (RH 150205)
+  - Fixed a bug in `copyFiles' that didn't handle the detection of GUI window properly. (RH 150205)
   - Updated the User's Guide. (RH 150129)
   - Debugged a few things in the GUI and R code; updated User's Guide. (RH 150128)
   - Changed function names: `setADMBPath' to `setADMBpath' and `setADMBVer' to `setADMBver'. (RH 150127)

@@ -16,7 +16,8 @@ makeAD("vonb"); runAD("vonb");
 vonb <- readList("vonb.rep"); unpackList(vonb);
 
 # Plot the data
-plot(age,y); lines(age,ypred,col="red",lwd=2);
+plot(age,y,pch=20,cex=2,col="blue",xlab="Age",ylab="Length (mm)");
+lines(age,ypred,col="red",lwd=3);
 
 # Check the calculations in R
 ypredR <- Linf*(1-exp(-K*(age-t0)));
@@ -29,3 +30,4 @@ cat(fval,"   ",fvalR,"\n")
 cat("Predictions (ADMB & R):\n");
 cat(ypred,"\n");
 cat(ypredR,"\n");
+
