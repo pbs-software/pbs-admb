@@ -15,14 +15,16 @@
 \newcommand{\code}[1]{{\texttt{#1}}}
 \newcommand{\bold}[1]{{\textbf{#1}}}
 \newcommand{\red}[1]{{\textcolor{red} {#1}}}
+\newcommand{\pbsa}{{\textbf{PBSadmb}}}
+\newcommand{\pbsm}{{\textbf{PBSmodelling}}}
 
 \usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry} % pbs
 \usepackage{verbatim}
-\usepackage{hyperref}
 
+\usepackage{hyperref}
 % from Sweave.Rnw in C:\Apps\R\R300\library\utils\doc
 \hypersetup{%
-colorlinks,%
+colorlinks=true,%
 plainpages=true,%
 linkcolor=black,%
 citecolor=black,%
@@ -47,28 +49,40 @@ pdfsubject={PBS R package for ADMB}%
 
 \section*{What is \pkg{PBSadmb}?}
 
-The R package \pkg{PBSadmb} gives complete R support to the external program AD Model Builder (ADMB, \url{http://admb-project.org/}) released into the public domain in 2009. The program offers users a remarkably efficient tool for estimating parameters and their uncertainty, based on complex nonlinear statistical models. Installation instructions for ADMB can be found at: \\
+The R package \pbsa{} gives complete R support to the external program AD Model Builder (\href{http://admb-project.org/}{ADMB}) released into the public domain in 2009.
+The program offers users a remarkably efficient tool for estimating parameters and their uncertainty, based on complex nonlinear statistical models.
+
+Installation instructions for ADMB can be found at: \\
 Windows -- \url{http://www.admb-project.org/tools/admb-tools-for-windows}\\
 Linux \& MacOS -- \url{http://www.admb-project.org/documentation/install}
 
-In a standard ADMB installation, users would interact with the program via a DOS command shell (in Windows) or a bash shell (in Linux or MacOS X). The package \pkg{PBSadmb} makes it possible to interact entirely from an R console, as a common interface for all operating systems. A single R script can encapsulate commands to ADMB, as well as all analyses that follow. The package includes protocols for writing code to make the integration between R and ADMB almost seamless.
+In a standard ADMB installation, users would interact with the program via a DOS command shell (in Windows) or a bash shell (in Linux or MacOS X).
+The package \pbsa{} makes it possible to interact entirely from an R console, as a common interface for all operating systems.
+A single R script can encapsulate commands to ADMB, as well as all analyses that follow.
+The package includes protocols for writing code to make the integration between R and ADMB almost seamless.
 
-\pkg{PBSadmb} also provides a Graphical User Interface (GUI) that facilitates the steps required for a complete ADMB analysis. Both new and experienced users can use the GUI for tutorial and educational purposes.
+\pbsa{} also provides a Graphical User Interface (GUI) that facilitates the steps required for a complete ADMB analysis.
+Both new and experienced users can use the GUI for tutorial and educational purposes.
 
-You can obtain \pkg{PBSadmb} from the Comprehensive R Archive Network (CRAN, \url{http://cran.r-project.org/}). Always use the current version of \pkg{PBSadmb} with the most recent version of \pkg{PBSmodelling}, another package available from CRAN. The web site \url{http://code.google.com/p/pbs-admb/}, hosted by Google Code, features the most recent revisions to \pkg{PBSadmb}, and the latest source code and binary package for Windows can found at \href{https://drive.google.com/folderview?id=0B2Bkic2Qu5LGOGx1WkRySVYxNFU&usp=drive_web}{\bold{PBS Software Repository}}, hosted by Google Drive. These may be slightly more recent than those available on CRAN.
+You can obtain \pbsa{} from the Comprehensive R Archive Network (\href{http://cran.r-project.org/}{CRAN}).
+Always use the current version of \pbsa{} with the most recent version of \pbsm{}, another package available from CRAN.
+The \href{https://github.com/pbs-software/pbs-awatea}{GitHub} web site features the most recent revisions to \pbsa{}, including tagged versions of the package.
+%, and the latest source code and binary package for Windows can found at \href{https://drive.google.com/folderview?id=0B2Bkic2Qu5LGOGx1WkRySVYxNFU&usp=drive_web}{\bold{PBS Software Repository}}, hosted by Google Drive. These may be slightly more recent than those available on CRAN.
 
-\pkg{PBSadmb} represents just one of a series of R packages developed at the Pacific Biological Station (PBS). For futher information about the series, see \url{http://code.google.com/p/pbs-software/}. 
+\pbsa{} represents just one of a series of R packages developed at the Pacific Biological Station (PBS).
+For futher information about the series, see \href{https://github.com/pbs-software/pbs-software}{PBS Software} on GitHub. 
 
 
 \section*{What is PBS?}
 
-The initials \bold{PBS} refer to the Pacific Biological Station, a major fisheries laboratory operated by by Fisheries and Oceans Canada on the Pacific coast in Nanaimo, British Columbia, Canada. For more information, see:\\
-\url{http://www.pac.dfo-mpo.gc.ca/science/facilities-installations/pbs-sbp/index-eng.html}.
+The initials \bold{PBS} refer to the \href{http://www.pac.dfo-mpo.gc.ca/science/facilities-installations/pbs-sbp/index-eng.html}{Pacific Biological Station}, a major fisheries laboratory operated by by Fisheries and Oceans Canada on the Pacific coast in Nanaimo, British Columbia, Canada.
 
 
 \section*{Where is the User's Guide?}
 
-The R directory \code{../library/PBSadmb/doc} includes a complete User's Guide \code{PBSadmb-UG.pdf}. To use this package effectively, please consult the Guide. Note: once \pkg{PBSadmb} has been loaded, you can access the UG from the R console using a \pkg{PBSmodelling} function: \code{openUG("PBSadmb")}.
+The R directory \code{./library/PBSadmb/doc} includes a complete User's Guide \code{PBSadmb-UG.pdf}.
+To use this package effectively, please consult the Guide. 
+Note: once \pkg{PBSadmb} has been loaded, you can access the UG from the R console using a \pkg{PBSmodelling} function: \code{openUG("PBSadmb")}.
 
 \section*{Reference}
 

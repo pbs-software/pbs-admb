@@ -5,6 +5,10 @@ Authors:  JTS = Jon T. Schnute
           ACB = Alex Couture-Beil
 -----------------------------------
 
+1.0.0 (2016-04-06)
+  • Updated the vignette `PBSadmabIntro.Rnw' to indicate GitHub as the development repository. (RH 160406)
+  • Switched to semantic versioning, updated DESCRIPTION file. (RH 160406)
+
 0.69  2015-06-15
   • Last update to Google Code before transferring pbs-admb repository to GitHub. (RH 150615)
   • Reorganised the User's Guide to somewhat demote the GUI and promote the scripting aspect. (RH 150205)

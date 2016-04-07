@@ -1,14 +1,23 @@
 Package:     PBSadmb
-Version:     0.69
-Date:        2015-01-29
+Version:     1.0.0
+Date:        2016-04-06
 Title:       ADMB for R Using Scripts or GUI
-Author:      Jon T. Schnute <schnutej-dfo@shaw.ca>,
-             Rowan Haigh <rowan.haigh@dfo-mpo.gc.ca>,
-             Alex Couture-Beil <alex@mofo.ca>
+Authors@R: c(
+   person(c("Jon", "T."), "Schnute", role = "aut", email = "schnutej-dfo@shaw.ca"),
+   person("Rowan", "Haigh", role = c("aut", "cre"), email = "rowan.haigh@dfo-mpo.gc.ca"),
+   person("Alex", "Couture-Beil", role = "aut", email = "alex@mofo.ca")
+   )
+Author: Jon T. Schnute [aut], Rowan Haigh [aut, cre], Alex Couture-Beil [aut]
 Maintainer:  Rowan Haigh <rowan.haigh@dfo-mpo.gc.ca>
+Copyright:   2008-2016, Fisheries and Oceans Canada
 Depends:     R (>= 2.15.0), PBSmodelling (>= 2.65)
 Imports:     methods
-Description: R Support for ADMB (Automatic Differentiation Model Builder)
+Description: The package software provides R support for `ADMB' 
+             (Automatic Differentiation Model Builder), including
+             a `GUI' interface to facilitate the conversion of `ADMB'
+             template code to `C code' to a binary executable.
+             Stand-alone functions can also be used for those users
+             not interested in using a `GUI'.
 License:     GPL (>=2)
-URL:         http://code.google.com/p/pbs-admb/
+URL:         https://github.com/pbs-software/pbs-awatea
 

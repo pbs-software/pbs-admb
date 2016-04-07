@@ -1,3 +1,16 @@
+# Packages declared in the 'Depends' field should not also be in the 'Imports' field (from R-exts.pdf).
+# For PBSadmb I have to IMPORT and DEPEND on PBSmodelling.
+#   IMPORT alone cannot find `ComboBox` when `admb()` is called.
+#   DEPEND alone causes NOTE in Rcheck.
+import( methods, PBSmodelling )
+
+importFrom("graphics", "axis", "lines", "mtext", "pairs", "par", "points")
+importFrom("utils", "read.table", "write.table")
+
+# Import the S4 options manager from PBSmodelling (doesn't work)
+#importClassesFrom(PBSmodelling, PBSoptions)
+#importMethodsFrom(PBSmodelling, initialize, print, show)
+
 # Export all names from PBSadmb
 # exportPattern(".")
 
@@ -19,14 +32,4 @@ exportPattern("^\\.set")
 exportPattern("^\\.win\\.")
 export(.asIs)
 export(.version)
-
-# Packages declared in the 'Depends' field should not also be in the 'Imports' field (from R-exts.pdf).
-# For PBSadmb I have to IMPORT and DEPEND on PBSmodelling.
-#   IMPORT alone cannot find `ComboBox` when `admb()` is called.
-#   DEPEND alone causes NOTE in Rcheck.
-import( methods, PBSmodelling )
-
-# Import the S4 options manager from PBSmodelling (doesn't work)
-#importClassesFrom(PBSmodelling, PBSoptions)
-#importMethodsFrom(PBSmodelling, initialize, print, show)
 
