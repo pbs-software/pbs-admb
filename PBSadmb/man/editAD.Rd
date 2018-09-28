@@ -24,7 +24,7 @@ editAD(prefix, suffix=c(".tpl",".cpp",".log"))
   or an application specified with \code{setPBSext}.
 }
 \seealso{
-  \code{\link{editADfile}}, \code{\link{setADMBpath}}
+  \code{\link{editADfile}}, \code{\link{setADpath}}
 }
 \keyword{file}
 

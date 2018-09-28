@@ -32,10 +32,13 @@ suggestPath(progs, ipath = NULL, file_ext = NULL)
   element in the vector, and shows the results of the search for each of the directories.
 }
 \author{
-  Rowan Haigh, Pacific Biological Station, Fisheries and Oceans Canada, Nanaimo BC
+  \href{mailto:rowan.haigh@dfo-mpo.gc.ca}{Rowan Haigh}, Program Head -- Offshore Rockfish\cr
+  Pacific Biological Station (PBS), Fisheries & Oceans Canada (DFO), Nanaimo BC\cr
+  \emph{locus opus}: Institute of Ocean Sciences (IOS), Sidney BC\cr
+  Last modified \code{Rd: 2018-09-28}
 }
 \seealso{
-\code{\link[PBSadmb]{setADMBpath}}
+\code{\link[PBSadmb]{setADpath}}
 }
 \keyword{ utilites }
 \keyword{ sysdata }

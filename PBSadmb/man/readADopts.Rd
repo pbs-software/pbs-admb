@@ -27,7 +27,7 @@
   \code{.win.readADopts} (\emph{not currently used}).
 }
 \seealso{
-  \code{\link[PBSadmb]{setADMBpath}}, \code{\link[PBSadmb]{readADpaths}},
+  \code{\link[PBSadmb]{setADpath}}, \code{\link[PBSadmb]{readADpaths}},
   \code{\link[PBSadmb]{writeADopts}}, \code{\link[PBSmodelling]{loadOptions}}
 }
 \keyword{ data }

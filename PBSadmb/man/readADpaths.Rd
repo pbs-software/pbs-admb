@@ -5,7 +5,7 @@
   Read ADMB Paths From a Text File
 }
 \description{
-  Read or save ADMB paths (\code{admbpath}, \code{gccpath}, \code{editor}) from 
+  Read or save ADMB paths (\code{admbpath}, \code{gccpath}, \code{msysbin}, \code{editor}) from 
   or to a simple, 2-column text file where the first column gives the R variable
   name and the second column specifies the path (enclosed by double quotation marks \dQuote{}).
 }
@@ -15,7 +15,7 @@ saveADpaths(pathfile)
 }
 \arguments{
   \item{pathfile}{string name of 2-column text file that details the 
-    relevant paths for the R variables \code{admbpath}, \code{gccpath}, and \code{editor}.}
+    relevant paths for the R variables \code{admbpath}, \code{gccpath}, \code{msysbin}, and \code{editor}.}
 }
 \details{
   The simplest way to pass valid paths to the options manager in \pkg{PBSadmb} is to supply a text file in the working directory.
@@ -24,11 +24,15 @@ saveADpaths(pathfile)
   \preformatted{
   admbpath "C:/admb"
   gccpath  "C:/mingw"
+  msysbin  "C:/mingw/msys/bin"
   editor   "C:/Windows/System32/notepad.exe"
   }
 }
 \author{
-  Rowan Haigh, Pacific Biological Station, Fisheries and Oceans Canada, Nanaimo BC.
+  \href{mailto:rowan.haigh@dfo-mpo.gc.ca}{Rowan Haigh}, Program Head -- Offshore Rockfish\cr
+  Pacific Biological Station (PBS), Fisheries & Oceans Canada (DFO), Nanaimo BC\cr
+  \emph{locus opus}: Institute of Ocean Sciences (IOS), Sidney BC\cr
+  Last modified \code{Rd: 2018-09-28}
 }
 \note{
   On UNIX systems the MinGW compiler and UNIX tools are readily available; 
@@ -36,7 +40,7 @@ saveADpaths(pathfile)
   and the path to a text editor are needed.
 
   The user can supply any number of paths in a \code{pathfile}, which are passed to 
-  the options manager; however, only the above three paths are used at present.
+  the options manager; however, only the above four paths are used at present.
 }
 \seealso{
   \code{\link[PBSadmb]{readADopts}},

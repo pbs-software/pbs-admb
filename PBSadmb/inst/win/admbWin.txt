@@ -1,12 +1,12 @@
-# PBSadmb GUI (last modified: 2015-01-27)
+# PBSadmb GUI (last modified: 2018-09-28)
 window name=PBSadmb title="PBSadmb for ADMB" #onclose=
 
 #------------------------------------ MENU -------------------------------------
 # All OS users see all OS intall instruction
 menu nitems=3 label=Install
 	menuitem label="ADMB Tools for Windows" function=doAction action="browseURL(`http://www.admb-project.org/tools/admb-tools-for-windows`)"
-	menuitem label="ADMB Installation Linux" function=doAction action="browseURL(`http://www.admb-project.org/documentation/install/admb-installation-linux`)"
-	menuitem label="ADMB Installation Mac XCode" function=doAction action="browseURL(`http://www.admb-project.org/documentation/install/admb-installation-macos-package-installer`)"
+	menuitem label="ADMB Downloads - Source, AD Studio, Binaries" function=doAction action="browseURL(`http://www.admb-project.org/downloads/`)"
+	menuitem label="Packaging for Linux/Mac" function=doAction action="browseURL(`http://www.admb-project.org/developers/packaging/`)"
 
 menu nitems=4 label="Edit"
 	menuitem label=TPL function=doAction action="editADfile(paste(getWinVal()$prefix,`.tpl`,sep=``))"
@@ -28,36 +28,38 @@ menu nitems=@nitems label="Examples"
 	@menuitems
 
 menu nitems=4 label="Help"
-	menu nitems=3 label="Manuals"
+	menu nitems=4 label="Manuals"
+		menuitem label="ADMB Installation" function=doAction action="openFile(`doc/ADMB-IG.pdf`,package=`PBSadmb`)"
 		menuitem label="ADMB Manual" function=doAction action="openFile(`doc/admb.pdf`,package=`PBSadmb`)"
 		menuitem label="ADMB RE Manual" function=doAction action="openFile(`doc/admb-re.pdf`,package=`PBSadmb`)"
 		menuitem label="AUTODIF Library" function=doAction action="openFile(`doc/autodif.pdf`,package=`PBSadmb`)"
 	menu nitems=4 label="Online"
 		menuitem label="ADMB Project" function=doAction action="browseURL(`http://admb-project.org/`)"
-		menuitem label="ADMB Examples" function=doAction action="browseURL(`www.admb-project.org/examples`)"
-		menuitem label="ADMB FAQ" function=doAction action="browseURL(`http://www.admb-project.org/documentation/faq`)"
-		menuitem label="ADMB IDE Manual" function=doAction action="browseURL(`http://www.admb-project.org/tools/admb-ide/manual`)"
+		menuitem label="ADMB Examples" function=doAction action="browseURL(`http://www.admb-project.org/examples/`)"
+		menuitem label="ADMB FAQ" function=doAction action="browseURL(`http://www.admb-project.org/docs/faq/`)"
+		menuitem label="ADMB on GitHub" function=doAction action="browseURL(`https://github.com/admb-project/admb/`)"
 	menuitem label="User Guide" function=doAction action="openFile(`doc/PBSadmb-UG.pdf`,package=`PBSadmb`)"
 	menuitem label=About function=doAction action="editADfile(paste(system.file(package=`PBSadmb`),`/DESCRIPTION`,sep=``))"
 
 #----------------------------------- BUTTONS -----------------------------------
 
-Grid 2 3 sticky=E
-	label "Current WD:" sticky=W
-	droplist name=currentdir value="'' '<change path>'" add=T width=40 func=.changeWDEnter
-	grid 1 2 sticky=W
-		button text="Set WD" function=.changeWD
-		button text="Open" func=doAction action="openFile(\".\")"
-
-	label "Prefix:" sticky=W
-	droplist name=prefix mode=character sticky=W width=40 values="" add=T 
-	button text="Refresh" sticky=W function=.load.prefix.droplist
-		
+grid 1 8 sticky=E
+	label "Prefix:" sticky=E
+	droplist name=prefix mode=character sticky=W width=25 values="" add=T 
+	button text="Refresh" sticky=W function=.load.prefix.droplist bg=honeydew
+	button text="Open" func=doAction action="openFile(\".\")" bg=honeydew
+	button text="Set WD" function=.changeWD bg=honeydew
+	button text="R" func=doAction action="viewCode(pkg=`PBSadmb`)" bg=lemonchiffon
+	button text="WDF" func=doAction action="openFile(`@wdf`)" bg=lemonchiffon
+	button text="UG"  func=doAction action="openUG(pkg=`PBSadmb`)" bg=lemonchiffon
+grid 1 2 sticky=E
+	label "WD:" sticky=E
+	droplist name=currentdir value="'' '<change path>'" add=T width=62 func=.changeWDEnter
 
 notebook tabs="Setup Make Run Output" pady="2 0" #selected=3
 
 #Setup--------------------------------------------------------------------------
-grid 7 1 sticky=E
+grid 8 1 sticky=E
 	grid 1 3 sticky=W
 		label "Path Setup" sticky=W fg=purple3 font="bold 11" padx="0 230"
 		#null padx=129
@@ -71,14 +73,15 @@ grid 7 1 sticky=E
 		entry name=gccpath value="" label="Win MinGW home:" width=45 mode=character func=setGUIoptions action=gccpath
 		button text=">" func=doAction action="selectDir(usewidget=\"gccpath\")"
 	grid 1 2 sticky=E
+		entry name=msysbin value="" label="Unix utilities bin:" width=45 mode=character func=setGUIoptions action=gccpath
+		button text=">" func=doAction action="selectDir(usewidget=\"msysbin\")"
+	grid 1 2 sticky=E
 		entry name=editor value="" label=Editor: width=45 mode=character func=setGUIoptions action=editor
 		button text=">" func=doAction action="selectFile(usewidget=\"editor\")"
-	grid 1 4 sticky=E
-		label text="Versions:"
-		entry name=admbver value="" label="admb" width=12 mode=character func=setGUIoptions action=admbver
-		entry name=gccver value="" label="g++" width=15 mode=character func=setGUIoptions action=gccver padx="2 0"
-		button name=checkbutton text="Verify" func=.win.setADMBpath action=check bg=moccasin padx="10 0"
-
+	grid 1 3 sticky=E
+		entry name=admbver value="" label="Versions:  admb" width=16 mode=character func=setGUIoptions action=admbver
+		entry name=gccver value="" label="g++" width=17 mode=character func=setGUIoptions action=gccver padx="2 0"
+		button name=checkbutton text="Verify" func=.win.checkADopts action=check bg=moccasin padx="10 0"
 	label "Load/Save Paths from/to File" sticky=W fg=purple3 font="bold 11" pady="5 0"
 	grid 1 5 sticky=E
 		label text="Path File: "
@@ -89,24 +92,13 @@ grid 7 1 sticky=E
 
 #Make---------------------------------------------------------------------------
 grid 4 1 sticky=""
-	#grid 1 4 sticky=W
-	#	label text=Make font="bold 11" sticky=W fg=blue
-	#	label text="        " font="Courier 8"
-	#	label "Prefix:"
-	#	droplist name=prefix mode=character sticky=W width=20 values="" add=T
 
-	grid 1 8 sticky=W
+	grid 1 5 sticky=W
 		label text=Make font="bold 11" sticky=W fg=blue padx="0 10"
 		button text="tpl" func=doAction action="editAD(getWinVal()$prefix,c(`.tpl`))" 
 		button text="dat pin" func=doAction action="editAD(getWinVal()$prefix,c(`.dat`,`.pin`))" 
 		button text="cpp log" func=doAction action="editAD(getWinVal()$prefix,c(`.cpp`,`.log`))" 
 		button text="r" width=1 func=doAction action="editADfile(paste(getWinVal()$prefix,`.r`,sep=``))"
-		button text="Rcode" func=doAction action="viewCode(pkg=`PBSadmb`)"
-		button text="WDF" func=doAction action="openFile(`@wdf`)"
-		button text=Docs func=doAction action="openUG(pkg=`PBSadmb`)"
-		#label text=" " font="Courier 8"
-		#label text="      Make times\nUsr        Sys        Elap" sticky=E
-		#label text="" font="Courier 8"
 	grid 1 2 sticky=W pady="5 0"
 		grid 4 3 sticky=W
 			label text=Operation: sticky=NW
@@ -142,7 +134,6 @@ grid 4 1 sticky=""
 grid 5 1 sticky=W
 	grid 1 2 sticky=W
 		label text=Run font="bold 11" sticky=W fg=forestgreen
-		#label text="         " font="Courier 8"
 		matrix nrow=1 ncol=3 names=Rtime rowlabels="'Run times'" collabels=NULL width=8 entrybg=grey94 padx="10 0"
 	grid 2 4  sticky=W
 		label text="Options:" 

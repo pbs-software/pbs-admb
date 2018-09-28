@@ -52,7 +52,7 @@ alisp(...)
 }
 \references{
   CRAN Repository Policy: 
-  \url{http://cran.r-project.org/web/packages/policies.html}
+  \url{https://cran.r-project.org/web/packages/policies.html}
 }
 \author{
   Rowan Haigh, Pacific Biological Station, Fisheries and Oceans Canada, Nanaimo BC

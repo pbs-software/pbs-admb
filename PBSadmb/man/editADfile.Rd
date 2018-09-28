@@ -21,7 +21,7 @@ editADfile(fname)
 }
 \author{Jon T. Schnute, Pacific Biological Station, Fisheries and Oceans Canada, Nanaimo BC}
 \seealso{
-  \code{\link{editAD}}, \code{\link{setADMBpath}}
+  \code{\link{editAD}}, \code{\link{setADpath}}
 }
 \keyword{file}
 

@@ -24,7 +24,7 @@ Packaged on ", pkg_date, "
 Pacific Biological Station, Nanaimo
 
 All available PBS packages can be found at
-https://github.com/pbs-software/pbs-awatea
+https://github.com/pbs-software/pbs-admb
 
 Type admb() to start a GUI for operating ADMB.
 -----------------------------------------------------------
@@ -48,6 +48,7 @@ if(getRversion() >= "2.15.1") utils::globalVariables(names=c(
 	"gccpath","gccver",
 	"isdir",
 	"logfile",
+	"msysbin",
 	"nsims","nthin",
 	"optfile",
 	"PBSadmb","pltView","prefix","pthin",

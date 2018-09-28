@@ -24,7 +24,7 @@ writeADopts(optfile="ADopts.txt")
   \code{.win.writeADopts} (\emph{not currently used}).
 }
 \seealso{
-  \code{\link[PBSadmb]{readADopts}}, \code{\link[PBSadmb]{setADMBpath}},
+  \code{\link[PBSadmb]{readADopts}}, \code{\link[PBSadmb]{setADpath}},
   \code{\link[PBSmodelling]{saveOptions}}
 }
 \keyword{ data }
