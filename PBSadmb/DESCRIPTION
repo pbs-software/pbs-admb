@@ -1,6 +1,6 @@
 Package:     PBSadmb
-Version:     1.1.0
-Date:        2018-09-28
+Version:     1.1.2
+Date:        2018-10-02
 Title:       ADMB for R Using Scripts or GUI
 Authors@R: c(
    person(c("Jon", "T."), "Schnute", role = "aut", email = "schnutej-dfo@shaw.ca"),

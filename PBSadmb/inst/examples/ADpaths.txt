@@ -1,3 +1,4 @@
 admbpath "C:/admb"
 gccpath  "C:/mingw"
+msysbin  "C:/mingw/msys/bin"
 editor   "C:/Windows/System32/notepad.exe"

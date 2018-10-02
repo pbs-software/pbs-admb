@@ -199,6 +199,7 @@ compAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE,
 	## add ADMB path to path env variable
 	#old_path <- Sys.getenv( "PATH" )
 	.setPath(pathfile)
+#browser();return()
 
 	## pre cmd run
 	if (logfile & !add)
@@ -441,7 +442,7 @@ runMC <- function(prefix, nsims=2000, nthin=20, outsuff=".mc.dat",
 	readADopts()
 }
 
-## checkADopts--------------------------2018-09-27
+## checkADopts--------------------------2018-10-02
 ## Checks path locations specified by ADMB options.
 ## ---------------------------------------------RH
 checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
@@ -459,34 +460,45 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 	## Check that .PSadmb has all required paths and that links point to actual files on the hard drive.
 	## check for admb, mingw, and editor programs ###
 	mess=list()
-	for (i in names(opts)) {
-		if (!any(i==check))
-			next
-		ii = ipath = convSlashes(opts[[i]])
-		if (i=="admbpath") {
-			ipath = paste0(ii,slash,"bin")
+	for (i in 1:length(opts)) {
+		ii = names(opts)[i]
+		if (!any(ii==check)) next
+		iii = ipath = convSlashes(opts[[ii]])
+		use.cwd = iii==""
+		if (use.cwd) iii = "."  ## set to current working directory
+		ipath = iii
+		if (ii=="admbpath") {
+			if (!use.cwd)
+				ipath = paste0(iii,slash,"bin")
 			progs = paste0(c("tpl2cpp","tpl2rem"),ifelse(isWin,".exe",""))
-		} else if (i=="gccpath") {
-			ipath = paste0(ii,slash,"bin")
+		} else if (ii=="gccpath") {
+			if (!use.cwd)
+				ipath = paste0(iii,slash,"bin")
 			progs = paste0("g++",ifelse(isWin,".exe",""))
-		} else if (i=="msysbin") {
+		} else if (ii=="msysbin") {
 			progs = paste0("make",ifelse(isWin,".exe",""))
-		} else if (i=="editor") {
-			ipath = convSlashes(dirname(ii))
-#browser();return()
-			progs = basename(ii)
+		} else if (ii=="editor") {
+			if (use.cwd)
+				progs = "editor"
+			else {
+				ipath = convSlashes(dirname(iii))
+				progs = basename(iii)
+			}
 		}
-		target=paste(ipath,progs,sep=slash)
-		if (!isWin && i=="gccpath") {
-			ipath = "/usr"; istatus = TRUE }
-		else if (all(target==slash)) {
-			progs="editor"; istatus = FALSE }
-		else
+		if (all(progs=="editor")) {
+			istatus = FALSE
+		} else if (!isWin && ii %in% c("gccpath","msysbin")) {
+			ipath = "/usr"; istatus = TRUE
+		} else {
+			target = paste(ipath,progs,sep=slash)
 			istatus = file.exists(target)
-		names(istatus)=progs
-#if (i=="editor") {browser();return()}
-		mess[[ipath]]=istatus
+		}
+		names(istatus) = progs
+#if (ii=="editor") {browser();return()}
+		mess[[i]] = istatus
+		names(mess)[i] = ipath
 	}
+#browser();return()
 	ADstatus=all(unlist(mess)==TRUE)
 	attr(ADstatus,"status") = mess
 	vmess=unlist(mess)
@@ -495,43 +507,46 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 	attr(ADstatus,"message") = vmess
 	if (warn|popup) {
 		if (all(vmess==TRUE)) {
-			if(warn) cat("All programs found\n\n") }
+			verify = getWinAct()[1]=="verify"
+			if(warn && verify) cat("All programs found\n\n")
 			#if(popup) showAlert("All programs found","Continue","info") }
-		else {
+		 } else {
 			badmess=paste("Programs not found:\n----------------------\n",paste(names(vmess)[!vmess],collapse="\n"),
 				"\n\nAlter the path file (default 'ADpaths.txt') in the working directory.\n",
 				"     ~~~OR~~~\n",
 				"If using the PBSadmb GUI, alter the path entries in the Setup tab.\n\n",sep="")
 			if (isWin && popup) {
-				badmess <- paste( badmess, "If you need to install ADMB, follow links from Install dropdown menu.\n\n", sep="" )
+				badmess <- paste( badmess, "If you need to install ADMB, see 'ADMB Installation' manual in Help dropdown menu.\n\n", sep="" )
 			}
+#browser();return()
 			if (warn) cat(badmess)
 			if (popup) showAlert(badmess,"User action required","warning") 
 		}
 	}
-	## check for sed.exe when all programs above are found ###
-#browser();return()
+	## check for sed.exe when all programs above are found
 	if (isWin && all(vmess)) {
 		opts.sed = opts[c("msysbin","gccpath","admbpath")]
+		opts.sed = sapply(opts.sed,function(x){if(x=="") "." else x},simplify=F)
 		sedmess=list()
-		for (i in names(opts.sed)) {
-			if (!any(i==c(check,"msysbin")))
-				next
-			ii = ipath = opts.sed[[i]]
-			if (i=="msysbin")
+		for (i in 1:length(opts.sed)) {
+			ii = names(opts.sed)[i]
+#browser();return()
+			if (!any(ii==check)) next
+			iii = ipath = opts.sed[[ii]]
+			if (ii=="msysbin" || iii==".")
 				progs = paste0("sed",ifelse(isWin,".exe",""))
-			else if (i %in% c("gccpath","admbpath"))
+			else if (ii %in% c("gccpath","admbpath"))
 				progs = paste0("bin",slash,"sed",ifelse(isWin,".exe",""))
 			target=paste(ipath,progs,sep=slash)
 #{browser();return()}
-			istatus=file.exists(target)
-			names(istatus)=progs
-			sedmess[[ipath]]=istatus
+			istatus = file.exists(target)
+			names(istatus) = progs
+			sedmess[[i]] = istatus
+			names(sedmess)[i] = ipath
 		}
 		smess=unlist(sedmess)
 		names(smess)=paste(rep(names(sedmess),sapply(sedmess,length,simplify=FALSE)),
 			unlist(sapply(sedmess,names,simplify=FALSE)),sep=slash)
-#{browser();return()}
 		if (warn|popup) {
 			if (any(smess)) {
 				# if(warn) cat(paste("'sed",ifelse(isWin,".exe'",",")," program found\n\n",sep="")) ### do not warn
@@ -541,6 +556,7 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 				badsedmess=paste("Exception: the program 'sed",ifelse(isWin,".exe",""),"' was not found on any of these paths:\n",
 					paste(gsub(paste0("sed",ifelse(isWin,".exe","")),"",names(smess))[!smess],collapse="\n"),
 					"\n\nPlace a copy of 'sed",ifelse(isWin,".exe",""),"' on any one of the paths indicated above.\n\n",sep="")
+#browser();return()
 				if (warn) cat(badsedmess)
 				if (popup) showAlert(badsedmess,"User action required","warning") 
 			}
@@ -565,11 +581,11 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.win.checkADopts
 
-##--------------------------------------2018-09-27
+##--------------------------------------2018-10-01
 .win.checkADpath=function(winName="PBSadmb")
 {
 	atget(.PBSadmb)
-	for (i in c("admbpath","gccpath","msysbin")) {
+	for (i in c("admbpath","gccpath","msysbin","editor")) {
 		wval = getWinVal()[[i]]
 		ival = getOptions(.PBSadmb,i)
 		if (is.null(ival) || wval!=ival) {
@@ -971,7 +987,6 @@ editADfile <- function(fname)
 	#f.edit <- paste("start \"\"",.addQuotes(convSlashes(.ADopts$editor)),.addQuotes(convSlashes(fname)),sep=" ");
 	if (.Platform$OS.type=="windows") {
 		f.edit <- paste(shQuote(getOptions(atcall(.PBSadmb),"editor")),shQuote(fname),sep=" ")
-		#f.edit <- paste(.addQuotes(convSlashes(getOptions(.PBSadmb,"editor"))),.addQuotes(convSlashes(fname)),sep=" ")
 	} else {
 		f.edit <- paste(getOptions(atcall(.PBSadmb),"editor"),fname,sep=" ")
 	}
@@ -1003,6 +1018,7 @@ editAD <- function(prefix, suffix=c(".tpl",".cpp",".log"))
 		for (j in 1:nsuff) {
 			fname=paste(prefix[i],suffix[j],sep="")
 			k=k+1
+print(c(npref, nsuff, fname))
 			ed.out[k]=editADfile(fname)
 		}
 	}
@@ -1608,7 +1624,6 @@ suggestPath <- function(progs, ipath=NULL, file_ext=NULL)
 		out=shell(dots,intern=TRUE) }
 	else {
 		cmd <- unlist(list(...))
-		#print( cmd )
 		if( wait == FALSE )
 			out=system(cmd,wait=FALSE)
 		else
@@ -1720,11 +1735,14 @@ suggestPath <- function(progs, ipath=NULL, file_ext=NULL)
 	normalizePath( path, winslash, mustWork )
 }
 
+## .version-----------------------------2018-10-02
 .version = function(x) {
 	if (is.null(x) || is.numeric(x)) return(x)
 	xpc = strsplit(x,split="\\.")[[1]]
-	npc = length(xpc)
-	xnu = as.numeric(paste(xpc[1:min(2,npc)],collapse="."))
+	#npc = length(xpc)
+	#xnu = as.numeric(paste(xpc[1:min(2,npc)],collapse="."))
+	npc = !grepl("[[:alpha:]]",xpc)  ## only numerics assuming alternative is alphanumeric
+	xnu = as.numeric(paste(xpc[npc],collapse="."))
 	return(xnu)
 }
 
