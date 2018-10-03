@@ -24,7 +24,9 @@ setupAD(pathfile)
   objects called \code{.PBSadmb} in the temporary environment \code{.PBSadmbEnv}.
 }
 \author{
-  Jon T. Schnute & Rowan Haigh, Pacific Biological Station, Fisheries and Oceans Canada, Nanaimo BC 
+  \href{mailto:schnutej-dfo@shaw.ca}{Jon T. Schnute}, Scientist Emeritus\cr
+  Pacific Biological Station (PBS), Fisheries & Oceans Canada (DFO), Nanaimo BC\cr
+  Last modified \code{Rd: 2014-02-27}
 }
 \note{
   To access the options manager in the temporary working environment, use the \pkg{PBSadmb}

@@ -26,7 +26,11 @@ runAD(prefix, argvec="", logfile=TRUE, add=TRUE, verbose=TRUE)
 \value{
   Invisibly returns the results of the shell call.
 }
-\author{ Jon T. Schnute, Pacific Biological Station, Nanaimo BC, Canada }
+\author{
+  \href{mailto:schnutej-dfo@shaw.ca}{Jon T. Schnute}, Scientist Emeritus\cr
+  Pacific Biological Station (PBS), Fisheries & Oceans Canada (DFO), Nanaimo BC\cr
+  Last modified \code{Rd: 2009-09-10}
+}
 \note{
   A wrapper function that can be called from a GUI exists as \code{.win.runAD}.
 }

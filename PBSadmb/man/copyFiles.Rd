@@ -23,7 +23,12 @@ copyFiles(prefix, suffix=NULL, srcdir=getwd(), dstdir=getwd(), ask=TRUE)
 \value{
   Invisibly returns a Boolean vector with names of files that have been copied or not.
 }
-\author{ Rowan Haigh, Pacific Biological Station, Nanaimo, BC }
+\author{
+  \href{mailto:rowan.haigh@dfo-mpo.gc.ca}{Rowan Haigh}, Program Head -- Offshore Rockfish\cr
+  Pacific Biological Station (PBS), Fisheries & Oceans Canada (DFO), Nanaimo BC\cr
+  \emph{locus opus}: Institute of Ocean Sciences (IOS), Sidney BC\cr
+  Last modified \code{Rd: 2011-02-14}
+}
 \seealso{ \code{\link{editAD}} }
 \keyword{ utilities }
 \keyword{ IO }

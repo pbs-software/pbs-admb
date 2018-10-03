@@ -19,7 +19,11 @@ editADfile(fname)
   \pkg{PBSmodelling} has another function \code{openFile} that uses Windows
   file associations or an application specified with \code{setPBSext}.
 }
-\author{Jon T. Schnute, Pacific Biological Station, Fisheries and Oceans Canada, Nanaimo BC}
+\author{
+  \href{mailto:schnutej-dfo@shaw.ca}{Jon T. Schnute}, Scientist Emeritus\cr
+  Pacific Biological Station (PBS), Fisheries & Oceans Canada (DFO), Nanaimo BC\cr
+  Last modified \code{Rd: 2018-09-28}
+}
 \seealso{
   \code{\link{editAD}}, \code{\link{setADpath}}
 }

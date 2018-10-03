@@ -15,7 +15,11 @@ editAD(prefix, suffix=c(".tpl",".cpp",".log"))
   Invisibly returns Boolean vector with elements \code{TRUE} if files exist, 
   \code{FALSE} if they do not.
 }
-\author{Jon T. Schnute, Pacific Biological Station, Fisheries and Oceans Canada, Nanaimo BC}
+\author{
+  \href{mailto:schnutej-dfo@shaw.ca}{Jon T. Schnute}, Scientist Emeritus\cr
+  Pacific Biological Station (PBS), Fisheries & Oceans Canada (DFO), Nanaimo BC\cr
+  Last modified \code{Rd: 2018-09-28}
+}
 \note{
   A wrapper function that can be called from a GUI exists as \code{.win.editAD}.
   

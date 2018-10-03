@@ -31,7 +31,9 @@ linkAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE,
   Invisibly returns the shell call and its messages.
 }
 \author{
-  Jon T. Schnute, Pacific Biological Station, Fisheries and Oceans Canada, Nanaimo BC
+  \href{mailto:schnutej-dfo@shaw.ca}{Jon T. Schnute}, Scientist Emeritus\cr
+  Pacific Biological Station (PBS), Fisheries & Oceans Canada (DFO), Nanaimo BC\cr
+  Last modified \code{Rd: 2015-01-27}
 }
 \note{
   A wrapper function that can be called from a GUI exists as \code{.win.linkAD}.

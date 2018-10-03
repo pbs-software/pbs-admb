@@ -20,7 +20,9 @@
   No values returned. Reads the ADMB options into the list object \code{.PBSadmb}.
 }
 \author{
-  Alex Couture-Beil, Vancouver Island University, Nanaimo BC
+  \href{mailto:alex@mofo.ca}{Alex Couture-Beil}, Software Engineer, Victoria BC\cr
+  Simon Fraser University (Burnaby BC), Vancouver Island University (Nanaimo BC)\cr
+  Last modified \code{Rd: 2018-09-28}
 }
 \note{
   A wrapper function that can be called from a GUI exists as 

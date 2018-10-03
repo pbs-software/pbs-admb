@@ -18,7 +18,10 @@ convOS(inam, onam = inam, path = getwd() )
   Text file(s) formatted in accordance with standards of the operating system.
 }
 \author{
-  Rowan Haigh, Pacific Biological Station, Nanaimo BC
+  \href{mailto:rowan.haigh@dfo-mpo.gc.ca}{Rowan Haigh}, Program Head -- Offshore Rockfish\cr
+  Pacific Biological Station (PBS), Fisheries & Oceans Canada (DFO), Nanaimo BC\cr
+  \emph{locus opus}: Institute of Ocean Sciences (IOS), Sidney BC\cr
+  Last modified \code{Rd: 2009-12-04}
 }
 \note{
   This function essentially executes a \code{readLines} command followed by a call to \code{writeLines}.

@@ -31,7 +31,11 @@ convAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE,
 \value{
   Invisibly returns the shell call and its messages.
 }
-\author{ Jon T. Schnute, Pacific Biological Station, Fisheries and Oceans Canada, Nanaimo BC. }
+\author{
+  \href{mailto:schnutej-dfo@shaw.ca}{Jon T. Schnute}, Scientist Emeritus\cr
+  Pacific Biological Station (PBS), Fisheries & Oceans Canada (DFO), Nanaimo BC\cr
+  Last modified \code{Rd: 2014-02-27}
+}
 \note{
   A wrapper function that can be called from a GUI exists as \code{.win.convAD}.
 

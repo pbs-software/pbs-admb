@@ -4,7 +4,22 @@ Authors:  JTS = Jon T. Schnute
           RH  = Rowan Haigh
           ACB = Alex Couture-Beil
           CG  = Chris Grandin
+          AE  = Anisa Egeli
 -----------------------------------
+
+1.1.3 (2018-10-03) [Rcheck=T, Rbuild=T]
+  * R code
+    + Added new function `.win.checkPrefix' to detect if the GUI prefix box is empty. (RH 181003)
+    + Fixed bug in 'checkADopts' which depended on GUI call. (RH 181003)
+      - Added new argument `verify=TRUE' to command line function and shifted detection of GUI button `Verify' push to function `.win.checkADopts'.
+    + Removed function `.guessPath' from function `readADopts' because it was not being used. (RH 181003)
+      - Software uses function `suggestPath' and `.win.suggestPath' instead (and has done so for a while).
+    + Removed old lines of code commented out, usually de-activated until new code proves stable. (RH 181003)
+    + Identified and isolated deprecated functions. (RH 181003)
+      -  `.appendToPath', `.win.readADopts', `.win.readADopts', `.win.viewCode'
+  * Documentation
+    + Updated authors section in all Rd files. (RH 181003)
+    + Removed file `00ReadMe.txt' from package `docs' because it contained nothing useful. (RH 181003)
 
 1.1.2 (2018-10-02) [Rcheck=T, Rbuild=T]
   * Documentation

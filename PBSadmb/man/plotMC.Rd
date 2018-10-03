@@ -16,7 +16,12 @@ plotMC(prefix, act="pairs", pthin=1, useCols=NULL)
     from the \code{.mc.dat} file for plotting.}
   \item{useCols}{logical vector indicating which columns of \code{.mc.dat} to plot.}
 }
-\author{ Rowan Haigh, Pacific Biological Station, Nanaimo BC, Canada }
+\author{
+  \href{mailto:rowan.haigh@dfo-mpo.gc.ca}{Rowan Haigh}, Program Head -- Offshore Rockfish\cr
+  Pacific Biological Station (PBS), Fisheries & Oceans Canada (DFO), Nanaimo BC\cr
+  \emph{locus opus}: Institute of Ocean Sciences (IOS), Sidney BC\cr
+  Last modified \code{Rd: 2009-09-10}
+}
 \note{
   A wrapper function that can be called from a GUI exists as \code{.win.plotMC}.
   Use the PBSadmb GUI to explore these plots easily.
