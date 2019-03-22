@@ -7,6 +7,14 @@ Authors:  JTS = Jon T. Schnute
           AE  = Anisa Egeli
 -----------------------------------
 
+1.1.4 (2019-03-19) [Rcheck=T, Rbuild=T]
+  * Documentation
+    + Replaced the ADMB 11.1 manuals with version 12 manuals in the inst/doc folder. (RH 190319)
+      - Source: http://www.admb-project.org/docs/manuals/
+    + Added link to GUI's <Help><Online> for navigating to ADMB's online manuals. (RH 190319)
+    + Updated the PBSadmb User's Guide. (RH 190319)
+    + Modified the ADMB Installation Guide. (RH 181004)
+
 1.1.3 (2018-10-03) [Rcheck=T, Rbuild=T]
   * R code
     + Added new function `.win.checkPrefix' to detect if the GUI prefix box is empty. (RH 181003)

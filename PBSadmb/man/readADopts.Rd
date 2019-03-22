@@ -22,15 +22,19 @@
 \author{
   \href{mailto:alex@mofo.ca}{Alex Couture-Beil}, Software Engineer, Victoria BC\cr
   Simon Fraser University (Burnaby BC), Vancouver Island University (Nanaimo BC)\cr
-  Last modified \code{Rd: 2018-09-28}
+  Last modified \code{Rd: 2019-03-14}
 }
 \note{
   A wrapper function that can be called from a GUI exists as 
   \code{.win.readADopts} (\emph{not currently used}).
 }
 \seealso{
-  \code{\link[PBSadmb]{setADpath}}, \code{\link[PBSadmb]{readADpaths}},
-  \code{\link[PBSadmb]{writeADopts}}, \code{\link[PBSmodelling]{loadOptions}}
+In package \pkg{PBSadmb}:\cr
+  \code{\link[PBSadmb]{setADpath}},
+  \code{\link[PBSadmb]{readADpaths}},
+  \code{\link[PBSadmb]{writeADopts}}\cr
+In package \pkg{PBSmodelling}:\cr
+  \code{\link[PBSmodelling]{loadOptions}}
 }
 \keyword{ data }
 \keyword{ list }
