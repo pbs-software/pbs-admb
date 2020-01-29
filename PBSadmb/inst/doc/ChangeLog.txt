@@ -7,6 +7,11 @@ Authors:  JTS = Jon T. Schnute
           AE  = Anisa Egeli
 -----------------------------------
 
+1.1.5 (2020-01-29) [Rcheck=F, Rbuild=F]
+  * Documentation
+    + Updated the ADMB Installation Guide. (RH 200129)
+      - Added section on how to build ADMB 12.1 + GCC 9.2.0
+
 1.1.4 (2019-03-19) [Rcheck=T, Rbuild=T]
   * Documentation
     + Replaced the ADMB 11.1 manuals with version 12 manuals in the inst/doc folder. (RH 190319)

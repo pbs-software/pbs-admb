@@ -1,6 +1,6 @@
 Package:     PBSadmb
-Version:     1.1.4
-Date:        2019-03-19
+Version:     1.1.5
+Date:        2020-01-29
 Title:       ADMB for R Using Scripts or GUI
 Authors@R: c(
    person(c("Jon", "T."), "Schnute", role = "aut", email = "schnutej-dfo@shaw.ca"),
@@ -9,7 +9,7 @@ Authors@R: c(
    )
 Author: Jon T. Schnute [aut], Rowan Haigh [aut, cre], Alex Couture-Beil [aut]
 Maintainer:  Rowan Haigh <rowan.haigh@dfo-mpo.gc.ca>
-Copyright:   2008-2019, Fisheries and Oceans Canada
+Copyright:   2008-2020, Fisheries and Oceans Canada
 Depends:     R (>= 3.5.0), PBSmodelling (>= 2.68.6)
 Imports:     methods
 Description: A collection of software provides R support for 'ADMB'
