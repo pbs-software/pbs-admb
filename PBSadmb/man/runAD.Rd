@@ -27,7 +27,7 @@ runAD(prefix, argvec="", logfile=TRUE, add=TRUE, verbose=TRUE)
   Invisibly returns the results of the shell call.
 }
 \author{
-  \href{mailto:schnutej-dfo@shaw.ca}{Jon T. Schnute}, Scientist Emeritus\cr
+  \href{mailto:schnutej@shaw.ca}{Jon T. Schnute}, Scientist Emeritus\cr
   Pacific Biological Station (PBS), Fisheries & Oceans Canada (DFO), Nanaimo BC\cr
   Last modified \code{Rd: 2009-09-10}
 }

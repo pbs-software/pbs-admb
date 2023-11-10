@@ -5,7 +5,7 @@
 \alias{atput}
 \alias{alisp}
 \title{
-  Get/Print Objects From or Put Objects Into Temporary Work Environment
+  Get/Put Objects From/To Temporary Work Environment
 }
 \description{
   These functions are wrappers to the PBSmodelling accessor functions that
@@ -36,7 +36,6 @@ alisp(...)
   These accessor functions were developed as a response to the CRAN
   repository policy statement: \dQuote{Packages should not modify the
   global environment (user's workspace).}
-  
 }
 \note{
   Additional wrapper functions to access functions in \code{.PBSadmbEnv}
@@ -51,17 +50,18 @@ alisp(...)
   arguments in other functions.
 }
 \references{
-  CRAN Repository Policy: 
-  \url{https://cran.r-project.org/web/packages/policies.html}
+  \href{https://cran.r-project.org/web/packages/policies.html}{CRAN Repository Policy}
 }
 \author{
   \href{mailto:rowan.haigh@dfo-mpo.gc.ca}{Rowan Haigh}, Program Head -- Offshore Rockfish\cr
   Pacific Biological Station (PBS), Fisheries & Oceans Canada (DFO), Nanaimo BC\cr
-  \emph{locus opus}: Institute of Ocean Sciences (IOS), Sidney BC\cr
-  Last modified \code{Rd: 2018-09-28}
+  \emph{locus opus}: Offsite, Vancouver BC\cr
+  Last modified \code{Rd: 2023-11-10}
 }
 \seealso{
-\code{\link[PBSmodelling]{tget}} and \code{\link[PBSmodelling]{lisp}} in \pkg{PBSmodelling}
+In package \pkg{PBSmodelling}:\cr
+\code{\link[PBSmodelling]{tget}}, and
+\code{\link[PBSmodelling]{lisp}}
 }
 \keyword{manip}
 \keyword{environment}

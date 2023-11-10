@@ -23,9 +23,9 @@ suggestPath(progs, ipath = NULL, file_ext = NULL)
 }
 \value{
   Returns a logical vector where each element corresponds to a program searched. 
-  If the element is {TRUE}, then the program was found on the path, 
+  If the element is \code{TRUE}, then the program was found on the path, 
   which is supplied as the name of the vector element.
-  If the element is {FALSE}, the program may exist on the user's system, 
+  If the element is \code{FALSE}, the program may exist on the user's system, 
   but is not in any of the directories specified by the \code{PATH} environment of the system.
   
   The returned vector has a list attribute where each item in the list corresponds to each
@@ -34,8 +34,8 @@ suggestPath(progs, ipath = NULL, file_ext = NULL)
 \author{
   \href{mailto:rowan.haigh@dfo-mpo.gc.ca}{Rowan Haigh}, Program Head -- Offshore Rockfish\cr
   Pacific Biological Station (PBS), Fisheries & Oceans Canada (DFO), Nanaimo BC\cr
-  \emph{locus opus}: Institute of Ocean Sciences (IOS), Sidney BC\cr
-  Last modified \code{Rd: 2018-09-28}
+  \emph{locus opus}: Offsite, Vancouver BC\cr
+  Last modified \code{Rd: 2023-11-09}
 }
 \seealso{
 \code{\link[PBSadmb]{setADpath}}

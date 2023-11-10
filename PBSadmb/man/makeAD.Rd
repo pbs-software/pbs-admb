@@ -32,7 +32,7 @@ makeAD(prefix, raneff=FALSE, safe=TRUE, dll=FALSE, debug=FALSE,
   return the shell call and its messages.
 }
 \author{
-  \href{mailto:schnutej-dfo@shaw.ca}{Jon T. Schnute}, Scientist Emeritus\cr
+  \href{mailto:schnutej@shaw.ca}{Jon T. Schnute}, Scientist Emeritus\cr
   Pacific Biological Station (PBS), Fisheries & Oceans Canada (DFO), Nanaimo BC\cr
   Last modified \code{Rd: 2015-01-27}
 }

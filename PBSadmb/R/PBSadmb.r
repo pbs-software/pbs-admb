@@ -778,7 +778,7 @@ setADpath <- function( admbpath, gccpath, msysbin, editor )
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.setPath
 
 
-## setADver---------------------------2015-01-27
+## setADver-----------------------------2023-11-09
 ## Sets the ADMB versions.
 ## Now simplified to always read in versions if admb/g++ exist.
 ## ---------------------------------------------RH
@@ -801,7 +801,7 @@ setADver <- function( admbver, gccver )
 			if (isWin) cmd = shQuote(paste(opts["gccpath"],"/bin/",cmd,sep=""))
 			gccVer = .callSys(cmd)[1]
 			## return the whole string minus `g++ '
-			gccver = PBSmodelling::.trimWhiteSpace(gsub("g\\+\\+","",gccVer))
+			gccver = PBSmodelling:::.trimWhiteSpace(gsub("g\\+\\+","",gccVer))  ## dot functions no longer exported (RH 231109)
 			setOptions(.PBSadmb, gccver = gccver)
 	} else {
 		setOptions(.PBSadmb, gccver = "")
@@ -1010,10 +1010,10 @@ appendLog <- function(prefix, lines)
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.win.appendLog
 
 
-## readRep------------------------------2009-07-09
+## readRep------------------------------2023-11-09
 ## Imports the generated reports in various ways
 ## ---------------------------------------------RH
-readRep=function(prefix, suffix=c(".cor",".rep",".std",".mc.dat"), global=FALSE)
+readRep <- function(prefix, suffix=c(".cor",".rep",".std",".mc.dat"), global=FALSE)
 {
 	## extracted from Alex's PBSmodelling::readList
 	findFormat=function(dat){
@@ -1041,7 +1041,7 @@ readRep=function(prefix, suffix=c(".cor",".rep",".std",".mc.dat"), global=FALSE)
 		contents=dat=readLines(i)
 		ncont=length(contents)
 		ff=findFormat(contents)
-		if (ff=="P") dat=PBSmodelling::.readList.P(i)
+		if (ff=="P") dat=PBSmodelling:::.readList.P(i)  ## dot functions no longer exported (RH 231109)
 		else if (ff=="D" || ff=="R") dat=eval(parse(i))
 		else if (any(ii==c("cor","std","mc.dat"))) { ## treat these as a data frames
 			tcont=gsub("std dev","std",contents)
@@ -1170,10 +1170,10 @@ convOS = function(inam, onam=inam, path=getwd())
 ##             PLOT FUNCTIONS                     
 ##================================================
 
-## plotMC-------------------------------2009-02-06
+## plotMC-------------------------------2023-11-09
 ## Plots the MCMC output in various ways
-## ----------------------------------------------RH
-plotMC=function(prefix,act="pairs",pthin=1,useCols=NULL)
+## ---------------------------------------------RH
+plotMC <- function(prefix,act="pairs",pthin=1,useCols=NULL)
 {
 	if (is.null(prefix) || prefix=="") return()
 	inFile=paste(prefix, ".mc.dat", sep="")
@@ -1225,7 +1225,7 @@ plotMC=function(prefix,act="pairs",pthin=1,useCols=NULL)
 		mtext("Sequential chain values",side=1,outer=TRUE,line=2,cex=1) 
 	}
 	if (act=="dens") {
-		rc=PBSmodelling::.findSquare(nc)
+		rc=PBSmodelling:::.findSquare(nc)  ## dot functions no longer exported (RH 231109)
 		#sqn=sqrt(nc); m=ceiling(sqn); n=ceiling(nc/m)
 		expandGraph(mfrow=c(rc[1],rc[2]),mar=c(2,2,0,0),oma=c(1,1.75,.5,.5),mgp=c(1.5,.2,0))
 		for (i in 1:nc) {
@@ -1299,8 +1299,9 @@ cleanAD <- function(prefix=NULL)
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.win.cleanAD
 
 
-## .cleanUp-----------------------------2009-02-11
+## .cleanUp-----------------------------2023-11-10
 ## Anisa's cleanProj function modified for flexibility.
+## Note:  PBSmodelling:::.doClean uses fixed winName of 'cleanWindow'
 ## ---------------------------------------------RH
 .cleanUp=function(prefix, suffix, files)
 {
@@ -1308,21 +1309,21 @@ cleanAD <- function(prefix=NULL)
 	if (missing(files))  files  = character(0)
 	rowLen = ceiling(sqrt(max(length(suffix), length(files))))
 	if (rowLen == 0) return(invisible(FALSE))
-	winDesc = c("window name=cleanWindow title=Clean",
+	winDesc = c("window name=cleanWindow title=\"Clean Project\"",
 		"grid 1 3",
 		paste("entry name=cleanPrefix value=\"", prefix, "\" label=Prefix ",
 			"mode=character width=12 font=\"bold 9\"", sep = ""),
 		"button text=\">\" function=.win.findClean",
-		"button text=refresh function=.cleanUpAgain",
+		"button text=refresh function=doAction action=\"PBSadmb:::.cleanUpAgain()\"",
 		"label text=\"\n\nSuffixes to Clean\" font=\"bold 9\"", 
-		PBSmodelling::.makeCleanVec("suff", suffix, rowLen), 
+		PBSmodelling:::.makeCleanVec("suff", suffix, rowLen), 
 		"label text=\"\n\nFiles to Clean\" font=\"bold 9\"", 
-		PBSmodelling::.makeCleanVec("file", files, rowLen), 
+		PBSmodelling:::.makeCleanVec("file", files, rowLen), 
 		"grid 1 3 relief=groove padx=4 pady=4", 
 		"button function=.selectCleanBoxes action=1 text=\"Select All\" padx=4 pady=4", 
 		"button function=.selectCleanBoxes action=0 text=\"Deselect All\" padx=4 pady=4", 
-		"button function=.doClean text=Clean bg=aliceblue padx=4 pady=4")
-	createWin(winDesc, astext = TRUE, env=PBSmodelling::.getHiddenEnv() ) 
+		"button function=doAction text=Clean bg=aliceblue padx=4 pady=4 action=\"PBSmodelling:::.doClean()\"")
+	createWin(winDesc, astext = TRUE, env=PBSmodelling:::.getHiddenEnv() ) 
 	invisible(TRUE)
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.cleanUp
@@ -1341,9 +1342,9 @@ cleanAD <- function(prefix=NULL)
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.win.findClean
 
 
-## .cleanWD-----------------------------2013-03-25
+## .cleanWD-----------------------------2023-11-09
 ## Clean all potential garbage files.
-## ------------------------------------------AE/RH
+## ------------------------------------------AE|RH
 .cleanWD=function(files)
 {
 	## Clean all nuisance files
@@ -1352,14 +1353,14 @@ cleanAD <- function(prefix=NULL)
 		try(closeWin("cleanWD"),silent=TRUE)
 		return(invisible(FALSE)) 
 	}
-	winDesc = c("window name=cleanWD title=Clean",
+	winDesc = c("window name=cleanWD title=\"Clean WD\"",
 		"label text=\"\n\nFiles to Clean\" font=\"bold 9\"",
-		PBSmodelling::.makeCleanVec("file", files, rowLen),
+		PBSmodelling:::.makeCleanVec("file", files, rowLen),
 		"grid 1 3 relief=groove padx=4 pady=4", 
 		"button function=.selectCleanBoxes action=1 text=\"Select All\" padx=4 pady=4", 
 		"button function=.selectCleanBoxes action=0 text=\"Deselect All\" padx=4 pady=4", 
-		"button function=doAction text=Clean bg=aliceblue padx=4 pady=4 action=\".doCleanAD(); closeWin(`cleanWD`)\"")
-	createWin(winDesc, astext = TRUE, env=PBSmodelling::.getHiddenEnv() )
+		"button function=doAction text=Clean bg=aliceblue padx=4 pady=4 action=\"PBSadmb:::.doCleanAD(`cleanWD`); closeWin(`cleanWD`)\"")
+	createWin(winDesc, astext = TRUE, env=PBSmodelling:::.getHiddenEnv() )
 	invisible(TRUE)
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.cleanWD
@@ -1368,9 +1369,9 @@ cleanAD <- function(prefix=NULL)
 ## .doCleanAD-------------------------2013-03-25
 ## Anisa's .doClean function modified for file names only
 ## ------------------------------------------AE/RH
-.doCleanAD=function ()
+.doCleanAD=function (winName="cleanWindow")
 {
-	vec=getWinVal(scope="L")
+	vec=getWinVal(winName=winName, scope="L")
 	vecList=logical()
 	for (i in names(vec)) vecList=c(vecList,vec[[i]])
 	filenames = names(vecList)[vecList]

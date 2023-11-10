@@ -48,7 +48,7 @@ grid 1 8 sticky=E
 	label "Prefix:" sticky=E
 	droplist name=prefix mode=character sticky=W width=25 values="" add=T 
 	button text="Refresh" sticky=W function=.load.prefix.droplist bg=honeydew action=refresh
-	button text="Open" func=doAction action="openFile(\".\")" bg=honeydew
+	button text="Open" func=doAction action="openFile(\"\")" bg=honeydew
 	button text="Set WD" function=.changeWD bg=honeydew action=setwd
 	button text="R" func=doAction action="viewCode(pkg=`PBSadmb`)" bg=lemonchiffon
 	button text="WDF" func=doAction action="openFile(`@wdf`)" bg=lemonchiffon

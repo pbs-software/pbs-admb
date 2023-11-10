@@ -11,25 +11,32 @@ importFrom("utils", "read.table", "write.table")
 #importClassesFrom(PBSmodelling, PBSoptions)
 #importMethodsFrom(PBSmodelling, initialize, print, show)
 
-# Export all names from PBSadmb
-# exportPattern(".")
-
+# Export all non-dot names from PBSadmb
 exportPattern("^[^\\.]")
-exportPattern("^\\.add")
-exportPattern("^\\.append")
-exportPattern("^\\.call")
-exportPattern("^\\.change")
-exportPattern("^\\.choose")
-exportPattern("^\\.clean")
-exportPattern("^\\.delete")
-exportPattern("^\\.do")
-exportPattern("^\\.get")
-exportPattern("^\\.init")
-exportPattern("^\\.load")
-exportPattern("^\\.norm")
-exportPattern("^\\.PBS")
-exportPattern("^\\.set")
-exportPattern("^\\.win\\.")
-export(.asIs)
-export(.version)
+
+## need .PBSadmbEnv
+export(.PBSadmbEnv)
+
+## need these functions called by Windows Description files (GUIs)
+exportPattern("^\\.win\\.")  ## function wrappers
+
+# R now requires documentation for all exported objects,
+#  even dot functions, so keep in the NAMESPACE
+#export(.asIs)
+#export(.version)
+#exportPattern("^\\.add")
+#exportPattern("^\\.append")
+#exportPattern("^\\.call")
+#exportPattern("^\\.change")
+#exportPattern("^\\.choose")
+#exportPattern("^\\.clean")
+#exportPattern("^\\.delete")
+#exportPattern("^\\.do")
+#exportPattern("^\\.get")
+#exportPattern("^\\.init")
+#exportPattern("^\\.load")
+#exportPattern("^\\.norm")
+#exportPattern("^\\.PBS")
+#exportPattern("^\\.set")
+#exportPattern("^\\.win\\.")
 

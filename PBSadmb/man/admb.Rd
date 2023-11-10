@@ -37,11 +37,11 @@ admb(prefix="", wdf="admbWin.txt", pathfile="ADpaths.txt")
   Do not call your \code{pathfile="ADopts.txt"} unless you want to tempt fate.
 }
 \author{
-  \href{mailto:schnutej-dfo@shaw.ca}{Jon T. Schnute}, Scientist Emeritus, Nanaimo BC\cr
+  \href{mailto:schnutej@shaw.ca}{Jon T. Schnute}, Scientist Emeritus, Nanaimo BC\cr
   \href{mailto:alex@mofo.ca}{Alex Couture-Beil}, Software Engineer, Victoria BC\cr
   \href{mailto:rowan.haigh@dfo-mpo.gc.ca}{Rowan Haigh}, Program Head -- Offshore Rockfish\cr
   Pacific Biological Station (PBS), Fisheries & Oceans Canada (DFO), Nanaimo BC\cr
-  \emph{locus opus}: Institute of Ocean Sciences (IOS), Sidney BC\cr
+  \emph{locus opus}: Offsite, Vancouver BC\cr
   Last modified \code{Rd: 2018-09-28}
 }
 \seealso{ 

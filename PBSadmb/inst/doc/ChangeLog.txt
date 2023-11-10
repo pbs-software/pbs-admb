@@ -3,9 +3,19 @@ PBSadmb Changes
 Authors:  JTS = Jon T. Schnute
           RH  = Rowan Haigh
           ACB = Alex Couture-Beil
-          CG  = Chris Grandin
           AE  = Anisa Egeli
 -----------------------------------
+
+1.1.6 (2023-11-10) [Rcheck=T, Rbuild=T]
+  * R code
+    + Fixed call to PBSmodelling unexported dot functions (RH 231109)
+      - changed double colon :: to triple colon ::: in function calls
+      - PBSmodelling 2.69.3 on CRAN now keeps most dot functions unexported from the NAMESPACE
+    + Messing around to make widgets in sub GUIs work.
+  * Documentation
+    + Updated the PBSadmb Inroduction vignette
+    + Added documentation (Rd) files for `.PBSadmbEnv' and the plethora of `.win' files (RH 231109)
+    + Added `upquote.sty' to vignettes directory because Unix platforms seem to lack this file.
 
 1.1.5 (2020-01-29) [Rcheck=F, Rbuild=F]
   * Documentation
@@ -280,7 +290,7 @@ Authors:  JTS = Jon T. Schnute
   * GUI code
     + Re-organized the GUI (moved some buttons from the Initialize section to the Make section).
   * R code
-    + Created a new function '.findPrefix()' to replace Anisa's 'findPrefix()'.
+    + Created a new function '.findPrefix()' to replace AE's 'findPrefix()'.
     + Edit menu now edits input files in the current working directory.
     + Fixed links to viewing and importing '*.plt' files.
 
@@ -358,7 +368,7 @@ Authors:  JTS = Jon T. Schnute
       - http://www.murdoch-sutherland.com/Rtools/
     + compiler script needs "-Dlinux" for this version
 
-0.1  2008-08-13  Anisa Egeli
+0.1  2008-08-13  AE
   * R code
     + Initial prototype for a commercial version of ADMB
     + Originally produced as version 1.1.5, after a series of experimental versions
