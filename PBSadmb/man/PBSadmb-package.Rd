@@ -23,18 +23,23 @@ between R and ADMB almost seamless.
 the steps required for a complete ADMB analysis. Both new and experienced users
 can use the GUI for tutorial and educational purposes.
 
-You can obtain \pkg{PBSadmb} from the
-\href{https://CRAN.R-project.org/package=PBSadmb}{Comprehensive R Archive Network}.
+You can obtain \href{https://CRAN.R-project.org/package=PBSadmb}{PBSadmb} from the
+Comprehensive R Archive Network (\href{https://CRAN.R-project.org}{CRAN}).
 Always use the current version of \pkg{PBSadmb} with the most recent version of
-\pkg{PBSmodelling}, another package available from CRAN. 
+\href{https://CRAN.R-project.org/package=PBSmodelling}{PBSmodelling},
+another package available from CRAN. 
 
 \pkg{PBSadmb} represents just one of a series of R packages developed at the 
-\href{https://www.pac.dfo-mpo.gc.ca/science/facilities-installations/index-eng.html#pbs}{Pacific Biological Station}
+Pacific Biological Station 
+(\href{https://www.pac.dfo-mpo.gc.ca/science/facilities-installations/index-eng.html#pbs}{PBS})
 in Nanaimo, British Columbia. A more advanced version of \pkg{PBSadmb} might be
-available on \href{https://github.com/pbs-software}{GitHub}. Any evolving
-package (Windows binary and source tarball) is built after using CRAN's rigorous
-\code{R CMD check --as-cran} routine (on a 64-bit Windows 10 system) and posted to
-\href{https://drive.google.com/open?id=0B2Bkic2Qu5LGOGx1WkRySVYxNFU}{Google Drive}.
+available on GitHub under \href{https://github.com/pbs-software}{PBS Software}
+in the repository \href{https://github.com/pbs-software/pbs-admb}{pbs-admb}.
+Regardless, a user can install the GitHub version using:
+\preformatted{
+     devtools::install_github("pbs-software/pbs-admb/PBSadmb")
+}
+Note: not every revision has been checked for CRAN worthiness.
 }
 \author{
   \href{mailto:schnutej@shaw.ca}{Jon T. Schnute}, Scientist Emeritus, Nanaimo BC\cr
@@ -43,8 +48,9 @@ package (Windows binary and source tarball) is built after using CRAN's rigorous
   Maintainer:\cr
   \href{mailto:rowan.haigh@dfo-mpo.gc.ca}{Rowan Haigh}, Program Head -- Offshore Rockfish\cr
   Pacific Biological Station (PBS), Fisheries & Oceans Canada (DFO), Nanaimo BC\cr
-  \emph{locus opus}: Offsite, Vancouver BC\cr
-  Last modified \code{Rd: 2023-11-10}
+  \emph{locus opus}: Remote office, Vancouver BC\cr
+  Last modified \code{Rd: 2024-04-25}
 }
-
 \keyword{package}
+\concept{ADMB}
+

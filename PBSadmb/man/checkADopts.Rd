@@ -1,14 +1,21 @@
 \name{checkADopts}
 \alias{checkADopts}
-\title{ Check ADMB Options for Path Integrity}
+\alias{.win.checkADopts}
+\alias{.win.checkADpath}
+\title{
+  Check ADMB Options for Path Integrity
+}
 \description{
-  Check that the options object \code{.PBSadmb} has all required components
+  Check that the options object \code{'.PBSadmb'} has all required components
   and that paths point to actual files on the hard drive.
 }
 \usage{
 checkADopts(opts=getOptions(atcall(.PBSadmb)),
    check=c("admbpath","gccpath","msysbin","editor"), 
    warn=TRUE, popup=FALSE, verify=TRUE)
+
+.win.checkADopts(winName="PBSadmb")
+.win.checkADpath(winName="PBSadmb")
 }
 \arguments{
   \item{opts}{\code{list} -- ADMB options values.}
@@ -17,6 +24,7 @@ checkADopts(opts=getOptions(atcall(.PBSadmb)),
   \item{popup}{\code{logical} -- if \code{TRUE}, display program location problems in a popup GUI.}
   \item{verify}{\code{logical} -- if \code{TRUE}, then the \sQuote{Verify} button in the GUI was pressed.
     This only affects the message generation \sQuote{All programs found}. Command line call does not depend on GUI.}
+  \item{winName}{\code{character} -- name of GUI window}
 }
 \value{
   Boolean value where \code{TRUE} indicates all programs were located in the 
@@ -28,12 +36,17 @@ checkADopts(opts=getOptions(atcall(.PBSadmb)),
 \author{
   \href{mailto:rowan.haigh@dfo-mpo.gc.ca}{Rowan Haigh}, Program Head -- Offshore Rockfish\cr
   Pacific Biological Station (PBS), Fisheries & Oceans Canada (DFO), Nanaimo BC\cr
-  \emph{locus opus}: Offsite, Vancouver BC\cr
-  Last modified \code{Rd: 2018-10-03}
+  \emph{locus opus}: Remote office, Vancouver BC\cr
+  Last modified \code{Rd: 2024-04-24}
 }
 \note{
   A wrapper function that can be called from a GUI exists as \code{.win.checkADopts}.
 }
-\seealso{ \code{\link[PBSadmb]{setADpath}},\code{\link[PBSadmb]{readADopts}} }
-\keyword{ data }
-\keyword{ list }
+\seealso{
+In package \pkg{PBSadmb}:\cr
+  \code{\link[PBSadmb]{setADpath}},
+  \code{\link[PBSadmb]{readADopts}}
+}
+\keyword{data}
+\keyword{list}
+\concept{options}

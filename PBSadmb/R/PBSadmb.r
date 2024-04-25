@@ -26,7 +26,7 @@ admb <- function(prefix="", wdf="admbWin.txt", pathfile="ADpaths.txt")
 	twdf <- paste(tdir,"/",wdf,sep="")        ## temporary window description file
 	twdf <- convSlashes(twdf,os="unix")
 
-	stripExt = function(x) { return(sub("[.].{1,3}$", "", x)) }
+	stripExt <- function(x) { return(sub("[.].{1,3}$", "", x)) }
 
 	win.filename <- paste(wdir,wdf,sep="/")
 	temp <- readLines(win.filename)
@@ -132,7 +132,7 @@ convAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE,
 	invisible(tplout2)
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~convAD
-.win.convAD=function(winName="PBSadmb")
+.win.convAD <- function(winName="PBSadmb")
 {
 	isOK=.win.checkADopts()
 	if (!isOK) return()
@@ -148,7 +148,7 @@ convAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE,
 	invisible(Ttime)
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.win.convAD
-.win.checkPrefix = function(winName="PBSadmb")
+.win.checkPrefix <- function(winName="PBSadmb")
 {
 	getWinVal(scope="L",winName=winName)
 	if (is.null(prefix) || prefix=="" || is.na(prefix)) {
@@ -158,6 +158,12 @@ convAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE,
 	}
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.win.checkPrefix
+.win.findTPL <- function(suffix=".tpl",winName="PBSadmb")
+{ 
+	choice=findPrefix(suffix) 
+	chooseWinVal(choice,"prefix",winname=winName) 
+	invisible()
+}
 
 
 ## compAD-------------------------------2014-02-25
@@ -226,7 +232,7 @@ compAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE,
 	invisible(out2)
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~compAD
-.win.compAD=function(winName="PBSadmb")
+.win.compAD <- function(winName="PBSadmb")
 {
 	isOK=.win.checkADopts()
 	if (!isOK) return()
@@ -304,7 +310,7 @@ linkAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE,
 	invisible(out2)
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~linkAD
-.win.linkAD=function(winName="PBSadmb")
+.win.linkAD <- function(winName="PBSadmb")
 {
 	isOK=.win.checkADopts()
 	if (!isOK) return()
@@ -333,7 +339,8 @@ makeAD <- function(prefix, raneff=FALSE, safe=TRUE, dll=FALSE,
 	linkAD(prefix, raneff, safe, dll, debug, logfile, add, verbose)
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~makeAD
-.win.makeAD=function(winName="PBSadmb") {
+.win.makeAD <- function(winName="PBSadmb")
+{
 	isOK=.win.checkADopts()
 	if (!isOK) return()
 	.win.checkPrefix()
@@ -377,7 +384,7 @@ runAD <- function(prefix, argvec="", logfile=TRUE, add=TRUE, verbose=TRUE)
 	invisible(p.out)
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~runAD
-.win.runAD=function(winName="PBSadmb")
+.win.runAD <- function(winName="PBSadmb")
 {
 	setWinVal(list(Rtime=matrix(NA,nrow=1,ncol=3)),winName=winName)
 	time0=proc.time()[1:3]
@@ -390,7 +397,7 @@ runAD <- function(prefix, argvec="", logfile=TRUE, add=TRUE, verbose=TRUE)
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.win.runAD
 
 
-## runMC--------------------------------2014-02-25
+## runMC--------------------------------2024-04-23
 ## Run MCMCs using the compiled executable file.
 ## -----------------------------------------JTS/RH
 runMC <- function(prefix, nsims=2000, nthin=20, outsuff=".mc.dat",
@@ -401,11 +408,12 @@ runMC <- function(prefix, nsims=2000, nthin=20, outsuff=".mc.dat",
 	arg2 <- "-mceval"
 	runAD(prefix, arg1, logfile=logfile, add=add, verbose=verbose)
 	p.out <- runAD(prefix, arg2, logfile=logfile, add=TRUE, verbose=verbose)
+	p.out <- p.out[grep("^$|[a-z]|[A-Z]", p.out, invert=TRUE)]  ## (RH 240423) ADMB 13.2 decided to add useless text to output file
 	writeLines(p.out,outf)
 	invisible(p.out)
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~runMC
-.win.runMC=function(winName="PBSadmb")
+.win.runMC <- function(winName="PBSadmb")
 {
 	time0=proc.time()[1:3]
 	getWinVal(scope="L",winName=winName)
@@ -419,7 +427,7 @@ runMC <- function(prefix, nsims=2000, nthin=20, outsuff=".mc.dat",
 	invisible(Ttime)
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.win.runMC
-.win.run=function(winName="PBSadmb")
+.win.run <- function(winName="PBSadmb")
 {
 	getWinVal(scope="L",winName=winName)
 	if (runType=="mcmc") .win.runMC()
@@ -442,15 +450,19 @@ runMC <- function(prefix, nsims=2000, nthin=20, outsuff=".mc.dat",
 	readADopts()
 }
 
-## setupAD------------------------------2014-02-26
+## setupAD------------------------------2024-04-23
 ## Command line initialization to read in path
 ## information and check for the presence of executables:
 ## admbpath -- tpl2cpp, tpl2rem
 ## gccpath  -- g++
 ## msysbin  -- make
-## editor   -- e.g. notepad, but can be any valid editor.
+## editor   -- e.g. notepad, but can be any valid editor
+## Note:
+##  MSYS (a contraction of "Minimal System") was introduced as a Bourne shell
+##  command line interpreter system with the aim of better interoperability 
+##  with native Windows software. Contains UNIX appliances like grep and make.
 ## ---------------------------------------------RH
-setupAD = function(pathfile)
+setupAD <- function(pathfile)
 {
 	if (missing(pathfile) || is.null(pathfile) || !file.exists(pathfile))
 	pathfile = "ADpaths.txt"
@@ -464,7 +476,7 @@ setupAD = function(pathfile)
 ## checkADopts--------------------------2018-10-03
 ## Checks path locations specified by ADMB options.
 ## ---------------------------------------------RH
-checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
+checkADopts <- function(opts=getOptions( atcall(.PBSadmb) ),
    check=c("admbpath","gccpath","msysbin","editor"),
    warn=TRUE, popup=FALSE, verify=TRUE)
 {
@@ -580,7 +592,7 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~checkADopts
 
 ##--------------------------------------2018-10-03
-.win.checkADopts = function(winName="PBSadmb")
+.win.checkADopts <- function(winName="PBSadmb")
 {
 	getWinVal(scope="L",winName=winName)
 	verify = getWinAct(winName="PBSadmb")[1]=="verify"
@@ -596,7 +608,7 @@ checkADopts=function(opts=getOptions( atcall(.PBSadmb) ),
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.win.checkADopts
 
 ##--------------------------------------2018-10-01
-.win.checkADpath=function(winName="PBSadmb")
+.win.checkADpath <- function(winName="PBSadmb")
 {
 	atget(.PBSadmb)
 	for (i in c("admbpath","gccpath","msysbin","editor")) {
@@ -665,7 +677,7 @@ writeADopts <- function(optfile="ADopts.txt")
 ## Allows user to pass in a file easily made by hand.
 ## Assumes .PBSadmb options object exists.
 ## ---------------------------------------------RH
-readADpaths = function(pathfile)
+readADpaths <- function(pathfile)
 {
 	sAF = options()$stringsAsFactors
 	on.exit(options(stringsAsFactors=sAF))
@@ -679,7 +691,7 @@ readADpaths = function(pathfile)
 	}
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~readADpaths
-.win.readADpaths = function(winName="PBSadmb")
+.win.readADpaths <- function(winName="PBSadmb")
 {
 	pathfile = getWinVal()$optfile
 	readADpaths(pathfile)
@@ -692,7 +704,7 @@ readADpaths = function(pathfile)
 ## Save ADMB paths to a simple 2-column file.
 ## Assumes .PBSadmb options object exists.
 ## ---------------------------------------------RH
-saveADpaths = function(pathfile)
+saveADpaths <- function(pathfile)
 {
 	sAF = options()$stringsAsFactors
 	on.exit(options(stringsAsFactors=sAF))
@@ -708,7 +720,7 @@ saveADpaths = function(pathfile)
 	write.table(ufile,file=pathfile,row.names=FALSE,col.names=FALSE,quote=FALSE,sep="")
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~saveADpaths
-.win.saveADpaths = function(winName="PBSadmb")
+.win.saveADpaths <- function(winName="PBSadmb")
 {
 	.win.setADpath()
 	pathfile = getWinVal()$optfile
@@ -736,7 +748,7 @@ setADpath <- function( admbpath, gccpath, msysbin, editor )
 	atput(.PBSadmb)
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~setADpath
-.win.setADpath=function(winName="PBSadmb")
+.win.setADpath <- function(winName="PBSadmb")
 {
 	getWinVal(scope="L",winName=winName)
 	setADpath(admbpath, gccpath, msysbin, editor) 
@@ -745,6 +757,57 @@ setADpath <- function( admbpath, gccpath, msysbin, editor )
 	invisible()
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.win.setADpath
+
+
+## setADver-----------------------------2024-04-23
+## Sets the ADMB versions.
+## Now simplified to always read in versions if admb/g++ exist (RH 230911)
+## Changed to deal with filename change from 'VERSION' to 'VERSION.txt'
+## ---------------------------------------------RH
+setADver <- function( admbver, gccver )
+{
+	.initOptions()
+	isWin = .Platform$OS.type=="windows" #; isWin=FALSE
+	sayWhat = attributes(checkADopts(warn=FALSE))$status
+	atget(.PBSadmb)
+	opts = getOptions(.PBSadmb)
+
+	if(all(sayWhat[[1]])) { # check ADMB version
+		#if(file.exists(paste(opts["admbpath"],"/VERSION",sep="")))
+		#	setOptions(.PBSadmb, admbver = readLines(paste(opts["admbpath"],"/VERSION",sep=""))[1] )
+		vfiles = list.files(opts[["admbpath"]], pattern="^VERSION(\\.txt)?$")  ## (RH 240423) used to be VERSION now is VERSION.txt (in Windows)
+		if (length(vfiles)>0)
+			setOptions(.PBSadmb, admbver = readLines(paste(opts[["admbpath"]], "/", vfiles[1], sep=""))[1] )
+	} else {
+		setOptions(.PBSadmb, admbver = basename(opts[["admbpath"]]) )
+	}
+	if(all(sayWhat[[2]])) { # check g++ version
+			cmd = "g++ --version"
+			if (isWin) cmd = shQuote(paste(opts[["gccpath"]],"/bin/",cmd,sep=""))
+			gccVer = .callSys(cmd)[1]
+			## return the whole string minus `g++ '
+			gccver = PBSmodelling:::.trimWhiteSpace(gsub("g\\+\\+","",gccVer))  ## dot functions no longer exported (RH 231109)
+			setOptions(.PBSadmb, gccver = gccver)
+	} else {
+		setOptions(.PBSadmb, gccver = "")
+	}
+	atput(.PBSadmb)
+}
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~setADver
+.win.setADver <- function(winName="PBSadmb")
+{
+	getWinVal(scope="L",winName=winName)
+	setADver(admbver,gccver) 
+	for (i in c("admbver","gccver")) {
+		ival = getOptions(atcall(.PBSadmb),i)
+		if (is.null(ival)) next
+		mess = paste0("setWinVal(list(",i,"=\"",ival,"\"),winName=winName)")
+		eval(parse(text=mess))
+	}
+	#.win.checkADopts()
+	invisible()
+}
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.win.setADver
 
 
 ## .setPath-----------------------------2018-09-28
@@ -778,53 +841,6 @@ setADpath <- function( admbpath, gccpath, msysbin, editor )
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.setPath
 
 
-## setADver-----------------------------2023-11-09
-## Sets the ADMB versions.
-## Now simplified to always read in versions if admb/g++ exist.
-## ---------------------------------------------RH
-setADver <- function( admbver, gccver )
-{
-	.initOptions()
-	isWin = .Platform$OS.type=="windows" #; isWin=FALSE
-	sayWhat = attributes(checkADopts(warn=FALSE))$status
-	atget(.PBSadmb)
-	opts = getOptions(.PBSadmb)
-
-	if(all(sayWhat[[1]])) { # check ADMB version
-		if(file.exists(paste(opts["admbpath"],"/VERSION",sep="")))
-			setOptions(.PBSadmb, admbver = readLines(paste(opts["admbpath"],"/VERSION",sep=""))[1] )
-	} else {
-		setOptions(.PBSadmb, admbver = "")
-	}
-	if(all(sayWhat[[2]])) { # check g++ version
-			cmd = "g++ --version"
-			if (isWin) cmd = shQuote(paste(opts["gccpath"],"/bin/",cmd,sep=""))
-			gccVer = .callSys(cmd)[1]
-			## return the whole string minus `g++ '
-			gccver = PBSmodelling:::.trimWhiteSpace(gsub("g\\+\\+","",gccVer))  ## dot functions no longer exported (RH 231109)
-			setOptions(.PBSadmb, gccver = gccver)
-	} else {
-		setOptions(.PBSadmb, gccver = "")
-	}
-	atput(.PBSadmb)
-}
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~setADver
-.win.setADver=function(winName="PBSadmb")
-{
-	getWinVal(scope="L",winName=winName)
-	setADver(admbver,gccver) 
-	for (i in c("admbver","gccver")) {
-		ival = getOptions(atcall(.PBSadmb),i)
-		if (is.null(ival)) next
-		mess = paste0("setWinVal(list(",i,"=\"",ival,"\"),winName=winName)")
-		eval(parse(text=mess))
-	}
-	#.win.checkADopts()
-	invisible()
-}
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.win.setADver
-
-
 ## showADargs---------------------------2015-01-27
 ## Show the AD arguments
 ## ---------------------------------------------RH
@@ -850,14 +866,14 @@ showADargs <- function(prefix,ed=TRUE)
 	invisible(p.out)
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~showADargs
-.win.showADargs=function(winName="PBSadmb")
+.win.showADargs <- function(winName="PBSadmb")
 {
 	getWinVal(scope="L",winName=winName)
 	showADargs(prefix=prefix) 
 	invisible()
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.win.showADargs
-.win.showGUIargs=function(winName="PBSadmb")
+.win.showGUIargs <- function(winName="PBSadmb")
 {
 	## display the argument vector in the GUI based on radio selection
 	getWinVal(scope="L",winName=winName)
@@ -878,7 +894,7 @@ showADargs <- function(prefix,ed=TRUE)
 ## Copy files with specified prefixes and suffixes 
 ## from one location to another.
 ## ---------------------------------------------RH
-copyFiles=function(prefix,suffix=NULL,srcdir=getwd(),dstdir=getwd(),ask=TRUE)
+copyFiles <- function(prefix,suffix=NULL,srcdir=getwd(),dstdir=getwd(),ask=TRUE)
 {
 	if (missing(prefix)) return()
 	if (is.null(prefix) || prefix=="*") prefix=""
@@ -954,14 +970,14 @@ editAD <- function(prefix, suffix=c(".tpl",".cpp",".log"))
 	return(ed.out)
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~editAD
-.win.editAD=function(winName="PBSadmb")
+.win.editAD <- function(winName="PBSadmb")
 {
 	getWinVal(scope="L",winName=winName)
 	editAD(prefix=prefix)
 	invisible()
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.win.editAD
-.win.editPLT=function()
+.win.editPLT <- function()
 {
 	pref=findPrefix(".plt")
 	editAD(prefix=pref,suffix=".plt")
@@ -982,7 +998,7 @@ startLog <- function(prefix)
 	writeLines(line1, con=p.log)
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~startLog
-.win.startLog=function(winName="PBSadmb")
+.win.startLog <- function(winName="PBSadmb")
 {
 	getWinVal(scope="L",winName=winName)
 	startLog(prefix=prefix) 
@@ -1001,7 +1017,7 @@ appendLog <- function(prefix, lines)
 	cat(lines, file=p.log, sep="\n", append=TRUE)
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~appendLog
-.win.appendLog=function(winName="PBSadmb")
+.win.appendLog <- function(winName="PBSadmb")
 {
 	getWinVal(scope="L",winName=winName)
 	appendLog(prefix=prefix,lines=lines) 
@@ -1016,7 +1032,7 @@ appendLog <- function(prefix, lines)
 readRep <- function(prefix, suffix=c(".cor",".rep",".std",".mc.dat"), global=FALSE)
 {
 	## extracted from Alex's PBSmodelling::readList
-	findFormat=function(dat){
+	findFormat <- function(dat){
 		for (i in 1:length(dat)) {
 			if (!any(grep("^[ \t]*[#`]", dat[i]))) {
 				if (any(grep("^[ \t]*structure", dat[i]))) fileformat="D"
@@ -1101,7 +1117,7 @@ readRep <- function(prefix, suffix=c(".cor",".rep",".std",".mc.dat"), global=FAL
 	invisible(flist)
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~readRep
-.win.readRep=function(winName="PBSadmb")
+.win.readRep <- function(winName="PBSadmb")
 {
 	getWinVal(scope="L",winName=winName)
 	act=getWinAct()[1]
@@ -1117,7 +1133,7 @@ readRep <- function(prefix, suffix=c(".cor",".rep",".std",".mc.dat"), global=FAL
 	invisible()
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.win.readRep
-.win.viewRep=function(winName="PBSadmb") {
+.win.viewRep <- function(winName="PBSadmb") {
 	getWinVal(scope="L",winName=winName)
 	act=getWinAct()[1]
 	if (!is.null(act) && act=="allnone") {
@@ -1148,7 +1164,7 @@ readRep <- function(prefix, suffix=c(".cor",".rep",".std",".mc.dat"), global=FAL
 ## Convert text files to the default format
 ## of the operating system.
 ## ---------------------------------------------RH
-convOS = function(inam, onam=inam, path=getwd())
+convOS <- function(inam, onam=inam, path=getwd())
 {
 	if (missing(inam)) stop("Supply names(s) of text file(s) to convert")
 	else if(length(inam)!=length(onam)) stop("Number of 'inam's does not match number of 'onam's")
@@ -1173,7 +1189,7 @@ convOS = function(inam, onam=inam, path=getwd())
 ## plotMC-------------------------------2023-11-09
 ## Plots the MCMC output in various ways
 ## ---------------------------------------------RH
-plotMC <- function(prefix,act="pairs",pthin=1,useCols=NULL)
+plotMC <- function(prefix, act="pairs", pthin=1, useCols=NULL)
 {
 	if (is.null(prefix) || prefix=="") return()
 	inFile=paste(prefix, ".mc.dat", sep="")
@@ -1201,7 +1217,7 @@ plotMC <- function(prefix,act="pairs",pthin=1,useCols=NULL)
 	clrs=rep(clrs,nc)[1:nc]
 	resetGraph()
 	
-	panel=function(x,y) {
+	panel <- function(x,y) {
 		len=length(x)
 		points(x[2:len],y[2:len],pch=21,col="grey",bg="gainsboro",cex=0.8)
 		points(x[1],y[1],pch=21,bg=puce,cex=1.2)
@@ -1239,7 +1255,7 @@ plotMC <- function(prefix,act="pairs",pthin=1,useCols=NULL)
 	invisible()
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~plotMC
-.win.plotMC=function(winName="PBSadmb")
+.win.plotMC <- function(winName="PBSadmb")
 {
 	getWinVal(scope="L",winName=winName)
 	if (is.null(prefix) || prefix=="") return()
@@ -1290,7 +1306,7 @@ cleanAD <- function(prefix=NULL)
 	}
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~cleanAD
-.win.cleanAD=function(winName="PBSadmb")
+.win.cleanAD <- function(winName="PBSadmb")
 {
 	getWinVal(scope="L",winName=winName)
 	cleanAD(prefix=prefix) 
@@ -1298,12 +1314,11 @@ cleanAD <- function(prefix=NULL)
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.win.cleanAD
 
-
 ## .cleanUp-----------------------------2023-11-10
-## Anisa's cleanProj function modified for flexibility.
+## Anisa Egeli's cleanProj function modified for flexibility.
 ## Note:  PBSmodelling:::.doClean uses fixed winName of 'cleanWindow'
 ## ---------------------------------------------RH
-.cleanUp=function(prefix, suffix, files)
+.cleanUp <- function(prefix, suffix, files)
 {
 	if (missing(suffix)) suffix = character(0)
 	if (missing(files))  files  = character(0)
@@ -1327,25 +1342,18 @@ cleanAD <- function(prefix=NULL)
 	invisible(TRUE)
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.cleanUp
-.cleanUpAgain=function(winName="cleanWindow")
+.cleanUpAgain <- function(winName="cleanWindow")
 {
 	cleanAD(getWinVal(winName=winName)$cleanPrefix)
 	invisible()
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.cleanUpAgain
-.win.findClean=function(winName="cleanWindow")
-{
-	choice=findPrefix(".tpl") 
-	chooseWinVal(choice,"cleanPrefix",winname=winName) 
-	invisible()
-}
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.win.findClean
-
 
 ## .cleanWD-----------------------------2023-11-09
 ## Clean all potential garbage files.
+## Anisa Egeli's function PBSmodelling::cleanWD
 ## ------------------------------------------AE|RH
-.cleanWD=function(files)
+.cleanWD <- function(files)
 {
 	## Clean all nuisance files
 	rowLen = ceiling(sqrt(length(files)))
@@ -1365,11 +1373,10 @@ cleanAD <- function(prefix=NULL)
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.cleanWD
 
-
 ## .doCleanAD-------------------------2013-03-25
-## Anisa's .doClean function modified for file names only
+## Anisa Egeli's PBSmodelling:::.doClean function modified for file names only
 ## ------------------------------------------AE/RH
-.doCleanAD=function (winName="cleanWindow")
+.doCleanAD <- function (winName="cleanWindow")
 {
 	vec=getWinVal(winName=winName, scope="L")
 	vecList=logical()
@@ -1385,6 +1392,14 @@ cleanAD <- function(prefix=NULL)
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.doCleanAD
 
+.win.findClean <- function(winName="cleanWindow")
+{
+	choice=findPrefix(".tpl") 
+	chooseWinVal(choice,"cleanPrefix",winname=winName) 
+	invisible()
+}
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.win.findClean
+
 
 ##================================================
 ##             UTILITY FUNCTIONS                  
@@ -1394,11 +1409,11 @@ cleanAD <- function(prefix=NULL)
 ## Provide PBSadmb wrappers for PBSmodelling 
 ##  functions tget/tcall/tprint/tput/lisp
 ## ---------------------------------------------RH 
-atget   = function(...) {tget  (..., penv=parent.frame(), tenv=.PBSadmbEnv)}
-atcall  = function(...) {tcall (..., penv=parent.frame(), tenv=.PBSadmbEnv)}
-atprint = function(...) {tprint(..., penv=parent.frame(), tenv=.PBSadmbEnv)}
-atput   = function(...) {tput  (..., penv=parent.frame(), tenv=.PBSadmbEnv)}
-alisp   = function(...) {lisp  (..., pos =.PBSadmbEnv)}
+atget <- function(...) {tget  (..., penv=parent.frame(), tenv=.PBSadmbEnv)}
+atcall <- function(...) {tcall (..., penv=parent.frame(), tenv=.PBSadmbEnv)}
+atprint <- function(...) {tprint(..., penv=parent.frame(), tenv=.PBSadmbEnv)}
+atput <- function(...) {tput  (..., penv=parent.frame(), tenv=.PBSadmbEnv)}
+alisp <- function(...) {lisp  (..., pos =.PBSadmbEnv)}
 
 
 ## suggestPath--------------------------2014-02-19
@@ -1443,7 +1458,7 @@ suggestPath <- function(progs, ipath=NULL, file_ext=NULL)
 ## .win.suggestPath---------------------2018-09-27
 ## Function called by GUI to suggest paths for setup.
 ## ---------------------------------------------RH
-.win.suggestPath=function(winName="PBSadmb")
+.win.suggestPath <- function(winName="PBSadmb")
 {
 	getWinVal(scope="L",winName=winName)
 	isWin = .Platform$OS.type=="windows" #; isWin=FALSE
@@ -1513,12 +1528,12 @@ suggestPath <- function(progs, ipath=NULL, file_ext=NULL)
 
 
 ## miscellanous-------------------------2009-02-11
-.addQuotes=function(str)
+.addQuotes <- function(str)
 {
 	return(paste("\"",str,"\"",sep=""))
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.addQuotes
-.asIs=function(x)
+.asIs <- function(x)
 {
 	if (is.numeric(x)) x=format(x,scientific=FALSE)
 	return(x)
@@ -1569,7 +1584,7 @@ suggestPath <- function(progs, ipath=NULL, file_ext=NULL)
 	}
 }
 ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.changeWD
-.chooseCols=function(winName="PBSadmb")
+.chooseCols <- function(winName="PBSadmb")
 {
 	getWinVal(scope="L",winName=winName)
 	if (is.null(prefix) || prefix=="")
@@ -1641,100 +1656,26 @@ suggestPath <- function(progs, ipath=NULL, file_ext=NULL)
 	setWinVal( list( prefix = choices[ ch1 ] ) )
 }
 
-.normPath = function(path, winslash="\\", mustWork=FALSE) {
+.normPath <- function(path, winslash="\\", mustWork=FALSE)
+{
 	normalizePath( path, winslash, mustWork )
 }
 
-## .version-----------------------------2018-10-02
-.version = function(x) {
+## .version-----------------------------
+.version <- function(x)
+{
 	if (is.null(x) || is.numeric(x)) return(x)
-	xpc = strsplit(x,split="\\.")[[1]]
-	npc = !grepl("[[:alpha:]]",xpc)  ## only numerics assuming alternative is alphanumeric
-	xnu = as.numeric(paste(xpc[npc],collapse="."))
-	return(xnu)
+	## JTS desire to have complicated version descriptor requires more robust extraction (RH 240423)
+	##  e.g., 'ADMB13.2-Rtools44-JTS'
+	xx = gsub("[a-z|A-Z]|-|_", "", x)  ## strip out alphas and some delimiters
+	xxx = round(as.numeric(xx),1)      ## assume ADMB.org uses only 1 decimal place
+	return(xxx)
+	## old version 2018-10-02
+	#xpc = strsplit(x,split="\\.")[[1]]
+	#npc = !grepl("[[:alpha:]]",xpc)  ## only numerics assuming alternative is alphanumeric
+	#xnu = as.numeric(paste(xpc[npc],collapse="."))
+	#return(xnu)
 }
 
-.win.findTPL=function(suffix=".tpl",winName="PBSadmb"){ 
-	choice=findPrefix(suffix) 
-	chooseWinVal(choice,"prefix",winname=winName) 
-	invisible()
-}
 
 
-##================================================
-##             DEPRECATED FUNCTIONS               
-##================================================
-
-## Functions not currently used in PBSadmb package.
-## Will be removed in some future package version.
-
-## .appendToPath------------------------2015-01-27
-## Add a dir to path variable
-##  (only if it hasn't already been set)
-## ---------------------------------------------RH
-.appendToPath <- function( path_to_add ) ## currently not used (deprecate)
-{
-	path <- Sys.getenv( "PATH" )
-	path_sep <- .Platform$path.sep
-	if( any( unlist( strsplit( path, path_sep ) ) == path_to_add ) == FALSE ) {
-		## path_to_add doesn't exist in path - append it, and reset env variable
-		path <- paste( path, path_to_add, sep = path_sep )
-		Sys.setenv( PATH = path )
-	}
-}
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.appendToPath
-
-.win.readADopts=function(winName="PBSadmb")  ## currently not used (deprecate)
-{
-	getWinVal(scope="L",winName=winName)
-	if (file.exists(optfile)) {
-		readADopts(optfile=optfile)
-		loadOptionsGUI( atcall(.PBSadmb) )
-	} else {
-		mess=paste("Options file '",optfile,"' does not exist",sep="")
-		showAlert(mess)
-	stop(mess) }
-	invisible()
-}
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.win.readADopts
-
-.win.writeADopts=function(winName="PBSadmb") ## currently not used (deprecate)
-{
-	isOK=.win.checkADopts()
-	if (!isOK) return()
-	getWinVal(scope="L",winName=winName)
-	writeADopts(optfile="ADopts.txt") #optfile) 
-	invisible()
-}
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.win.writeADopts
-
-## .win.viewCode------------------------2009-02-13
-## View the package R code on the fly.
-## ---------------------------------------------RH
-.win.viewCode=function(pkg="PBSadmb")
-{
-	eval(parse(text=paste("if(!require(",pkg,",quietly=TRUE)) stop(\"",pkg," package is required\")",sep="")))
-	tdir <- tempdir()
-	tdir <- gsub("\\\\","/",tdir)   ## temporary directory for R
-	pkgO=ls(paste("package:",pkg,sep=""),all.names=TRUE)                  ## package objects
-	z=sapply(pkgO,function(x){f=get(x);is.function(f)}); pkgF=names(z)[z] ## package functions
-	bad=regexpr("[\\|()[{^$*+?<-]",pkgF)
-	pkgF=pkgF[bad<0]                ## get rid of weird names
-	if (length(pkgF)==0) {
-		showAlert(paste(pkg,"has no recognizable functions"))
-		return()
-	}
-	dots=regexpr("^\\.",pkgF)
-	pkgF0=pkgF[dots==1]
-	pkgF1=pkgF[dots!=1]
-	code=c(paste("#",pkg,"Functions"),paste("#",paste(rep("-",nchar(pkg)+10),collapse="")))
-	for (i in c(pkgF1,pkgF0)) {
-		expr=paste("fun=deparse(",pkg,"::",i,"); fun[1]=paste(\"",i,"\",fun[1],sep=\" = \",collapse=\"\"); code=c(code,fun)",sep="")
-		eval(parse(text=expr)) 
-	}
-	fname=paste(tdir,"/",pkg,".r",sep="")
-	writeLines(code, fname)
-	editADfile(fname)
-	invisible()
-}
-##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.win.viewCode

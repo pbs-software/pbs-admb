@@ -8,11 +8,11 @@
 copyFiles(prefix, suffix=NULL, srcdir=getwd(), dstdir=getwd(), ask=TRUE)
 }
 \arguments{
-  \item{prefix}{ string scalar/vector of potential file prefixes. }
-  \item{suffix}{ string scalar/vector of potential file suffixes. }
-  \item{srcdir}{ source directory from which to copy files. }
-  \item{dstdir}{ destination directory to copy files to. }
-  \item{ask}{ logical: if \code{TRUE}, popup boxes will prompt the user
+  \item{prefix}{\code{character} -- scalar/vector of potential file prefixes. }
+  \item{suffix}{\code{character} -- scalar/vector of potential file suffixes. }
+  \item{srcdir}{\code{character} -- source directory from which to copy files. }
+  \item{dstdir}{\code{character} -- destination directory to copy files to. }
+  \item{ask}{\code{logical} -- if \code{TRUE}, popup boxes will prompt the user
     for every instance that a file will be overwritten. }
 }
 \details{
@@ -26,9 +26,12 @@ copyFiles(prefix, suffix=NULL, srcdir=getwd(), dstdir=getwd(), ask=TRUE)
 \author{
   \href{mailto:rowan.haigh@dfo-mpo.gc.ca}{Rowan Haigh}, Program Head -- Offshore Rockfish\cr
   Pacific Biological Station (PBS), Fisheries & Oceans Canada (DFO), Nanaimo BC\cr
-  \emph{locus opus}: Offsite, Vancouver BC\cr
-  Last modified \code{Rd: 2011-02-14}
+  \emph{locus opus}: Remote office, Vancouver BC\cr
+  Last modified \code{Rd: 2024-04-24}
 }
-\seealso{ \code{\link{editAD}} }
-\keyword{ utilities }
-\keyword{ IO }
+\seealso{
+In package \pkg{PBSadmb}:\cr
+  \code{\link[PBSadmb]{editAD}}
+}
+\keyword{utilities}
+\keyword{IO}

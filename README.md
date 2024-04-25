@@ -1,5 +1,5 @@
 ## PBSadmb: ADMB for R using scripts or GUI ##
-&copy; Fisheries and Oceans Canada (2008-2023)
+&copy; Fisheries and Oceans Canada (2008-2024)
 
 The R package **PBSadmb** gives complete R support to the external program AD Model Builder (<a href="http://www.admb-project.org/">ADMB</a>) released into the public domain in 2009. The program offers users a remarkably efficient tool for estimating parameters and their uncertainty, based on complex nonlinear statistical models.
 

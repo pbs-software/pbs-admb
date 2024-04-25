@@ -6,6 +6,17 @@ Authors:  JTS = Jon T. Schnute
           AE  = Anisa Egeli
 -----------------------------------
 
+1.1.7 (2024-04-25) [Rcheck=T, Rbuild=T]
+  * R code
+    + The update to ADMB from 12.3 to 13.2 causes a bug because MCMC output contains extraneous lines (messages)
+      - Fixed function `runMC to delete extraneous lines (RH 240423)
+      - Fixed detection of ADMB version; new ADMB uses 'VERSION.txt' instead of 'VERSION' (RH 240423)
+  * Documentation
+    + Added documentation for miscellaneous dot functions (RH 240423)
+    + Paired the `.win' (and other dot) functions with their masters (RH 240425)
+      - removed `dot-win.funs.Rd'
+      - created `dot-funs.Rd' for miscellaneous dot functions not paired with main functions
+
 1.1.6 (2023-11-10) [Rcheck=T, Rbuild=T]
   * R code
     + Fixed call to PBSmodelling unexported dot functions (RH 231109)

@@ -12,7 +12,7 @@
 setupAD(pathfile)
 }
 \arguments{
-  \item{pathfile}{string name of 2-column text file that details the 
+  \item{pathfile}{\code{character} -- name of 2-column text file that details the 
     relevant paths for the R variables \code{admbpath}, \code{gccpath}, and \code{editor}.}
 }
 \details{
@@ -24,9 +24,12 @@ setupAD(pathfile)
   objects called \code{.PBSadmb} in the temporary environment \code{.PBSadmbEnv}.
 }
 \author{
-  \href{mailto:schnutej@shaw.ca}{Jon T. Schnute}, Scientist Emeritus\cr
+  \href{mailto:schnutej@shaw.ca}{Jon T. Schnute}, Scientist Emeritus, Nanaimo BC\cr
+
+  Maintainer: \href{mailto:rowan.haigh@dfo-mpo.gc.ca}{Rowan Haigh}, Program Head -- Offshore Rockfish\cr
   Pacific Biological Station (PBS), Fisheries & Oceans Canada (DFO), Nanaimo BC\cr
-  Last modified \code{Rd: 2014-02-27}
+  \emph{locus opus}: Remote office, Vancouver BC\cr
+  Last modified \code{Rd: 2024-04-23}
 }
 \note{
   To access the options manager in the temporary working environment, use the \pkg{PBSadmb}
@@ -39,8 +42,10 @@ setupAD(pathfile)
   and the path to a text editor are needed.
 }
 \seealso{ 
-  \code{\link[PBSadmb]{readADpaths}}, \code{\link[PBSadmb]{checkADopts}},
-   \code{\link[PBSadmb]{makeAD}}
+In package \pkg{PBSadmb}:\cr
+  \code{\link[PBSadmb]{readADpaths}},
+  \code{\link[PBSadmb]{checkADopts}},
+  \code{\link[PBSadmb]{makeAD}}
 }
 \keyword{ manip }
 
